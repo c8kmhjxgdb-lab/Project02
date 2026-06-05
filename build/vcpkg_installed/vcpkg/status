@@ -1,0 +1,114 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: d78118b197ec07bf54de9cf485f4dd9e0a4786e9fd7c213a52aefa5175b769b4
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 0e896e9ab17d2b91fb9932ba3f746f4050d95677a85b24919b49dd79b639b550
+Status: install ok installed
+
+Package: box2d
+Version: 3.1.1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: f1a2741d114125536bf2f1d1790ddeb583c20dd9ad6272caa5831baa61681ed3
+Description: An open source C++ engine for simulating rigid bodies in 2D
+Status: install ok installed
+
+Package: egl-registry
+Version: 2025-05-27
+Architecture: x64-windows
+Multi-Arch: same
+Abi: d84a43c97ad912669ec85324bb3d155cb6024e1928172f0249f49bfb20a96bba
+Description: EGL API and Extension Registry
+Status: install ok installed
+
+Package: opengl-registry
+Version: 2026-01-26
+Depends: egl-registry
+Architecture: x64-windows
+Multi-Arch: same
+Abi: dce1011d30049c0d20db434e918650c336c3c4cbf98baa0016785568e279ae81
+Description: OpenGL, OpenGL ES, and OpenGL ES-SC API and Extension Registry
+Status: install ok installed
+
+Package: opengl
+Version: 2022-12-04
+Port-Version: 3
+Depends: opengl-registry
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 711036d5de2884f03417d60e3969a05c9008655bd408f90ae7f4205923f7a37e
+Description: Open Graphics Library (OpenGL)[3][4][5] is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics.
+Status: install ok installed
+
+Package: glew
+Version: 2.3.1
+Depends: opengl, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 97eac1a5500ddbe5a696ee9ed61eefd600c1cbf2c8ae7171f39e7daad954f5c5
+Description: The OpenGL Extension Wrangler Library (GLEW) is a cross-platform open-source C/C++ extension loading library.
+Status: install ok installed
+
+Package: glm
+Version: 1.0.3
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 36e52771d5279e080c36048522b851f4eb212a265c9faada70446b0f89a4735b
+Description: OpenGL Mathematics (GLM)
+Status: install ok installed
+
+Package: vcpkg-cmake-get-vars
+Version: 2025-05-29
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 3202873d480166066fc88d22745cb5351a3d6083dbb79288e78de306a1113420
+Status: install ok installed
+
+Package: luajit
+Version: 2026-05-24
+Depends: vcpkg-cmake, vcpkg-cmake-config, vcpkg-cmake-get-vars
+Architecture: x64-windows
+Multi-Arch: same
+Abi: cc6aeafe8891a742b00a10aa813e8ca582d946a480368655d037c6cd4322a74a
+Description: LuaJIT is a Just-In-Time (JIT) compiler for the Lua programming language.
+Status: install ok installed
+
+Package: nlohmann-json
+Version: 3.12.0
+Port-Version: 2
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: d15e8f50708037e32f2158cd374ba46f9d4dc8be0ff6c7729b6793ce073c7447
+Description: JSON for Modern C++
+Status: install ok installed
+
+Package: sdl2
+Version: 2.32.10
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 2b23fdb13bd4fb63d49a0d8f898d44dad1099b11666a390699e1e7ab39f14245
+Description: Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
+Status: install ok installed
+
+Package: sol2
+Version: 3.5.0
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 4b07919f20ce559a2d2527361355f8d85701b67d917539636c3f20372068d469
+Description: Sol3 (sol2 v3.0) - a C++ <-> Lua API wrapper with advanced features and top notch performance
+Status: install ok installed
+

@@ -1,0 +1,10 @@
+^E:\DOUBAO2\PROJECT\KATCODE\PROJECT02\BUILD\CMAKEFILES\AC7909EE7F76B0A22D972B1793F116C5\GENERATE.STAMP.RULE
+setlocal
+E:\Dev\CMake\bin\cmake.exe -SE:/DouBao2/Project/KatCode/Project02 -BE:/DouBao2/Project/KatCode/Project02/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/DouBao2/Project/KatCode/Project02/build/Starchild2D.slnx
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -1,0 +1,13 @@
+{
+  "name": "starchild2d",
+  "version": "0.1.0",
+  "dependencies": [
+    "sdl2",
+    "glew",
+    "box2d",
+    "glm",
+    "sol2",
+    "luajit",
+    "nlohmann-json"
+  ]
+}
