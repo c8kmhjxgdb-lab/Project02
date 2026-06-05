@@ -10,6 +10,12 @@
  * 当公主在队伍中且 ultimateCharge 满时，按 G 键释放合体技。
  * 效果：全屏星愿冲击波，对范围内所有敌人造成巨额伤害。
  */
+enum class BondTechniqueState {
+    Inactive,     // Not active
+    Expanding,    // Wave is expanding, damage not yet applied
+    Damaged       // Damage has been applied this activation
+};
+
 struct BondTechnique {
     std::vector<glm::vec2> waveFronts;   // 扩散波前位置
     float remainingTime = 0.0f;
@@ -17,23 +23,26 @@ struct BondTechnique {
     float radius = 0.0f;
     float maxRadius = 15.0f;
     float damage = 100.0f;
-    bool active = false;
-    bool damageApplied = false;  // 防止重复伤害
+    BondTechniqueState state = BondTechniqueState::Inactive;
+
+    bool isActive() const { return state != BondTechniqueState::Inactive; }
+    bool hasDealtDamage() const { return state == BondTechniqueState::Damaged; }
 
     void reset() {
         waveFronts.clear();
         remainingTime = 0.0f;
         radius = 0.0f;
-        active = false;
-        damageApplied = false;
+        state = BondTechniqueState::Inactive;
     }
 
     void activate(const glm::vec2& centerPos) {
         reset();
-        active = true;
+        state = BondTechniqueState::Expanding;
         remainingTime = lifetime;
         waveFronts.push_back(centerPos);
     }
+
+    void markDamaged() { state = BondTechniqueState::Damaged; }
 };
 
 class BondTechniqueSystem {
@@ -47,7 +56,7 @@ public:
     void update(float dt);
 
     // 是否正在激活
-    bool isActive() const { return technique.active; }
+    bool isActive() const { return technique.isActive(); }
 
     // 获取当前羁绊技数据
     const BondTechnique& getCurrentTechnique() const { return technique; }

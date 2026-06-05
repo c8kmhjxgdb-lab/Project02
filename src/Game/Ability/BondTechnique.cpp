@@ -10,13 +10,18 @@ bool BondTechniqueSystem::activate(const glm::vec2& centerPos) {
 }
 
 void BondTechniqueSystem::update(float dt) {
-    if (!technique.active) return;
+    if (!technique.isActive()) return;
 
     technique.remainingTime -= dt;
+    if (technique.remainingTime < 0.0f) technique.remainingTime = 0.0f;
 
-    // Expand radius
-    float progress = 1.0f - (technique.remainingTime / technique.lifetime);
-    technique.radius = technique.maxRadius * progress;
+    // Expand radius (guard against division by zero)
+    if (technique.lifetime > 0.0f) {
+        float progress = 1.0f - (technique.remainingTime / technique.lifetime);
+        technique.radius = technique.maxRadius * progress;
+    } else {
+        technique.radius = technique.maxRadius;
+    }
 
     if (technique.remainingTime <= 0.0f) {
         technique.reset();

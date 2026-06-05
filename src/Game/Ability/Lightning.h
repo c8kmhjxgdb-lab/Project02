@@ -3,6 +3,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
+#include <box2d/box2d.h>
 
 /**
  * Lightning - 雷电链式技能
@@ -13,6 +14,7 @@
 struct LightningChain {
     std::vector<glm::vec2> points;     // 折线路径点（从玩家到各目标）
     std::vector<float> damageValues;   // 每个跳点的伤害
+    std::vector<b2BodyId> hitBodies;   // 已命中敌人的 body ID，用于去重
     float remainingTime = 0.0f;
     float lifetime = 0.5f;             // 视觉持续时间
     float baseDamage = 30.0f;
@@ -24,6 +26,7 @@ struct LightningChain {
     void reset() {
         points.clear();
         damageValues.clear();
+        hitBodies.clear();
         remainingTime = 0.0f;
         active = false;
     }
@@ -35,10 +38,10 @@ struct LightningChain {
         points.push_back(startPos);
     }
 
-    void addHit(const glm::vec2& hitPos, float damage) {
-        points.push_back(hitPos);
-        damageValues.push_back(damage);
-    }
+    void addHit(const glm::vec2& hitPos, float damage, const b2BodyId& bodyId);
+
+    // Check if an enemy body has already been hit (O(n) but n <= maxChains)
+    bool hasHit(const b2BodyId& bodyId) const;
 };
 
 class Lightning {
@@ -49,7 +52,7 @@ public:
     void begin(const glm::vec2& startPos);
 
     // 添加一个击中点
-    void addHit(const glm::vec2& hitPos, float damage);
+    void addHit(const glm::vec2& hitPos, float damage, const b2BodyId& bodyId);
 
     // 结束雷电
     void end();

@@ -194,6 +194,7 @@ struct GameState {
     float flightHeightTarget = 0.0f;
     float flightMaxHeight = 5.0f;
     float flightSpeed = 2.0f;          // height change speed
+    float flightDescentSpeedMult = 1.5f;  // descent is 1.5x ascent speed
     float flightManaDrain = 15.0f;     // per second
     float flightCooldown = 0.0f;
     float flightCooldownMax = 2.0f;
@@ -1286,15 +1287,8 @@ int main(int argc, char* argv[]) {
                             glm::vec2 enemyPos(ePos.x, ePos.y);
                             float dist = glm::distance(currentPos, enemyPos);
 
-                            // Check if this enemy is already in the chain
-                            bool alreadyHit = false;
-                            for (const auto& hitPos : gs.lightning.getCurrentChain().points) {
-                                if (glm::distance(hitPos, enemyPos) < 0.5f) {
-                                    alreadyHit = true;
-                                    break;
-                                }
-                            }
-                            if (alreadyHit) continue;
+                            // Check if this enemy is already in the chain (using body ID)
+                            if (gs.lightning.getCurrentChain().hasHit(enemy->bodyId)) continue;
 
                             if (dist < nearestDist) {
                                 nearestDist = dist;
@@ -1308,7 +1302,7 @@ int main(int argc, char* argv[]) {
                         glm::vec2 enemyPos(ePos.x, ePos.y);
 
                         // Add to chain and deal damage
-                        gs.lightning.addHit(enemyPos, currentDamage);
+                        gs.lightning.addHit(enemyPos, currentDamage, nearestEnemy->bodyId);
                         gs.enemyManager.damage(nearestEnemy->id, currentDamage);
 
                         // Lightning hit particles
@@ -1482,8 +1476,8 @@ int main(int argc, char* argv[]) {
 
             // Apply bond technique damage when the wave expands
             if (gs.bondTechnique.isActive()) {
-                const BondTechnique& tech = gs.bondTechnique.getCurrentTechnique();
-                if (!tech.damageApplied && tech.radius > tech.maxRadius * 0.3f) {
+                BondTechnique& tech = gs.bondTechnique.getCurrentTechnique();
+                if (!tech.hasDealtDamage() && tech.radius > tech.maxRadius * 0.3f) {
                     // Damage all enemies in range
                     for (const Enemy* enemy : aliveEnemies) {
                         if (!enemy || !b2Body_IsValid(enemy->bodyId)) continue;
@@ -1493,8 +1487,7 @@ int main(int argc, char* argv[]) {
                             gs.enemyManager.damage(enemy->id, tech.damage);
                         }
                     }
-                    // Mark damage as applied (need non-const access)
-                    gs.bondTechnique.getCurrentTechnique().damageApplied = true;
+                    tech.markDamaged();
                 }
             }
 
@@ -1506,7 +1499,7 @@ int main(int argc, char* argv[]) {
                 // Check all active enemies (reuse aliveEnemies from above)
                 for (const Enemy* enemy : aliveEnemies) {
                     if (enemy && b2Body_IsValid(enemy->bodyId)) {
-                        gs.shield.checkAndRepelEnemy(gs.worldId, enemy->bodyId, playerPos, 15.0f);
+                        gs.shield.checkAndRepelEnemy(enemy->bodyId, playerPos, 15.0f);
                     }
                 }
             }
@@ -1546,7 +1539,7 @@ int main(int argc, char* argv[]) {
             } else {
                 // Descend when not flying
                 if (gs.flightHeight > 0.0f) {
-                    gs.flightHeight -= gs.flightSpeed * 1.5f * dt;
+                    gs.flightHeight -= gs.flightSpeed * gs.flightDescentSpeedMult * dt;
                     if (gs.flightHeight <= 0.0f) {
                         gs.flightHeight = 0.0f;
                     }

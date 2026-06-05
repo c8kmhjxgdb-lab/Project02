@@ -144,12 +144,14 @@ src/
 
 **Combat & Abilities**
 
-- **ProjectileManager** — SDF-rendered projectiles (fireballs, ice spikes) with collision detection.
+- **ProjectileManager** — SDF-rendered projectiles (fireballs, ice spikes) with collision detection. Projectile trails are emitted per type (fire → spark, ice → circle, thunder → spark).
 - **HealthComponent** — Tracks HP, handles damage and healing with death callbacks.
+- **Mana System** — Player has 100 max mana, regenerates at 5/sec. Abilities consume mana (Shield: 15, Lightning: 25, Flight: 15/sec).
 - **SuperStrength** — Distance-joint based grabbing and throwing of objects.
-- **Lightning** — Auto-targeting chain lightning that jumps between nearby enemies.
-- **Shield** — Rotating barrier that reflects enemy collisions.
-- **BondTechnique** — Princess combo attack triggered when ultimate charge reaches 100.
+- **Lightning** — Auto-targeting chain lightning that jumps between nearby enemies. Uses `b2BodyId` tracking for hit deduplication.
+- **Shield** — Rotating barrier that reflects enemy collisions. Renders as dashed circle with flickering at low duration.
+- **BondTechnique** — Princess combo attack triggered when ultimate charge reaches 100. Expanding shockwave with state-based damage tracking.
+- **Flight** — Hold Space to fly. Height affects shadow scale, movement speed (1.5×), and ignores terrain cost. Consumes mana.
 - **Drop** — Item drop system with pickup detection.
 
 **Implemented Abilities:**
@@ -157,16 +159,11 @@ src/
 |---------|-----|--------|
 | Fireball | J | 25 damage, 400 speed, 2s lifetime, particle trail |
 | Ice Spike | L | 20 damage, 500 speed, applies 2s slow debuff |
-| Dash | Space | 0.2s invincible dash, 1s cooldown |
+| Flight | Space | Hold to fly (height simulation, shadow scaling, ignores terrain cost) |
 | Super Strength | K | Grab/throw objects via Box2D distance joint |
 | Lightning | Q | Auto-targeting chain lightning, jumps between enemies |
 | Shield | F | Rotating barrier, reflects enemy collisions, 15 mana |
 | Bond Technique | G | Princess combo attack when ultimateCharge reaches 100 |
-
-**Planned (Not Yet Implemented):**
-| Ability | Description |
-|---------|-------------|
-| Flight | Height simulation, shadow scaling, fog layer, replaces dash |
 
 ### Data Flow
 
@@ -213,7 +210,7 @@ See `doc/plan5.md` for stage 5 details, `doc/plan6.md` for stage 6 implementatio
 - **L** — Fire ice spike projectile (slow effect)
 - **Q** — Cast chain lightning (auto-targeting, jumps between enemies)
 - **G** — Bond technique (Princess combo attack, requires ultimate charge)
-- **Space** — Dash (0.2s invincible, 1s cooldown)
+- **Space** — Flight (hold to fly, consumes mana)
 - **F** — Activate shield (rotating barrier, reflects enemies, 15 mana)
 - **K** — Grab/throw object (super strength)
 - **E** — Interact (talk to Princess, vent at home)

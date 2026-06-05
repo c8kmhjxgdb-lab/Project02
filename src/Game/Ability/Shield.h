@@ -56,7 +56,7 @@ public:
 
     // 检查敌人是否撞到护盾，如果是则击退
     // 返回是否发生碰撞
-    bool checkAndRepelEnemy(b2WorldId world, b2BodyId enemyBody,
+    bool checkAndRepelEnemy(b2BodyId enemyBody,
                            const glm::vec2& playerPos, float knockbackForce = 15.0f);
 
 private:
@@ -73,7 +73,7 @@ private:
     HitCallback onHit;
 
     // 击退敌人
-    void repelEnemy(b2WorldId world, b2BodyId enemyBody,
+    void repelEnemy(b2BodyId enemyBody,
                    const glm::vec2& playerPos, const glm::vec2& enemyPos,
                    float knockbackForce);
 };

@@ -36,9 +36,9 @@ void Shield::update(float dt) {
         active = false;
     }
 
-    // 更新击中冷却
+    // 更新击中冷却（clamp to avoid underflow)
     if (hitCooldown > 0.0f) {
-        hitCooldown -= dt;
+        hitCooldown = std::max(0.0f, hitCooldown - dt);
     }
 }
 
@@ -56,7 +56,7 @@ float Shield::getIntensity() const {
     return 1.0f;
 }
 
-bool Shield::checkAndRepelEnemy(b2WorldId world, b2BodyId enemyBody,
+bool Shield::checkAndRepelEnemy(b2BodyId enemyBody,
                                 const glm::vec2& playerPos, float knockbackForce) {
     if (!active || hitCooldown > 0.0f) return false;
     if (!b2Body_IsValid(enemyBody)) return false;
@@ -68,7 +68,7 @@ bool Shield::checkAndRepelEnemy(b2WorldId world, b2BodyId enemyBody,
 
     // 护盾碰撞检测：敌人在护盾半径内
     if (dist < shieldRadius + 0.3f) {  // 0.3f 是敌人近似半径
-        repelEnemy(world, enemyBody, playerPos, enemyPos, knockbackForce);
+        repelEnemy(enemyBody, playerPos, enemyPos, knockbackForce);
 
         hitCooldown = HIT_COOLDOWN_MIN;
         if (onHit) {
@@ -80,11 +80,9 @@ bool Shield::checkAndRepelEnemy(b2WorldId world, b2BodyId enemyBody,
     return false;
 }
 
-void Shield::repelEnemy(b2WorldId world, b2BodyId enemyBody,
+void Shield::repelEnemy(b2BodyId enemyBody,
                        const glm::vec2& playerPos, const glm::vec2& enemyPos,
                        float knockbackForce) {
-    (void)world;
-
     // 计算击退方向（从玩家指向敌人）
     glm::vec2 repelDir = glm::normalize(enemyPos - playerPos);
 
