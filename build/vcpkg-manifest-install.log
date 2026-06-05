@@ -1,6 +1,6 @@
 Detecting compiler hash for triplet x64-windows...
 Compiler found: E:/Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe
-The following packages will be built and installed:
+The following packages are already installed:
     box2d:x64-windows@3.1.1
   * egl-registry:x64-windows@2025-05-27
     glew:x64-windows@2.3.1
@@ -14,53 +14,6 @@ The following packages will be built and installed:
   * vcpkg-cmake:x64-windows@2024-04-23
   * vcpkg-cmake-config:x64-windows@2024-05-23
   * vcpkg-cmake-get-vars:x64-windows@2025-05-29
-Additional packages (*) will be modified to complete this operation.
-Restored 13 package(s) from C:\Users\liaomingyi\AppData\Local\vcpkg\archives in 4.4 s. Use --debug to see more details.
-Installing 1/13 vcpkg-cmake-config:x64-windows@2024-05-23...
-vcpkg-cmake-config:x64-windows@2024-05-23 package ABI: d78118b197ec07bf54de9cf485f4dd9e0a4786e9fd7c213a52aefa5175b769b4
-Elapsed time to handle vcpkg-cmake-config:x64-windows: 23.1 ms
-Installing 2/13 vcpkg-cmake:x64-windows@2024-04-23...
-vcpkg-cmake:x64-windows@2024-04-23 package ABI: 0e896e9ab17d2b91fb9932ba3f746f4050d95677a85b24919b49dd79b639b550
-Elapsed time to handle vcpkg-cmake:x64-windows: 30.4 ms
-Installing 3/13 box2d:x64-windows@3.1.1...
-box2d:x64-windows@3.1.1 package ABI: f1a2741d114125536bf2f1d1790ddeb583c20dd9ad6272caa5831baa61681ed3
-Elapsed time to handle box2d:x64-windows: 44.2 ms
-Installing 4/13 egl-registry:x64-windows@2025-05-27...
-egl-registry:x64-windows@2025-05-27 package ABI: d84a43c97ad912669ec85324bb3d155cb6024e1928172f0249f49bfb20a96bba
-Elapsed time to handle egl-registry:x64-windows: 23.3 ms
-Installing 5/13 opengl-registry:x64-windows@2026-01-26...
-opengl-registry:x64-windows@2026-01-26 package ABI: dce1011d30049c0d20db434e918650c336c3c4cbf98baa0016785568e279ae81
-Elapsed time to handle opengl-registry:x64-windows: 52.3 ms
-Installing 6/13 opengl:x64-windows@2022-12-04#3...
-opengl:x64-windows@2022-12-04#3 package ABI: 711036d5de2884f03417d60e3969a05c9008655bd408f90ae7f4205923f7a37e
-Elapsed time to handle opengl:x64-windows: 41.5 ms
-Installing 7/13 glew:x64-windows@2.3.1...
-glew:x64-windows@2.3.1 package ABI: 97eac1a5500ddbe5a696ee9ed61eefd600c1cbf2c8ae7171f39e7daad954f5c5
-Elapsed time to handle glew:x64-windows: 44.7 ms
-Installing 8/13 glm:x64-windows@1.0.3...
-glm:x64-windows@1.0.3 package ABI: 36e52771d5279e080c36048522b851f4eb212a265c9faada70446b0f89a4735b
-Elapsed time to handle glm:x64-windows: 734 ms
-Installing 9/13 vcpkg-cmake-get-vars:x64-windows@2025-05-29...
-vcpkg-cmake-get-vars:x64-windows@2025-05-29 package ABI: 3202873d480166066fc88d22745cb5351a3d6083dbb79288e78de306a1113420
-Elapsed time to handle vcpkg-cmake-get-vars:x64-windows: 55.8 ms
-Installing 10/13 luajit:x64-windows@2026-05-24...
-luajit:x64-windows@2026-05-24 package ABI: cc6aeafe8891a742b00a10aa813e8ca582d946a480368655d037c6cd4322a74a
-Elapsed time to handle luajit:x64-windows: 93.7 ms
-Installing 11/13 nlohmann-json:x64-windows@3.12.0#2...
-nlohmann-json:x64-windows@3.12.0#2 package ABI: d15e8f50708037e32f2158cd374ba46f9d4dc8be0ff6c7729b6793ce073c7447
-Elapsed time to handle nlohmann-json:x64-windows: 119 ms
-Installing 12/13 sdl2:x64-windows@2.32.10...
-sdl2:x64-windows@2.32.10 package ABI: 2b23fdb13bd4fb63d49a0d8f898d44dad1099b11666a390699e1e7ab39f14245
-Elapsed time to handle sdl2:x64-windows: 633 ms
-Installing 13/13 sol2:x64-windows@3.5.0#1...
-sol2:x64-windows@3.5.0#1 package ABI: 4b07919f20ce559a2d2527361355f8d85701b67d917539636c3f20372068d469
-Elapsed time to handle sol2:x64-windows: 437 ms
-Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
-Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
-Packages installed in this vcpkg installation declare the following licenses:
-Apache-2.0
-MIT
-Zlib
 box2d provides CMake targets:
 
   find_package(box2d CONFIG REQUIRED)
@@ -128,4 +81,4 @@ sol2 provides pkg-config modules:
   # C++ <-> Lua Wrapper Library
   sol2
 
-All requested installations completed successfully in: 2.4 s
+All requested installations completed successfully in: 782 us

@@ -75,7 +75,10 @@ src/
 │   │   ├── MapTileManager.h/.cpp   # Tile↔Box2D sync, modification tracking
 │   │   ├── TerrainGenerator.h/.cpp # Perlin noise terrain generation
 │   │   ├── Decoration.h            # Decor types and instance data
-│   │   └── DecorationGen.h/.cpp    # Procedural decoration placement
+│   │   ├── DecorationGen.h/.cpp    # Procedural decoration placement
+│   │   ├── RegionManager.h/.cpp    # Multi-region world management
+│   │   ├── TimeSystem.h/.cpp       # Day/night cycle
+│   │   └── WeatherSystem.h/.cpp    # Weather effects (rain, snow)
 │   ├── Social/
 │   │   ├── NPC.h/.cpp          # NPC base class with schedule system
 │   │   ├── Princess.h          # Princess NPC (affection 0-1000, following; header-only)
@@ -85,11 +88,16 @@ src/
 │   │   └── VentAnimation.h/.cpp # Venting animation
 │   ├── Ability/
 │   │   ├── Projectile.h/.cpp   # Projectile/missile system
-│   │   └── SuperStrength.h/.cpp # Grab/throw via distance joint
+│   │   ├── SuperStrength.h/.cpp # Grab/throw via distance joint
+│   │   ├── Lightning.h/.cpp    # Chain lightning, auto-targeting
+│   │   ├── Shield.h/.cpp       # Rotating barrier, reflects enemies
+│   │   └── BondTechnique.h/.cpp # Princess combo attack
 │   ├── AI/
-│   │   └── Enemy.h/.cpp        # Enemy AI (Chaser, Shooter, Exploder)
+│   │   ├── Enemy.h/.cpp        # Enemy AI (Chaser, Shooter, Exploder)
+│   │   └── PathfindingSystem.h/.cpp # A* pathfinding for NPCs
 │   ├── Health.h/.cpp           # HP/damage with death callbacks
-│   └── Drop.h/.cpp             # Item drop system
+│   ├── Drop.h/.cpp             # Item drop system with pickup detection
+│   └── SaveSystem.h/.cpp       # Save/load game state (JSON serialization)
 └── Utils/
     ├── Math.h                  # Math utilities (normalize, distance, direction)
     └── ShaderUtils.h           # Shared shader loading (createShaderProgram)
@@ -110,12 +118,17 @@ src/
 - **MapTileManager** — Coordinates all tile modifications between `TileMap` and Box2D. Automatically creates/destroys physics bodies when tiles change. Tracks modifications for save/load.
 - **TerrainGenerator** — Perlin noise + fBm terrain generation producing coherent biomes (deep water → water → sand → grass → dirt → stone → wall).
 - **Decoration / DecorRenderer** — SDF-rendered decorations (trees, bushes, flowers, rocks) with instanced rendering. Tall decorations (trees) participate in y-sorted rendering.
+- **RegionManager** — Multi-region world management. Each region has its own TileMap, spawn points, and properties. Supports transitions via Portal tiles.
+- **TimeSystem** — Day/night cycle with configurable day length. Affects lighting, NPC schedules, and visibility.
+- **WeatherSystem** — Dynamic weather (rain, snow, clear) with particle effects and gameplay modifiers.
+- **SaveSystem** — JSON-based save/load for game state including player progress, map modifications, NPC states, and world time.
+- **PathfindingSystem** — A* pathfinding for NPC movement across the tile map, respecting passability and movement costs.
 
 **Rendering**
 
 - **RenderLayer** — 7-layer rendering system: Ground → Water → DecorLow → Objects (y-sorted) → DecorHigh → Effects → UI.
 - **PostProcess** — FBO-based post-processing pipeline. Vignette effect scales with grievance.
-- **ParticleSystem** — GPU-rendered particle effects (fire, explosions, muzzle flash).
+- **ParticleSystem** — GPU-rendered particle effects with types: Point, Circle, Spark (with gravity), Trail. Methods: `emit()`, `emitBurst()` (explosions), `emitRing()` (halo effects). Used for muzzle flash, dash particles, enemy death effects.
 - **MiniMap** — Lazy-updated minimap texture (updates every 1s or on demand).
 
 **Scripting & Dialogue**
@@ -125,16 +138,35 @@ src/
 
 **Characters & AI**
 
-- **NPC/Princess** — NPCs with schedule-based movement. Princess has affection system (0-1000) with 5 levels: Stranger, Acquaintance, Friend, CloseFriend, Beloved.
+- **NPC/Princess** — NPCs with schedule-based movement. Princess has affection system (0-1000) with 5 levels: Stranger, Acquaintance, Friend, CloseFriend, Beloved. Princess has `ultimateCharge` (0-100) for bond technique system.
 - **EmotionSystem** — Grievance system (0-100). At 70+, triggers vignette post-processing and ×0.7 speed reduction.
 - **EnemyManager** — Spawns and renders enemies (Chaser, Shooter, Exploder types).
 
 **Combat & Abilities**
 
-- **ProjectileManager** — SDF-rendered projectiles (fireballs) with collision detection.
+- **ProjectileManager** — SDF-rendered projectiles (fireballs, ice spikes) with collision detection.
 - **HealthComponent** — Tracks HP, handles damage and healing with death callbacks.
 - **SuperStrength** — Distance-joint based grabbing and throwing of objects.
+- **Lightning** — Auto-targeting chain lightning that jumps between nearby enemies.
+- **Shield** — Rotating barrier that reflects enemy collisions.
+- **BondTechnique** — Princess combo attack triggered when ultimate charge reaches 100.
 - **Drop** — Item drop system with pickup detection.
+
+**Implemented Abilities:**
+| Ability | Key | Effect |
+|---------|-----|--------|
+| Fireball | J | 25 damage, 400 speed, 2s lifetime, particle trail |
+| Ice Spike | L | 20 damage, 500 speed, applies 2s slow debuff |
+| Dash | Space | 0.2s invincible dash, 1s cooldown |
+| Super Strength | K | Grab/throw objects via Box2D distance joint |
+| Lightning | Q | Auto-targeting chain lightning, jumps between enemies |
+| Shield | F | Rotating barrier, reflects enemy collisions, 15 mana |
+| Bond Technique | G | Princess combo attack when ultimateCharge reaches 100 |
+
+**Planned (Not Yet Implemented):**
+| Ability | Description |
+|---------|-------------|
+| Flight | Height simulation, shadow scaling, fog layer, replaces dash |
 
 ### Data Flow
 
@@ -167,8 +199,8 @@ Box2D with **zero gravity** (top-down perspective). Player is a dynamic body wit
 | 2 | ✅ Done | Draw2D, Camera2D, SDF character, TileMap |
 | 3 | ✅ Done | Combat (projectiles, enemies, damage, drops, particles) |
 | 4 | ✅ Done | Lua scripting, dialogue, emotion system |
-| 5 | ✅ Done | Map upgrade (passability, noise terrain, decorations, minimap) |
-| 6 | 🟡 Active | Multi-region, A* pathfinding, save/load, day/night cycle, weather |
+| 5 | ✅ Done | All abilities (fireball, ice, lightning, shield, dash, super strength, bond technique), particle trails, map upgrade |
+| 6 | ✅ Done | Multi-region, A* pathfinding, save/load, day/night cycle, weather |
 | 7-8 | Pending | Indoor details, building mode, furniture, audio, UI polish, main story |
 
 See `doc/plan5.md` for stage 5 details, `doc/plan6.md` for stage 6 implementation plan, and `doc/技术栈.md` for the full 8-stage roadmap.
@@ -179,12 +211,17 @@ See `doc/plan5.md` for stage 5 details, `doc/plan6.md` for stage 6 implementatio
 - **Mouse wheel / +/-** — Zoom in/out
 - **J** — Fire fireball projectile
 - **L** — Fire ice spike projectile (slow effect)
-- **Space** — Dash (brief invincibility)
+- **Q** — Cast chain lightning (auto-targeting, jumps between enemies)
+- **G** — Bond technique (Princess combo attack, requires ultimate charge)
+- **Space** — Dash (0.2s invincible, 1s cooldown)
+- **F** — Activate shield (rotating barrier, reflects enemies, 15 mana)
 - **K** — Grab/throw object (super strength)
 - **E** — Interact (talk to Princess, vent at home)
 - **W/S or ↑/↓** — Navigate dialogue choices (when in dialogue)
 - **H** — Debug: heal 30 HP (Debug builds only)
 - **1/2/3** — Change character expression (normal/happy/sad)
+- **F5** — Quick save
+- **F9** — Quick load
 - **Esc** — Exit
 
 ## Important Patterns

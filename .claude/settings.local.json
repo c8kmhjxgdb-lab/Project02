@@ -3,7 +3,10 @@
     "allow": [
       "Bash(cmake -B build)",
       "Bash(cmake -B build -G \"Visual Studio 18 2025\" -A x64)",
-      "Bash(cmake -B build -G \"Visual Studio 17 2022\" -A x64)"
+      "Bash(cmake -B build -G \"Visual Studio 17 2022\" -A x64)",
+      "Bash(xargs grep -l -i \"flight\\\\|flying\\\\|altitude\\\\|height\")",
+      "Bash(xargs grep -l -i \"shield\\\\|护盾\")",
+      "Bash(xargs grep -l -i \"bond\\\\|combo\\\\|羁绊\\\\|合体\")"
     ]
   }
 }

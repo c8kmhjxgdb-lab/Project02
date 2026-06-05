@@ -168,6 +168,13 @@ void ProjectileManager::destroy(ProjectileId id) {
     }
 }
 
+void ProjectileManager::resetParticleTimer(ProjectileId id) {
+    Projectile* proj = find(id);
+    if (proj) {
+        proj->particleEmitTimer = 0.0f;
+    }
+}
+
 void ProjectileManager::clear() {
     for (auto& proj : projectiles) {
         if (b2Body_IsValid(proj.bodyId)) {

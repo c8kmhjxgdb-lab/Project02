@@ -50,6 +50,9 @@ add_executable(Starchild2D
     src/Game/Drop.cpp
     src/Game/Ability/Projectile.cpp
     src/Game/Ability/SuperStrength.cpp
+    src/Game/Ability/Shield.cpp
+    src/Game/Ability/Lightning.cpp
+    src/Game/Ability/BondTechnique.cpp
     src/Game/AI/Enemy.cpp
     src/Game/AI/PathfindingSystem.cpp
     src/Game/Social/NPC.cpp

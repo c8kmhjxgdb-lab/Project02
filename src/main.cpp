@@ -42,6 +42,9 @@
 #include "Game/Drop.h"
 #include "Game/Ability/Projectile.h"
 #include "Game/Ability/SuperStrength.h"
+#include "Game/Ability/Shield.h"
+#include "Game/Ability/Lightning.h"
+#include "Game/Ability/BondTechnique.h"
 #include "Game/AI/Enemy.h"
 #include "Game/AI/PathfindingSystem.h"
 #include "Game/Social/NPC.h"
@@ -153,6 +156,21 @@ struct GameState {
     // Super strength
     SuperStrength superStrength;
 
+    // Shield (Stage 5: new ability)
+    Shield shield;
+    float shieldCooldown = 0.0f;
+    float shieldCooldownMax = 5.0f;
+
+    // Lightning (Stage 5: new ability)
+    Lightning lightning;
+
+    // Bond Technique (Stage 5: Princess combo)
+    BondTechniqueSystem bondTechnique;
+
+    float playerMana = 100.0f;
+    float playerMaxMana = 100.0f;
+    float manaRegen = 5.0f;  // per second
+
     // Skill cooldowns
     float fireballCooldown = 0.0f;
     float fireballCooldownMax = 0.3f;
@@ -170,14 +188,16 @@ struct GameState {
     // Score
     int score = 0;
 
-    // Dash (Stage 5)
-    bool isDashing = false;
-    float dashTimer = 0.0f;
-    float dashDuration = 0.2f;
-    glm::vec2 dashDirection;
-    bool dashInvincible = false;
-    float dashCooldown = 0.0f;
-    float dashCooldownMax = 1.0f;
+    // Flight (Stage 5: replaces dash)
+    bool isFlying = false;
+    float flightHeight = 0.0f;         // 0 = ground level, max ~5
+    float flightHeightTarget = 0.0f;
+    float flightMaxHeight = 5.0f;
+    float flightSpeed = 2.0f;          // height change speed
+    float flightManaDrain = 15.0f;     // per second
+    float flightCooldown = 0.0f;
+    float flightCooldownMax = 2.0f;
+    float shadowScale = 1.0f;          // shadow scale based on height
     int coinsCollected = 0;
 
     // Enemy spawn timer
@@ -417,19 +437,22 @@ static void renderCharacter(GameState& gs, const glm::mat4& viewProj) {
     float px = pos.x;
     float py = pos.y;
 
+    // Flight height offset (character appears higher when flying)
+    float flightYOffset = -gs.flightHeight * 0.3f;  // In 2D top-down, "up" is negative Y
+
     // Character quad in world space (centered at player position)
     float s = 1.0f;
     float sh = 1.5f;
     GLfloat verts[] = {
-        px - s, py - sh,
-        px + s, py - sh,
-        px + s, py + sh,
-        px - s, py + sh,
+        px - s, py + flightYOffset - sh,
+        px + s, py + flightYOffset - sh,
+        px + s, py + flightYOffset + sh,
+        px - s, py + flightYOffset + sh,
     };
 
     glUseProgram(gs.characterShader);
     glUniformMatrix4fv(gs.charUniformViewProj, 1, GL_FALSE, &viewProj[0][0]);
-    glUniform2f(gs.charUniformPosition, px, py);
+    glUniform2f(gs.charUniformPosition, px, py + flightYOffset);
     glUniform1f(gs.charUniformTime, gs.charTime);
     glUniform3f(gs.charUniformBodyColor, 0.4f, 0.7f, 0.95f);
     glUniform1i(gs.charUniformExpression, gs.charExpression);
@@ -442,6 +465,116 @@ static void renderCharacter(GameState& gs, const glm::mat4& viewProj) {
     glBindVertexArray(0);
 
     glUseProgram(0);
+
+    // Render character shadow (scales with flight height)
+    if (gs.flightHeight > 0.1f) {
+        float shadowAlpha = 0.3f * gs.shadowScale;
+        float shadowS = s * gs.shadowScale;
+        float shadowSh = sh * gs.shadowScale;
+        float shadowY = py - gs.flightHeight * 0.1f;  // Shadow stays near ground
+
+        Draw2D::drawRectFilled(
+            px - shadowS, shadowY - shadowSh,
+            shadowS * 2.0f, shadowSh * 2.0f,
+            glm::vec3(shadowAlpha));  // Use grayscale with alpha as intensity
+    }
+}
+
+// ========== Render Shield ==========
+
+static void renderShield(GameState& gs) {
+    if (!gs.shield.isActive()) return;
+
+    float intensity = gs.shield.getIntensity();
+    if (intensity <= 0.01f) return;
+
+    b2Vec2 pos = b2Body_GetPosition(gs.playerBodyId);
+    glm::vec2 playerPos(pos.x, pos.y);
+    float radius = gs.shield.getRadius();
+    float rotation = gs.shield.getRotationAngle();
+
+    // Draw rotating dashed circle using Draw2D
+    const int DASH_COUNT = 8;
+    float spacingAngle = glm::two_pi<float>() / DASH_COUNT;  // angle between dash starts
+    float dashAngle = spacingAngle * 0.5f;  // each dash is half the spacing (equal dash and gap)
+
+    glm::vec3 shieldColor(0.3f, 0.7f, 1.0f);
+    float lineWidth = 0.04f;
+
+    for (int d = 0; d < DASH_COUNT; ++d) {
+        float startAngle = rotation + d * spacingAngle;
+        float endAngle = startAngle + dashAngle;
+
+        // Draw arc segment
+        const int arcSegments = 6;
+        for (int i = 0; i < arcSegments; ++i) {
+            float a0 = startAngle + (endAngle - startAngle) * (i / static_cast<float>(arcSegments));
+            float a1 = startAngle + (endAngle - startAngle) * ((i + 1) / static_cast<float>(arcSegments));
+
+            glm::vec2 p0 = playerPos + glm::vec2(cos(a0), sin(a0)) * radius;
+            glm::vec2 p1 = playerPos + glm::vec2(cos(a1), sin(a1)) * radius;
+
+            Draw2D::drawLine(p0.x, p0.y, p1.x, p1.y, shieldColor, lineWidth);
+        }
+    }
+
+    // Inner glow (subtle filled circle with low alpha)
+    Draw2D::drawCircleFilled(playerPos.x, playerPos.y, radius * 0.8f,
+        shieldColor, 0.03f * intensity);
+}
+
+// ========== Render Lightning ==========
+
+static void renderLightning(GameState& gs) {
+    if (!gs.lightning.isActive()) return;
+
+    const LightningChain& chain = gs.lightning.getCurrentChain();
+    if (chain.points.size() < 2) return;
+
+    // Flash intensity based on remaining time
+    float flashIntensity = chain.remainingTime / chain.lifetime;
+
+    // Draw lightning chain as zigzag lines
+    glm::vec3 lightningColor(0.5f, 0.8f, 1.0f);
+    float lineWidth = 0.06f * flashIntensity;
+
+    for (size_t i = 0; i < chain.points.size() - 1; ++i) {
+        glm::vec2 start = chain.points[i];
+        glm::vec2 end = chain.points[i + 1];
+
+        // Create zigzag effect with offset points
+        glm::vec2 direction = glm::normalize(end - start);
+        glm::vec2 perpendicular(-direction.y, direction.x);
+
+        // Number of segments in this chain link
+        int segments = 4;
+        float segLen = glm::distance(start, end) / segments;
+
+        glm::vec2 prevPoint = start;
+        for (int s = 0; s < segments; ++s) {
+            float t = (s + 1) / static_cast<float>(segments);
+            glm::vec2 targetPoint = start + (end - start) * t;
+
+            // Add zigzag offset
+            float offset = (s % 2 == 0 ? 1.0f : -1.0f) * 0.15f * flashIntensity;
+            glm::vec2 zigzagPoint = (prevPoint + targetPoint) * 0.5f + perpendicular * offset;
+
+            Draw2D::drawLine(prevPoint.x, prevPoint.y,
+                           zigzagPoint.x, zigzagPoint.y,
+                           lightningColor, lineWidth);
+            Draw2D::drawLine(zigzagPoint.x, zigzagPoint.y,
+                           targetPoint.x, targetPoint.y,
+                           lightningColor, lineWidth);
+
+            prevPoint = targetPoint;
+        }
+    }
+
+    // Draw bright glow at each hit point
+    for (const auto& point : chain.points) {
+        Draw2D::drawCircleFilled(point.x, point.y, 0.15f * flashIntensity,
+            glm::vec3(0.8f, 0.9f, 1.0f), flashIntensity * 0.5f);
+    }
 }
 
 // ========== Render Projectile ==========
@@ -626,6 +759,31 @@ static void renderUI(GameState& gs) {
     // Health bar border
     Draw2D::drawRect(barX, barY, barW, barH, glm::vec3(0.5f), 0.02f);
 
+    // Mana bar (below health bar)
+    float manaPercent = gs.playerMana / gs.playerMaxMana;
+    float manaBarY = barY - barH - 4.0f;
+
+    Draw2D::drawRectFilled(barX, manaBarY, barW, barH * 0.8f, glm::vec3(0.15f));
+    Draw2D::drawRectFilled(barX, manaBarY, barW * manaPercent, barH * 0.8f,
+        glm::vec3(0.2f, 0.4f, 0.9f));
+    Draw2D::drawRect(barX, manaBarY, barW, barH * 0.8f, glm::vec3(0.4f), 0.02f);
+
+    // Shield cooldown indicator
+    if (gs.shieldCooldown > 0) {
+        float shieldCdPercent = 1.0f - (gs.shieldCooldown / gs.shieldCooldownMax);
+        float shieldBarY = manaBarY - barH * 0.8f - 4.0f;
+        Draw2D::drawRectFilled(barX, shieldBarY, barW * shieldCdPercent, barH * 0.6f,
+            glm::vec3(0.3f, 0.7f, 1.0f));
+    }
+
+    // Flight height indicator
+    if (gs.isFlying || gs.flightHeight > 0.1f) {
+        float flightPercent = gs.flightHeight / gs.flightMaxHeight;
+        float flightBarY = manaBarY - barH * 1.6f - 8.0f;
+        Draw2D::drawRectFilled(barX, flightBarY, barW * flightPercent, barH * 0.5f,
+            glm::vec3(0.6f, 0.8f, 1.0f));
+    }
+
     // Score
     Draw2D::endFrame();
 
@@ -714,7 +872,7 @@ static void handleCollisions(GameState& gs) {
     b2Vec2 playerPos = b2Body_GetPosition(gs.playerBodyId);
     glm::vec2 pPos2(playerPos.x, playerPos.y);
 
-    if (!gs.playerHealth.isInvincible() && !gs.isDead && !gs.dashInvincible) {
+    if (!gs.playerHealth.isInvincible() && !gs.isDead && !gs.isFlying) {
         for (const Enemy* enemy : aliveEnemies) {
             if (!enemy->active) continue;
 
@@ -768,7 +926,8 @@ static void handleCollisions(GameState& gs) {
 
             // Explosion particles
             gs.particleSystem.emitBurst(ePos3, 30, glm::vec3(1, 0.5f, 0.1f), 5.0f, 0.5f, 0.2f);
-            gs.particleSystem.emitRing(ePos3, 20, glm::vec3(1, 0.3f, 0.0), enemy.explosionRange, 0.3f, 0.15f);
+            gs.particleSystem.emitRing(ePos3, 20, glm::vec3(1, 0.3f, 0.0),
+                enemy.explosionRange, 0.3f, 0.15f);
 
             // Damage player if in range.
             // Note: drops & score were already awarded by onEnemyDeath in
@@ -776,7 +935,7 @@ static void handleCollisions(GameState& gs) {
             // Exploder attack branch in EnemyManager::update() (when self-destructing).
             // We do NOT spawn drops here to avoid doubling.
             float distToPlayer = glm::distance(pPos2, ePos3);
-            if (distToPlayer < enemy.explosionRange && !gs.playerHealth.isInvincible() && !gs.isDead && !gs.dashInvincible) {
+            if (distToPlayer < enemy.explosionRange && !gs.playerHealth.isInvincible() && !gs.isDead && !gs.isFlying) {
                 DamageInfo info;
                 info.amount = enemy.explosionDamage;
                 info.sourcePosition = ePos3;
@@ -1069,18 +1228,119 @@ int main(int argc, char* argv[]) {
                     }
                 }
 
-                // Stage 5: Dash
-                if (scancode == SDL_SCANCODE_SPACE && !gs.isDead && !gs.isDashing
-                    && gs.dashCooldown <= 0) {
-                    gs.isDashing = true;
-                    gs.dashTimer = 0.0f;
-                    gs.dashDirection = gs.facingDir;
-                    gs.dashInvincible = true;
-                    gs.dashCooldown = gs.dashCooldownMax;
+                // Stage 5: Flight (Space key - hold to fly)
+                if (scancode == SDL_SCANCODE_SPACE && !gs.isDead
+                    && gs.flightCooldown <= 0
+                    && gs.playerMana >= 5.0f
+                    && gs.flightHeight <= 0.1f) {
+                    if (!gs.isFlying) {
+                        gs.isFlying = true;
+                        gs.flightHeightTarget = gs.flightMaxHeight;
+                    }
+                }
 
-                    // Dash particles
-                    gs.particleSystem.emitBurst(gs.camera.position, 8,
-                        glm::vec3(0.8f, 0.8f, 1.0f), 3.0f, 0.1f, 0.05f);
+                // Stage 5: Shield ability (F key)
+                if (scancode == SDL_SCANCODE_F && !gs.isDead && !gs.shield.isActive()
+                    && gs.shieldCooldown <= 0
+                    && gs.playerMana >= 15.0f) {
+                    gs.shield.activate(15.0f);
+                    gs.playerMana -= 15.0f;
+                    gs.shieldCooldown = gs.shieldCooldownMax;
+
+                    // Shield activation particles
+                    b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+                    gs.particleSystem.emitRing(glm::vec2(pPos.x, pPos.y),
+                        16, glm::vec3(0.3f, 0.7f, 1.0f),
+                        gs.shield.getRadius(), 0.5f, 0.1f);
+                }
+
+                // Stage 5: Lightning ability (Q key)
+                if (scancode == SDL_SCANCODE_Q && !gs.isDead
+                    && gs.lightning.canCast()
+                    && gs.playerMana >= gs.lightning.getManaCost()) {
+                    b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+                    glm::vec2 playerPos(pPos.x, pPos.y);
+
+                    // Begin lightning chain
+                    gs.lightning.begin(playerPos);
+                    gs.playerMana -= gs.lightning.getManaCost();
+                    gs.lightning.setCooldown(3.0f);
+
+                    // Find and chain to enemies
+                    float currentDamage = gs.lightning.getBaseDamage();
+                    glm::vec2 currentPos = playerPos;
+                    float range = gs.lightning.getChainRange();
+
+                    // Cache alive enemies once — avoid repeated getAlive() calls
+                    auto aliveEnemies = gs.enemyManager.getAlive();
+
+                    for (int chain = 0; chain < gs.lightning.getMaxChains(); ++chain) {
+                        // Find nearest enemy to current position
+                        const Enemy* nearestEnemy = nullptr;
+                        float nearestDist = range;
+
+                        for (const Enemy* enemy : aliveEnemies) {
+                            if (!enemy || !b2Body_IsValid(enemy->bodyId)) continue;
+
+                            b2Vec2 ePos = b2Body_GetPosition(enemy->bodyId);
+                            glm::vec2 enemyPos(ePos.x, ePos.y);
+                            float dist = glm::distance(currentPos, enemyPos);
+
+                            // Check if this enemy is already in the chain
+                            bool alreadyHit = false;
+                            for (const auto& hitPos : gs.lightning.getCurrentChain().points) {
+                                if (glm::distance(hitPos, enemyPos) < 0.5f) {
+                                    alreadyHit = true;
+                                    break;
+                                }
+                            }
+                            if (alreadyHit) continue;
+
+                            if (dist < nearestDist) {
+                                nearestDist = dist;
+                                nearestEnemy = enemy;
+                            }
+                        }
+
+                        if (!nearestEnemy) break;
+
+                        b2Vec2 ePos = b2Body_GetPosition(nearestEnemy->bodyId);
+                        glm::vec2 enemyPos(ePos.x, ePos.y);
+
+                        // Add to chain and deal damage
+                        gs.lightning.addHit(enemyPos, currentDamage);
+                        gs.enemyManager.damage(nearestEnemy->id, currentDamage);
+
+                        // Lightning hit particles
+                        gs.particleSystem.emitBurst(enemyPos, 6,
+                            glm::vec3(0.5f, 0.8f, 1.0f), 4.0f, 0.3f, 0.08f);
+
+                        currentDamage *= gs.lightning.getCurrentChain().damageDecay;
+                        currentPos = enemyPos;
+                    }
+
+                    gs.lightning.end();
+                }
+
+                // Stage 5: Bond Technique (G key) - Princess combo attack
+                if (scancode == SDL_SCANCODE_G && !gs.isDead
+                    && gs.princess && gs.princess->isFollowing()
+                    && gs.princess->isUltimateReady()
+                    && gs.bondTechnique.canActivate()) {
+                    b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+                    glm::vec2 centerPos(pPos.x, pPos.y);
+
+                    // Activate bond technique
+                    gs.bondTechnique.activate(centerPos);
+                    gs.princess->ultimateCharge = 0.0f;  // Reset princess ultimate
+                    gs.bondTechnique.setCooldown(30.0f);  // 30 second cooldown
+
+                    // Big explosion particles
+                    gs.particleSystem.emitBurst(centerPos, 40,
+                        glm::vec3(1.0f, 0.9f, 0.5f), 8.0f, 0.8f, 0.15f);
+                    gs.particleSystem.emitRing(centerPos, 24,
+                        glm::vec3(1.0f, 0.7f, 0.3f),
+                        gs.bondTechnique.getMaxRadius(), 1.0f, 0.2f);
                 }
 
                 // Stage 4: Interact / Dialogue
@@ -1201,28 +1461,107 @@ int main(int argc, char* argv[]) {
 
         // Skip update if dead (but still render)
         if (!gs.isDead) {
-            // Update dash cooldown
-            if (gs.dashCooldown > 0) gs.dashCooldown -= dt;
+            // Update cooldowns
+            if (gs.flightCooldown > 0) gs.flightCooldown -= dt;
+            if (gs.shieldCooldown > 0) gs.shieldCooldown -= dt;
 
-            // Dash logic
-            if (gs.isDashing) {
-                gs.dashTimer += dt;
-                // Apply strong dash force
-                b2Vec2 dashForce = {
-                    gs.dashDirection.x * 30.0f,
-                    gs.dashDirection.y * 30.0f
-                };
-                b2Body_ApplyForceToCenter(gs.playerBodyId, dashForce, true);
+            // Mana regeneration
+            if (gs.playerMana < gs.playerMaxMana) {
+                gs.playerMana = std::min(gs.playerMaxMana, gs.playerMana + gs.manaRegen * dt);
+            }
 
-                // Dash trail particles
-                b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
-                gs.particleSystem.emitBurst(glm::vec2(pPos.x, pPos.y), 2,
-                    glm::vec3(0.7f, 0.8f, 1.0f), 2.0f, 0.05f, 0.03f);
+            // Update shield
+            gs.shield.update(dt);
+            gs.lightning.update(dt);
+            gs.lightning.updateCooldown(dt);
+            gs.bondTechnique.update(dt);
+            gs.bondTechnique.updateCooldown(dt);
 
-                if (gs.dashTimer >= gs.dashDuration) {
-                    gs.isDashing = false;
-                    gs.dashInvincible = false;
+            // Cache alive enemies once for shield and bond technique checks
+            auto aliveEnemies = gs.enemyManager.getAlive();
+
+            // Apply bond technique damage when the wave expands
+            if (gs.bondTechnique.isActive()) {
+                const BondTechnique& tech = gs.bondTechnique.getCurrentTechnique();
+                if (!tech.damageApplied && tech.radius > tech.maxRadius * 0.3f) {
+                    // Damage all enemies in range
+                    for (const Enemy* enemy : aliveEnemies) {
+                        if (!enemy || !b2Body_IsValid(enemy->bodyId)) continue;
+                        b2Vec2 ePos = b2Body_GetPosition(enemy->bodyId);
+                        glm::vec2 enemyPos(ePos.x, ePos.y);
+                        if (glm::distance(tech.waveFronts[0], enemyPos) < tech.radius) {
+                            gs.enemyManager.damage(enemy->id, tech.damage);
+                        }
+                    }
+                    // Mark damage as applied (need non-const access)
+                    gs.bondTechnique.getCurrentTechnique().damageApplied = true;
                 }
+            }
+
+            // Shield hit detection: check enemies near player
+            if (gs.shield.isActive()) {
+                b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+                glm::vec2 playerPos(pPos.x, pPos.y);
+
+                // Check all active enemies (reuse aliveEnemies from above)
+                for (const Enemy* enemy : aliveEnemies) {
+                    if (enemy && b2Body_IsValid(enemy->bodyId)) {
+                        gs.shield.checkAndRepelEnemy(gs.worldId, enemy->bodyId, playerPos, 15.0f);
+                    }
+                }
+            }
+
+            // Flight logic
+            if (gs.isFlying) {
+                // Increase height toward target
+                if (gs.flightHeight < gs.flightHeightTarget) {
+                    gs.flightHeight += gs.flightSpeed * dt;
+                    if (gs.flightHeight >= gs.flightHeightTarget) {
+                        gs.flightHeight = gs.flightHeightTarget;
+                    }
+                }
+
+                // Drain mana while flying
+                gs.playerMana -= gs.flightManaDrain * dt;
+                if (gs.playerMana <= 0) {
+                    gs.playerMana = 0;
+                    gs.isFlying = false;
+                    gs.flightHeightTarget = 0.0f;
+                    gs.flightCooldown = gs.flightCooldownMax;
+                }
+
+                // Flight particles (dust rising from ground)
+                if (gs.flightHeight > 1.0f) {
+                    b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+                    // Emit particles below player
+                    gs.particleSystem.emit(
+                        glm::vec2(pPos.x, pPos.y - gs.flightHeight * 0.3f),
+                        glm::vec2(0.0f, 0.5f),
+                        glm::vec3(0.8f, 0.8f, 0.7f),
+                        0.5f + gs.flightHeight * 0.1f,
+                        0.05f + gs.flightHeight * 0.02f,
+                        ParticleType::Circle
+                    );
+                }
+            } else {
+                // Descend when not flying
+                if (gs.flightHeight > 0.0f) {
+                    gs.flightHeight -= gs.flightSpeed * 1.5f * dt;
+                    if (gs.flightHeight <= 0.0f) {
+                        gs.flightHeight = 0.0f;
+                    }
+                }
+            }
+
+            // Update shadow scale based on height
+            gs.shadowScale = 1.0f - (gs.flightHeight / gs.flightMaxHeight) * 0.6f;
+            if (gs.shadowScale < 0.4f) gs.shadowScale = 0.4f;
+
+            // Check if space is still held for flight
+            if (!gs.keys[SDL_SCANCODE_SPACE] && gs.isFlying) {
+                gs.isFlying = false;
+                gs.flightHeightTarget = 0.0f;
+                gs.flightCooldown = gs.flightCooldownMax;
             }
 
             // Physics step
@@ -1244,8 +1583,9 @@ int main(int argc, char* argv[]) {
             force.x *= speedMult;
             force.y *= speedMult;
 
-            // Apply terrain movement cost
-            b2Vec2 playerPos = b2Body_GetPosition(gs.playerBodyId);
+            // Get player position and terrain info (needed for multiple systems)
+            b2Vec2 playerPosVec = b2Body_GetPosition(gs.playerBodyId);
+            glm::vec2 playerPos(playerPosVec.x, playerPosVec.y);
             glm::ivec2 playerTile;
 
             // Stage 6: Get terrain info from current region
@@ -1256,13 +1596,21 @@ int main(int argc, char* argv[]) {
                 playerTile = gs.tileMap.worldToTile(playerPos.x, playerPos.y);
             }
 
-            float terrainCost = currentRegion ?
-                currentRegion->getTileMap().getMovementCost(playerTile.x, playerTile.y) :
-                gs.tileMap.getMovementCost(playerTile.x, playerTile.y);
+            // Flight mode: ignore terrain cost, increased mobility
+            if (!gs.isFlying) {
+                // Apply terrain movement cost
+                float terrainCost = currentRegion ?
+                    currentRegion->getTileMap().getMovementCost(playerTile.x, playerTile.y) :
+                    gs.tileMap.getMovementCost(playerTile.x, playerTile.y);
 
-            if (terrainCost > 0.0f) {
-                force.x /= terrainCost;
-                force.y /= terrainCost;
+                if (terrainCost > 0.0f) {
+                    force.x /= terrainCost;
+                    force.y /= terrainCost;
+                }
+            } else {
+                // Flying: 1.5x movement speed
+                force.x *= 1.5f;
+                force.y *= 1.5f;
             }
 
             // Stage 6: Apply weather movement modifier
@@ -1297,14 +1645,72 @@ int main(int argc, char* argv[]) {
             }
 
             // Camera follow (reuse playerPos from above — already updated by physics step)
-            playerPos = b2Body_GetPosition(gs.playerBodyId);
-            gs.camera.smoothFollow(glm::vec2(playerPos.x, playerPos.y), dt, 5.0f);
+            playerPosVec = b2Body_GetPosition(gs.playerBodyId);
+            gs.camera.smoothFollow(glm::vec2(playerPosVec.x, playerPosVec.y), dt, 5.0f);
 
             // Update Stage 3 systems.
             // particleSystem.update is intentionally skipped here so the
             // shared always-run block below can update it uniformly (it ticks
             // both alive and dead frames exactly once).
             gs.projectileManager.update(dt, gs.worldId);
+
+            // Emit trail particles from active projectiles
+            for (const auto& proj : gs.projectileManager.getActive()) {
+                if (!proj.active) continue;
+
+                // Check if it's time to emit a particle
+                if (proj.particleEmitTimer >= proj.particleEmitRate) {
+                    // Reset timer
+                    gs.projectileManager.resetParticleTimer(proj.id);
+
+                    b2Vec2 pPos = b2Body_GetPosition(proj.bodyId);
+                    glm::vec2 pos(pPos.x, pPos.y);
+
+                    // Emit trail particle based on projectile type
+                    switch (proj.type) {
+                        case ProjectileType::Fireball:
+                            // Fire trail - spark type with upward velocity
+                            gs.particleSystem.emit(
+                                pos,
+                                glm::vec2(
+                                    (Math::hashRandom(static_cast<unsigned>(gs.charTime * 1000))) * 0.5f - 0.25f,
+                                    0.3f
+                                ),
+                                glm::vec3(1.0f, 0.5f, 0.0f),
+                                0.3f,
+                                0.08f + (Math::hashRandom(static_cast<unsigned>(gs.charTime * 2000))) * 0.05f,
+                                ParticleType::Spark
+                            );
+                            break;
+                        case ProjectileType::IceSpike:
+                            // Ice trail - circle type, blue-white
+                            gs.particleSystem.emit(
+                                pos,
+                                glm::vec2(0.0f, 0.0f),
+                                glm::vec3(0.5f, 0.8f, 1.0f),
+                                0.4f,
+                                0.06f,
+                                ParticleType::Circle
+                            );
+                            break;
+                        case ProjectileType::Thunder:
+                            // Thunder trail - small bright sparks
+                            gs.particleSystem.emit(
+                                pos,
+                                glm::vec2(
+                                    (Math::hashRandom(static_cast<unsigned>(gs.charTime * 3000))) * 0.8f - 0.4f,
+                                    (Math::hashRandom(static_cast<unsigned>(gs.charTime * 4000))) * 0.8f - 0.4f
+                                ),
+                                glm::vec3(0.8f, 0.9f, 1.0f),
+                                0.2f,
+                                0.04f,
+                                ParticleType::Spark
+                            );
+                            break;
+                    }
+                }
+            }
+
             gs.enemyManager.update(dt, gs.worldId, gs.camera.position);
             gs.dropManager.update(dt, gs.camera.position);
 
@@ -1523,6 +1929,44 @@ int main(int argc, char* argv[]) {
                         if (!gs.isDead) renderCharacter(gs, viewProj);
                         break;
                 }
+            }
+        }
+
+        // 3.5. Render shield (after character, before projectiles)
+        renderShield(gs);
+
+        // 3.5b. Render flight fog effect (when flying high)
+        if (gs.isFlying && gs.flightHeight > 2.0f) {
+            b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+            float fogAlpha = (gs.flightHeight / gs.flightMaxHeight) * 0.15f;
+            float fogRadius = 3.0f + gs.flightHeight;
+
+            // Height fog circle around player
+            Draw2D::drawCircleFilled(pPos.x, pPos.y, fogRadius,
+                glm::vec3(0.8f, 0.85f, 0.9f), fogAlpha);
+        }
+
+        // 3.6. Render lightning (after shield, before projectiles)
+        renderLightning(gs);
+
+        // 3.7. Render bond technique (fullscreen shockwave)
+        if (gs.bondTechnique.isActive()) {
+            const BondTechnique& tech = gs.bondTechnique.getCurrentTechnique();
+            float progress = 1.0f - (tech.remainingTime / tech.lifetime);
+            float alpha = 0.3f * (1.0f - progress);
+
+            // Expanding ring
+            Draw2D::drawCircle(gs.bondTechnique.getCurrentTechnique().waveFronts[0].x,
+                gs.bondTechnique.getCurrentTechnique().waveFronts[0].y,
+                tech.radius,
+                glm::vec3(1.0f, 0.9f, 0.5f), 0.05f * (1.0f - progress));
+
+            // Inner glow
+            if (progress < 0.5f) {
+                Draw2D::drawCircleFilled(gs.bondTechnique.getCurrentTechnique().waveFronts[0].x,
+                    gs.bondTechnique.getCurrentTechnique().waveFronts[0].y,
+                    tech.radius * 0.5f,
+                    glm::vec3(1.0f, 0.8f, 0.3f), alpha * 0.3f);
             }
         }
 

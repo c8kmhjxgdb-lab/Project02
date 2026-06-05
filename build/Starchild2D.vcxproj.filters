@@ -67,6 +67,15 @@
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\SuperStrength.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Shield.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Lightning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\BondTechnique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\AI\Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

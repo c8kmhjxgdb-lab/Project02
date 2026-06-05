@@ -93,6 +93,9 @@ public:
     // 获取下一个可用ID
     int getNextId() const { return nextId; }
 
+    // 重置投射物的粒子发射计时器
+    void resetParticleTimer(ProjectileId id);
+
 private:
     std::vector<Projectile> projectiles;
     int nextId;

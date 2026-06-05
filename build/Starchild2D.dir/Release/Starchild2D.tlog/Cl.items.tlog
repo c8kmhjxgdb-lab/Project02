@@ -20,6 +20,9 @@ E:\DouBao2\Project\KatCode\Project02\src\Game\Health.cpp;E:\DouBao2\Project\KatC
 E:\DouBao2\Project\KatCode\Project02\src\Game\Drop.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\Drop.obj
 E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Projectile.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\Projectile.obj
 E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\SuperStrength.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\SuperStrength.obj
+E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Shield.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\Shield.obj
+E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Lightning.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\Lightning.obj
+E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\BondTechnique.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\BondTechnique.obj
 E:\DouBao2\Project\KatCode\Project02\src\Game\AI\Enemy.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\Enemy.obj
 E:\DouBao2\Project\KatCode\Project02\src\Game\AI\PathfindingSystem.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\PathfindingSystem.obj
 E:\DouBao2\Project\KatCode\Project02\src\Game\Social\NPC.cpp;E:\DouBao2\Project\KatCode\Project02\build\Starchild2D.dir\Release\NPC.obj

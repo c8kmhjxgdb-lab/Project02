@@ -2,6 +2,8 @@
 
 #include <glm/vec2.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/common.hpp>
+#include <glm/geometric.hpp>
 #include <cmath>
 #include <random>
 
