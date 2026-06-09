@@ -24,10 +24,12 @@ struct DamageInfo {
     float amount;
     glm::vec2 sourcePosition;   // 伤害来源位置（用于击退）
     b2BodyId sourceBody;        // 来源刚体（可为null）
+    b2BodyId victimBody;        // 受伤者刚体（用于击退方向）
     DamageType type;
 
     DamageInfo() : amount(0), sourcePosition(0, 0),
-                   sourceBody(b2_nullBodyId), type(DamageType::Normal) {}
+                   sourceBody(b2_nullBodyId), victimBody(b2_nullBodyId),
+                   type(DamageType::Normal) {}
 };
 
 /**
@@ -61,6 +63,9 @@ public:
     float getHealthPercent() const {
         return maxHealth > 0 ? currentHealth / maxHealth : 0.0f;
     }
+
+    // Restore persisted values without triggering damage/heal side effects.
+    void restore(float health, float newMaxHealth);
 
     // 无敌时间管理
     void setInvincible(float duration);

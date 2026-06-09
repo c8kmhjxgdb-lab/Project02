@@ -1,9 +1,11 @@
 #include "WeatherSystem.h"
 #include "Engine/Renderer/ParticleSystem.h"
 #include "Engine/Camera/Camera2D.h"
+#include "Game/Data/WeatherConfigLoader.h"
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 void WeatherSystem::init(ParticleSystem* particleSys, Camera2D* cam) {
     currentWeather = WeatherType::Clear;
@@ -16,6 +18,31 @@ void WeatherSystem::init(ParticleSystem* particleSys, Camera2D* cam) {
     useRandomWeather = false;
     particleSystem = particleSys;
     camera = cam;
+    currentRegionId = "default";
+    indoorContext = false;
+    allowParticleEffects = true;
+    currentSpecialTag.clear();
+    defaultChangeInterval = 300.0f;
+    regionRules.clear();
+}
+
+bool WeatherSystem::loadConfig(LuaVM& lua, const char* path) {
+    WeatherConfig defaults;
+    defaults.defaultChangeInterval = defaultChangeInterval;
+    defaults.regionRules = regionRules;
+
+    WeatherConfig config;
+    if (!WeatherConfigLoader::load(lua, path, defaults, config)) {
+        return false;
+    }
+
+    defaultChangeInterval = config.defaultChangeInterval;
+    if (config.hasRegionRules) {
+        regionRules = std::move(config.regionRules);
+        setRegionContext(currentRegionId, indoorContext, allowParticleEffects);
+    }
+
+    return true;
 }
 
 void WeatherSystem::update(float dt, const Camera2D& cam) {
@@ -36,13 +63,13 @@ void WeatherSystem::update(float dt, const Camera2D& cam) {
     switch (currentWeather) {
         case WeatherType::Rain:
         case WeatherType::HeavyRain:
-            updateRainEffect(dt, cam);
+            if (shouldEmitParticles()) updateRainEffect(dt, cam);
             break;
         case WeatherType::Fog:
             updateFogEffect(dt);
             break;
         case WeatherType::Snow:
-            updateSnowEffect(dt, cam);
+            if (shouldEmitParticles()) updateSnowEffect(dt, cam);
             break;
         default:
             break;
@@ -61,6 +88,7 @@ void WeatherSystem::updateTransition(float dt) {
         intensity -= dt * transitionSpeed;
         if (intensity <= targetIntensity) {
             intensity = targetIntensity;
+            currentWeather = targetWeather;
         }
     }
 }
@@ -73,9 +101,9 @@ void WeatherSystem::updateRainEffect(float dt, const Camera2D& cam) {
     emitRate *= intensity;
 
     // 计算视口范围
-    int screenWidth = 800, screenHeight = 600;  // 从配置读取或使用默认值
-    glm::vec2 topLeft = cam.screenToWorld(0, screenHeight, screenWidth, screenHeight);
-    glm::vec2 bottomRight = cam.screenToWorld(screenWidth, 0, screenWidth, screenHeight);
+    float screenWidth = 800.0f, screenHeight = 600.0f;  // 从配置读取或使用默认值
+    glm::vec2 topLeft = cam.screenToWorld(0.0f, screenHeight, screenWidth, screenHeight);
+    glm::vec2 bottomRight = cam.screenToWorld(screenWidth, 0.0f, screenWidth, screenHeight);
     float viewportWidth = bottomRight.x - topLeft.x;
     float viewportHeight = bottomRight.y - topLeft.y;
 
@@ -97,9 +125,8 @@ void WeatherSystem::updateRainEffect(float dt, const Camera2D& cam) {
             ParticleType::Circle
         );
     }
-
-    // 处理小数部分
-    rainAccumulator += emitRate * dt - particlesToEmit;
+    // (rainAccumulator was previously incremented here for fractional particles
+    // but never read — removed as dead state.)
 }
 
 void WeatherSystem::updateFogEffect(float) {
@@ -112,9 +139,9 @@ void WeatherSystem::updateSnowEffect(float dt, const Camera2D& cam) {
 
     float emitRate = 60.0f * intensity;
 
-    int screenWidth = 800, screenHeight = 600;
-    glm::vec2 topLeft = cam.screenToWorld(0, screenHeight, screenWidth, screenHeight);
-    glm::vec2 bottomRight = cam.screenToWorld(screenWidth, 0, screenWidth, screenHeight);
+    float screenWidth = 800.0f, screenHeight = 600.0f;
+    glm::vec2 topLeft = cam.screenToWorld(0.0f, screenHeight, screenWidth, screenHeight);
+    glm::vec2 bottomRight = cam.screenToWorld(screenWidth, 0.0f, screenWidth, screenHeight);
     float viewportWidth = bottomRight.x - topLeft.x;
     float viewportHeight = bottomRight.y - topLeft.y;
 
@@ -135,18 +162,30 @@ void WeatherSystem::updateSnowEffect(float dt, const Camera2D& cam) {
             ParticleType::Circle
         );
     }
-
-    snowAccumulator += emitRate * dt - particlesToEmit;
+    // (snowAccumulator was previously incremented here for fractional particles
+    // but never read — removed as dead state.)
 }
 
 void WeatherSystem::setWeather(WeatherType type) {
     targetWeather = type;
     targetIntensity = (type == WeatherType::Clear) ? 0.0f : 1.0f;
+    if (std::abs(intensity - targetIntensity) < 0.001f) {
+        currentWeather = targetWeather;
+    }
     useRandomWeather = false;
 }
 
+void WeatherSystem::setWeatherImmediate(WeatherType type, float restoredIntensity) {
+    currentWeather = type;
+    targetWeather = type;
+    intensity = (type == WeatherType::Clear) ? 0.0f : std::clamp(restoredIntensity, 0.0f, 1.0f);
+    targetIntensity = intensity;
+    useRandomWeather = false;
+    weatherTimer = 0.0f;
+}
+
 void WeatherSystem::setRandomWeather(float interval) {
-    changeInterval = interval > 0.0f ? interval : 300.0f;
+    changeInterval = interval > 0.0f ? interval : defaultChangeInterval;
     useRandomWeather = true;
     weatherTimer = 0.0f;
 }
@@ -155,7 +194,33 @@ void WeatherSystem::clearWeather() {
     setWeather(WeatherType::Clear);
 }
 
+void WeatherSystem::setRegionContext(const std::string& regionId, bool indoor, bool allowParticles) {
+    currentRegionId = regionId.empty() ? "default" : regionId;
+    indoorContext = indoor;
+    allowParticleEffects = allowParticles;
+    currentSpecialTag.clear();
+
+    const WeatherRegionRule* rule = findRegionRule(currentRegionId);
+    if (!rule) {
+        rule = findRegionRule("default");
+    }
+    if (rule) {
+        indoorContext = rule->indoor;
+        allowParticleEffects = rule->allowParticles;
+        currentSpecialTag = rule->specialTag;
+    }
+}
+
+bool WeatherSystem::shouldEmitParticles() const {
+    if (indoorContext || !allowParticleEffects) return false;
+    return currentWeather == WeatherType::Rain ||
+           currentWeather == WeatherType::HeavyRain ||
+           currentWeather == WeatherType::Snow;
+}
+
 float WeatherSystem::getMovementMultiplier() const {
+    if (indoorContext) return 1.0f;
+
     switch (currentWeather) {
         case WeatherType::Rain:
             return 1.0f - 0.1f * intensity;  // 减速10%
@@ -169,6 +234,8 @@ float WeatherSystem::getMovementMultiplier() const {
 }
 
 float WeatherSystem::getVisibility() const {
+    if (indoorContext) return 1.0f;
+
     switch (currentWeather) {
         case WeatherType::Fog:
             return 1.0f - 0.5f * intensity;  // 能见度50%
@@ -199,29 +266,49 @@ glm::vec3 WeatherSystem::getLightModifier() const {
 }
 
 const char* WeatherSystem::getWeatherName(WeatherType type) {
-    switch (type) {
-        case WeatherType::Clear:      return "晴天";
-        case WeatherType::Cloudy:     return "多云";
-        case WeatherType::Rain:       return "雨天";
-        case WeatherType::HeavyRain:  return "大雨";
-        case WeatherType::Fog:        return "雾天";
-        case WeatherType::Snow:       return "雪天";
-        default:                      return "未知";
-    }
+    return WeatherTypes::getWeatherName(type);
+}
+
+const char* WeatherSystem::getWeatherId(WeatherType type) {
+    return WeatherTypes::getWeatherId(type);
+}
+
+WeatherType WeatherSystem::weatherFromId(const std::string& id) {
+    return WeatherTypes::weatherFromId(id);
 }
 
 WeatherType WeatherSystem::chooseRandomWeather() const {
-    // 根据权重随机选择天气
+    const WeatherRegionRule* rule = findRegionRule(currentRegionId);
+    if (!rule || rule->weights.empty()) {
+        rule = findRegionRule("default");
+    }
+
+    if (rule && !rule->weights.empty()) {
+        int total = 0;
+        for (const auto& entry : rule->weights) {
+            total += std::max(0, entry.second);
+        }
+        if (total > 0) {
+            int roll = rand() % total;
+            for (const auto& entry : rule->weights) {
+                roll -= std::max(0, entry.second);
+                if (roll < 0) {
+                    return entry.first;
+                }
+            }
+        }
+    }
+
     int roll = rand() % 100;
-    if (roll < 40) return WeatherType::Clear;      // 40% 晴天
-    if (roll < 60) return WeatherType::Cloudy;     // 20% 多云
-    if (roll < 75) return WeatherType::Rain;       // 15% 雨天
-    if (roll < 85) return WeatherType::Fog;        // 10% 雾天
-    if (roll < 95) return WeatherType::HeavyRain;  // 10% 大雨
-    return WeatherType::Snow;                      // 5% 雪天
+    if (roll < 40) return WeatherType::Clear;
+    if (roll < 60) return WeatherType::Cloudy;
+    if (roll < 75) return WeatherType::Rain;
+    if (roll < 85) return WeatherType::Fog;
+    if (roll < 95) return WeatherType::HeavyRain;
+    return WeatherType::Snow;
 }
 
-void WeatherSystem::render() {
-    // 天气粒子效果通过 ParticleSystem 渲染
-    // 这里可以添加额外的天气特效渲染（如全屏雾效）
+const WeatherRegionRule* WeatherSystem::findRegionRule(const std::string& regionId) const {
+    auto it = regionRules.find(regionId);
+    return it == regionRules.end() ? nullptr : &it->second;
 }

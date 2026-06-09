@@ -4,7 +4,22 @@
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\GameBootstrap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\GameLoop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\WindowEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\Draw2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\TextRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\ParticleSystem.cpp">
@@ -40,10 +55,16 @@
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\MapRegion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\RegionFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\RegionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\TimeSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\WeatherTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\WeatherSystem.cpp">
@@ -53,6 +74,33 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\MiniMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\DialogueScriptLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\EmotionConfigLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\FurnitureDefinitionLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\QuestDefinitionLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\TimeConfigLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\ToyDefinitionLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\WeatherConfigLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveRepository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveSerializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Health.cpp">
@@ -74,6 +122,153 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\BondTechnique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingPlacementRules.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingPhysicsSync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\Furniture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Inventory\Inventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Toy\MiniCarGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Toy\ToySystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Quest\QuestSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\AbilityInputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\BuildingInputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\InputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\InteractionInputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\MainMenuInputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\AbilityUpdateService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\CombatCollisionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\CombatService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\EnemySpawnService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\GameSessionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\PlayerInputQuery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\PlayerLifecycleService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\PlayerMotionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\ProgressionUpdateService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\ProjectileTrailService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\RegionUpdateService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SaveApplier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SaveGameService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SaveSnapshotBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SessionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldCombatUpdateService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldNpcUiUpdateService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldQuery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldUpdateService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\AbilityView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\AimReticleView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\BuildingView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\EntityView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\GameRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\HudView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\MainMenuView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\MiniMapPresenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\ParticleView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\PresentationModelBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WindowTitlePresenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldSignView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Scenes\MainMenuScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Scenes\SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Scenes\WorldScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\AI\Enemy.cpp">

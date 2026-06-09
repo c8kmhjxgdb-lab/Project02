@@ -17,6 +17,9 @@ public:
     // 初始化FBO和全屏四边形
     bool init(int width, int height);
 
+    // 显式释放GL资源
+    void shutdown();
+
     // 窗口大小改变时重置FBO
     void resize(int width, int height);
 

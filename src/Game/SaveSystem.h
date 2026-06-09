@@ -1,63 +1,11 @@
 #pragma once
 
-#include "Game/World/MapRegion.h"
-#include "Game/World/RegionManager.h"
+#include "Game/Data/SaveData.h"
+
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
-
-/**
- * 玩家进度数据
- */
-struct PlayerProgress {
-    std::vector<std::string> discoveredRegions;
-    std::vector<std::string> completedQuests;
-    std::vector<std::string> collectedItems;
-    float totalPlayTime;
-    int maxHealth;
-    int maxMana;
-};
-
-/**
- * 存档数据
- */
-struct SaveData {
-    int version = 2;
-    std::string timestamp;
-
-    // 玩家数据
-    struct PlayerData {
-        glm::vec2 position;
-        float health;
-        float maxHealth;
-        float mana;
-        float maxMana;
-        int coins;
-        PlayerProgress progress;
-    } player;
-
-    // 区域数据（种子+差异）
-    struct RegionData {
-        std::string id;
-        std::string name;
-        int seed;
-        glm::ivec2 size;
-        float tileSize;
-        std::vector<TileModification> modifications;
-        std::vector<Decoration> decorModifications;
-        std::vector<PointOfInterest> pois;
-    };
-
-    std::vector<RegionData> regions;
-
-    // 情感状态
-    float grievance;
-    float joy;
-
-    SaveData() : grievance(0.0f), joy(0.0f) {}
-};
+class RegionManager;
 
 /**
  * SaveSystem — 存档/读档系统
@@ -69,6 +17,7 @@ class SaveSystem {
 public:
     // 保存游戏
     bool saveGame(const std::string& slot,
+                 const std::string& playerRegionId,
                  const glm::vec2& playerPos,
                  float playerHealth,
                  float playerMaxHealth,
@@ -77,7 +26,21 @@ public:
                  int playerCoins,
                  const PlayerProgress& progress,
                  const RegionManager& regionManager,
-                 float grievance);
+                 float childlikeHeart,
+                 float grievance,
+                 float joy,
+                 float stress,
+                 int environmentDay,
+                 float environmentHour,
+                 const std::string& weather,
+                 float weatherIntensity,
+                 const std::string& storyWeatherTag,
+                 const SaveData::PrincessData& princessData,
+                 const std::vector<FurnitureInstance>& homeFurniture,
+                 const std::vector<FurnitureStock>& furnitureStock,
+                 const std::vector<std::string>& unlockedFurniture,
+                 const ToySaveData& toyData,
+                 const std::vector<QuestSaveEntry>& quests);
 
     // 加载游戏
     bool loadGame(const std::string& slot, SaveData& outData);
@@ -101,12 +64,6 @@ public:
     SaveMeta getSaveMeta(const std::string& slot) const;
 
 private:
-    std::string getSavePath(const std::string& slot) const;
-
-    // JSON 序列化/反序列化
-    json saveDataToJson(const SaveData& data) const;
-    SaveData jsonToSaveData(const json& data) const;
-
     // 获取当前时间戳
     static std::string getCurrentTimestamp();
 };

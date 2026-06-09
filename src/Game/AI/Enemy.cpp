@@ -24,9 +24,13 @@ b2BodyId EnemyManager::createBody(b2WorldId world, const glm::vec2& pos, EnemyTy
 
     b2BodyId bodyId = b2CreateBody(world, &bd);
 
+    float radius = 0.3f;
+    if (type == EnemyType::Shooter) radius = 0.25f;
+    else if (type == EnemyType::Exploder) radius = 0.35f;
+
     b2Circle circle;
     circle.center = { 0, 0 };
-    circle.radius = 0.3f;
+    circle.radius = radius;
 
     b2ShapeDef sd = b2DefaultShapeDef();
     sd.density = 1.0f;
@@ -37,6 +41,7 @@ b2BodyId EnemyManager::createBody(b2WorldId world, const glm::vec2& pos, EnemyTy
     sd.filter.maskBits = 0x0001 | 0x0002;  // 与玩家(0x0001)和投射物(0x0002)碰撞
 
     b2CreateCircleShape(bodyId, &sd, &circle);
+    b2Body_SetLinearDamping(bodyId, 4.5f);
 
     return bodyId;
 }
@@ -55,8 +60,8 @@ EnemyId EnemyManager::spawn(b2WorldId world, const glm::vec2& pos, EnemyType typ
         enemy.health = 30.0f;
         enemy.maxHealth = 30.0f;
         enemy.damage = 10.0f;
-        enemy.speed = 3.0f;
-        enemy.detectionRange = 10.0f;
+        enemy.speed = 1.65f;
+        enemy.detectionRange = 8.0f;
         enemy.attackRange = 0.8f;
         enemy.attackCooldown = 1.0f;
         enemy.color = glm::vec3(1.0f, 0.2f, 0.2f);  // 红色
@@ -69,8 +74,8 @@ EnemyId EnemyManager::spawn(b2WorldId world, const glm::vec2& pos, EnemyType typ
         enemy.health = 20.0f;
         enemy.maxHealth = 20.0f;
         enemy.damage = 8.0f;
-        enemy.speed = 2.0f;
-        enemy.detectionRange = 12.0f;
+        enemy.speed = 1.15f;
+        enemy.detectionRange = 9.0f;
         enemy.attackRange = 5.0f;
         enemy.attackCooldown = 1.5f;
         enemy.color = glm::vec3(0.6f, 0.2f, 0.8f);  // 紫色
@@ -83,8 +88,8 @@ EnemyId EnemyManager::spawn(b2WorldId world, const glm::vec2& pos, EnemyType typ
         enemy.health = 15.0f;
         enemy.maxHealth = 15.0f;
         enemy.damage = 25.0f;
-        enemy.speed = 4.0f;
-        enemy.detectionRange = 8.0f;
+        enemy.speed = 1.85f;
+        enemy.detectionRange = 7.0f;
         enemy.attackRange = 0.8f;
         enemy.attackCooldown = 0.5f;
         enemy.color = glm::vec3(1.0f, 0.5f, 0.1f);  // 橙色
@@ -100,6 +105,7 @@ EnemyId EnemyManager::spawn(b2WorldId world, const glm::vec2& pos, EnemyType typ
     enemy.stateTimer = 0;
     enemy.attackTimer = 0;
     enemy.deathTimer = 0;
+    enemy.explosionTriggered = false;
 
     enemies.push_back(enemy);
     return enemy.id;
@@ -120,8 +126,15 @@ const Enemy* EnemyManager::find(EnemyId id) const {
 }
 
 void EnemyManager::update(float dt, b2WorldId world, const glm::vec2& playerPos) {
+    (void)world;
+
     for (auto& enemy : enemies) {
         if (!enemy.active) continue;
+
+        if (!b2Body_IsValid(enemy.bodyId)) {
+            enemy.active = false;
+            continue;
+        }
 
         // Update slow effect
         enemy.updateSlow(dt);
@@ -148,7 +161,7 @@ void EnemyManager::update(float dt, b2WorldId world, const glm::vec2& playerPos)
                         std::sin(enemy.stateTimer * 1.3f),
                         std::cos(enemy.stateTimer * 0.7f)
                     );
-                    float spd = enemy.speed * enemy.getSpeedMultiplier() * 0.3f;
+                    float spd = enemy.speed * enemy.getSpeedMultiplier() * 0.18f;
                     b2Vec2 force = { std::cos(angle) * spd,
                                      std::sin(angle) * spd };
                     b2Body_ApplyForceToCenter(enemy.bodyId, force, true);
@@ -157,7 +170,7 @@ void EnemyManager::update(float dt, b2WorldId world, const glm::vec2& playerPos)
             break;
 
         case Enemy::State::Chase:
-            if (distToPlayer > enemy.detectionRange * 1.5f) {
+            if (distToPlayer > enemy.detectionRange * 1.25f) {
                 // 玩家跑太远，返回idle
                 enemy.state = Enemy::State::Idle;
                 enemy.stateTimer = 0;
@@ -173,14 +186,14 @@ void EnemyManager::update(float dt, b2WorldId world, const glm::vec2& playerPos)
                     glm::vec2 dir = enemyPos - playerPos;
                     float dlen = sqrtf(dir.x * dir.x + dir.y * dir.y);
                     if (dlen > 0.001f) { dir.x /= dlen; dir.y /= dlen; }
-                    b2Vec2 force = { dir.x * spd * 2.0f, dir.y * spd * 2.0f };
+                    b2Vec2 force = { dir.x * spd * 1.2f, dir.y * spd * 1.2f };
                     b2Body_ApplyForceToCenter(enemy.bodyId, force, true);
                 } else {
                     // 其他类型：直接追击
                     glm::vec2 dir = playerPos - enemyPos;
                     float dlen = sqrtf(dir.x * dir.x + dir.y * dir.y);
                     if (dlen > 0.001f) { dir.x /= dlen; dir.y /= dlen; }
-                    b2Vec2 force = { dir.x * spd * 3.0f, dir.y * spd * 3.0f };
+                    b2Vec2 force = { dir.x * spd * 1.55f, dir.y * spd * 1.55f };
                     b2Body_ApplyForceToCenter(enemy.bodyId, force, true);
                 }
             }
@@ -226,6 +239,7 @@ void EnemyManager::update(float dt, b2WorldId world, const glm::vec2& playerPos)
                     }
                     enemy.state = Enemy::State::Dead;
                     enemy.deathTimer = 0.5f;  // 爆炸动画时间
+                    enemy.explosionTriggered = false;
                     break;
 
                 default:
@@ -244,11 +258,13 @@ void EnemyManager::update(float dt, b2WorldId world, const glm::vec2& playerPos)
                 }
                 enemy.active = false;
             }
-            break;
+            continue;
         }
 
         // 限制速度
-        PhysicsWorld::clampVelocity(enemy.bodyId, enemy.speed * enemy.getSpeedMultiplier() * 2.0f);
+        if (enemy.active && b2Body_IsValid(enemy.bodyId)) {
+            PhysicsWorld::clampVelocity(enemy.bodyId, enemy.speed * enemy.getSpeedMultiplier() * 1.35f);
+        }
     }
 }
 
@@ -264,7 +280,7 @@ void EnemyManager::cleanup() {
 std::vector<const Enemy*> EnemyManager::getAlive() const {
     std::vector<const Enemy*> alive;
     for (const auto& e : enemies) {
-        if (e.active && e.state != Enemy::State::Dead) {
+        if (e.active && e.state != Enemy::State::Dead && b2Body_IsValid(e.bodyId)) {
             alive.push_back(&e);
         }
     }
@@ -278,6 +294,12 @@ void EnemyManager::damage(EnemyId id, float amount) {
     enemy->health -= amount;
 
     if (enemy->health <= 0.0f) {
+        enemy->health = 0.0f;
+        if (!b2Body_IsValid(enemy->bodyId)) {
+            enemy->active = false;
+            return;
+        }
+
         // 死亡
         b2Vec2 pos = b2Body_GetPosition(enemy->bodyId);
         if (onEnemyDeath) {
@@ -285,6 +307,7 @@ void EnemyManager::damage(EnemyId id, float amount) {
         }
         enemy->state = Enemy::State::Dead;
         enemy->deathTimer = 0.5f;
+        enemy->explosionTriggered = false;
     }
 }
 

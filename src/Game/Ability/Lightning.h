@@ -54,11 +54,10 @@ public:
     // 添加一个击中点
     void addHit(const glm::vec2& hitPos, float damage, const b2BodyId& bodyId);
 
-    // 结束雷电
-    void end();
-
     // 更新雷电状态
     void update(float dt);
+
+    void reset() { currentChain.reset(); cooldown = 0.0f; }
 
     // 是否正在激活（视觉效果）
     bool isActive() const { return currentChain.active; }
@@ -88,7 +87,6 @@ public:
 
 private:
     LightningChain currentChain;
-    float baseDamage = 30.0f;
     float cooldown = 0.0f;
     float manaCost = 25.0f;
 };

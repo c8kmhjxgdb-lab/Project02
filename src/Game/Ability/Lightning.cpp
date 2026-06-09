@@ -11,10 +11,6 @@ void Lightning::addHit(const glm::vec2& hitPos, float damage, const b2BodyId& bo
     currentChain.addHit(hitPos, damage, bodyId);
 }
 
-void Lightning::end() {
-    // 雷电链完成，视觉效果由 isActive() 和 lifetime 控制
-}
-
 void Lightning::update(float dt) {
     if (!currentChain.active) return;
 

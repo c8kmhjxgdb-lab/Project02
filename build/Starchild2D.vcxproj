@@ -139,7 +139,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>vcpkg_installed\x64-windows\debug\lib\SDL2d.lib;vcpkg_installed\x64-windows\debug\lib\glew32d.lib;vcpkg_installed\x64-windows\debug\lib\box2dd.lib;vcpkg_installed\x64-windows\debug\lib\glm.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vcpkg_installed\x64-windows\debug\lib\SDL2d.lib;vcpkg_installed\x64-windows\debug\lib\glew32d.lib;vcpkg_installed\x64-windows\debug\lib\box2dd.lib;vcpkg_installed\x64-windows\debug\lib\glm.lib;gdi32.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -211,7 +211,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>vcpkg_installed\x64-windows\lib\SDL2.lib;vcpkg_installed\x64-windows\lib\glew32.lib;vcpkg_installed\x64-windows\lib\box2d.lib;vcpkg_installed\x64-windows\lib\glm.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vcpkg_installed\x64-windows\lib\SDL2.lib;vcpkg_installed\x64-windows\lib\glew32.lib;vcpkg_installed\x64-windows\lib\box2d.lib;vcpkg_installed\x64-windows\lib\glm.lib;gdi32.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -283,7 +283,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>vcpkg_installed\x64-windows\lib\SDL2.lib;vcpkg_installed\x64-windows\lib\glew32.lib;vcpkg_installed\x64-windows\lib\box2d.lib;vcpkg_installed\x64-windows\lib\glm.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vcpkg_installed\x64-windows\lib\SDL2.lib;vcpkg_installed\x64-windows\lib\glew32.lib;vcpkg_installed\x64-windows\lib\box2d.lib;vcpkg_installed\x64-windows\lib\glm.lib;gdi32.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -354,7 +354,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>vcpkg_installed\x64-windows\lib\SDL2.lib;vcpkg_installed\x64-windows\lib\glew32.lib;vcpkg_installed\x64-windows\lib\box2d.lib;vcpkg_installed\x64-windows\lib\glm.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vcpkg_installed\x64-windows\lib\SDL2.lib;vcpkg_installed\x64-windows\lib\glew32.lib;vcpkg_installed\x64-windows\lib\box2d.lib;vcpkg_installed\x64-windows\lib\glm.lib;gdi32.lib;vcpkg_installed\x64-windows\debug\lib\lua51.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -430,7 +430,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\main.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\Application.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\GameBootstrap.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\GameLoop.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\App\WindowEvents.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\Draw2D.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\TextRenderer.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\ParticleSystem.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\PostProcess.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\DialogueUI.cpp" />
@@ -442,11 +447,22 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\TerrainGenerator.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\DecorationGen.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\MapRegion.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\RegionFactory.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\RegionManager.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\TimeSystem.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\WeatherTypes.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\World\WeatherSystem.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\DecorRenderer.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Engine\Renderer\MiniMap.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\DialogueScriptLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\EmotionConfigLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\FurnitureDefinitionLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\QuestDefinitionLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\TimeConfigLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\ToyDefinitionLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\WeatherConfigLoader.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveRepository.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveSerializer.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Health.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Drop.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Projectile.cpp" />
@@ -454,6 +470,55 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Shield.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Lightning.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\BondTechnique.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingPlacementRules.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingPhysicsSync.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingStats.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\Furniture.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Building\BuildingSystem.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Inventory\Inventory.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Toy\MiniCarGame.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Toy\ToySystem.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Quest\QuestSystem.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\AbilityInputController.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\BuildingInputController.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\InputController.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\InteractionInputController.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Controllers\MainMenuInputController.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\AbilityUpdateService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\CombatCollisionService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\CombatService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\EnemySpawnService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\GameSessionService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\PlayerInputQuery.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\PlayerLifecycleService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\PlayerMotionService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\ProgressionUpdateService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\ProjectileTrailService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\RegionUpdateService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SaveApplier.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SaveGameService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SaveSnapshotBuilder.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\SessionService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldCombatUpdateService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldNpcUiUpdateService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldQuery.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Services\WorldUpdateService.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\AbilityView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\AimReticleView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\BuildingView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\EntityView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\GameRenderer.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\HudView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\MainMenuView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\MiniMapPresenter.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\ParticleView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\PresentationModelBuilder.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WindowTitlePresenter.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldRenderer.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldSignView.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Scenes\MainMenuScene.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Scenes\SceneManager.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Scenes\WorldScene.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\AI\Enemy.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\AI\PathfindingSystem.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Social\NPC.cpp" />

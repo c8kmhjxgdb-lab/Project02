@@ -62,8 +62,6 @@ public:
         return affection / 1000.0f * 0.2f;
     }
 
-    void triggerSpecialEvent(const std::string&) {}
-
     void render(const glm::mat4& viewProj) override {
         if (!hasBody()) return;
 
@@ -71,21 +69,50 @@ public:
 
         Draw2D::beginFrame(viewProj);
 
-        float s = 0.35f;
-        float sh = 0.7f;
+        glm::vec3 skin(0.96f, 0.80f, 0.68f);
+        glm::vec3 hair(0.42f, 0.22f, 0.16f);
+        glm::vec3 outline(0.10f, 0.07f, 0.08f);
+        glm::vec3 dress = bodyColor;
+        glm::vec3 shoe(0.35f, 0.18f, 0.24f);
+        glm::vec3 gold(1.0f, 0.82f, 0.24f);
+        glm::vec3 eye(0.05f, 0.05f, 0.07f);
 
-        Draw2D::drawRectFilled(pos.x - s, pos.y - sh, s * 2.0f, sh * 2.0f, bodyColor);
-        Draw2D::drawRect(pos.x - s, pos.y - sh, s * 2.0f, sh * 2.0f, bodyColor * 0.5f, 0.03f);
+        float x = pos.x;
+        float y = pos.y;
+
+        Draw2D::drawCircleFilled(x, y - 0.58f, 0.42f, glm::vec3(0.0f), 0.18f);
+
+        Draw2D::drawRectFilled(x - 0.22f, y - 0.74f, 0.18f, 0.10f, shoe);
+        Draw2D::drawRectFilled(x + 0.04f, y - 0.74f, 0.18f, 0.10f, shoe);
+        Draw2D::drawRectFilled(x - 0.38f, y - 0.36f, 0.76f, 0.68f, dress);
+        Draw2D::drawRect(x - 0.38f, y - 0.36f, 0.76f, 0.68f, outline, 0.025f, 0.7f);
+        Draw2D::drawRectFilled(x - 0.24f, y + 0.08f, 0.48f, 0.16f, dress * 1.12f);
+
+        Draw2D::drawLine(x - 0.38f, y + 0.08f, x - 0.55f, y - 0.24f, skin, 0.08f);
+        Draw2D::drawLine(x + 0.38f, y + 0.08f, x + 0.55f, y - 0.24f, skin, 0.08f);
+
+        Draw2D::drawCircleFilled(x, y + 0.50f, 0.35f, skin);
+        Draw2D::drawCircle(x, y + 0.50f, 0.35f, outline, 0.025f, 24, 0.7f);
+        Draw2D::drawCircleFilled(x - 0.24f, y + 0.56f, 0.18f, hair);
+        Draw2D::drawCircleFilled(x + 0.24f, y + 0.56f, 0.18f, hair);
+        Draw2D::drawRectFilled(x - 0.32f, y + 0.64f, 0.64f, 0.13f, hair);
+        Draw2D::drawRectFilled(x - 0.20f, y + 0.82f, 0.12f, 0.12f, gold);
+        Draw2D::drawRectFilled(x - 0.04f, y + 0.86f, 0.12f, 0.16f, gold);
+        Draw2D::drawRectFilled(x + 0.12f, y + 0.82f, 0.12f, 0.12f, gold);
+        Draw2D::drawCircleFilled(x - 0.11f, y + 0.50f, 0.035f, eye);
+        Draw2D::drawCircleFilled(x + 0.11f, y + 0.50f, 0.035f, eye);
+        Draw2D::drawRectFilled(x - 0.08f, y + 0.35f, 0.16f, 0.025f, glm::vec3(0.58f, 0.16f, 0.22f));
 
         float haloIntensity = affection / 1000.0f * 0.3f;
         if (haloIntensity > 0.01f) {
-            float haloR = s * 1.5f;
-            Draw2D::drawCircle(pos.x, pos.y, haloR, bodyColor * haloIntensity, 0.02f);
+            float haloR = 0.78f;
+            Draw2D::drawCircle(x, y + 0.18f, haloR, bodyColor, 0.03f, 32, 0.25f + haloIntensity);
         }
 
         if (following) {
-            float indicatorY = pos.y + sh + 0.2f;
-            Draw2D::drawCircleFilled(pos.x, indicatorY, 0.05f, glm::vec3(1.0f, 0.8f, 0.2f));
+            float indicatorY = y + 1.08f;
+            Draw2D::drawCircleFilled(x, indicatorY, 0.07f, gold);
+            Draw2D::drawCircle(x, indicatorY, 0.12f, gold, 0.02f, 24, 0.7f);
         }
 
         Draw2D::endFrame();
@@ -101,36 +128,9 @@ public:
         addAffection(2.0f);
     }
 
-    void updateBehavior(float dt, const glm::vec2& playerPos) {
-        if (!hasBody()) return;
-
-        b2Vec2 npcPos = b2Body_GetPosition(bodyId);
-        glm::vec2 currentPos(npcPos.x, npcPos.y);
-
-        if (following) {
-            glm::vec2 dir = playerPos - currentPos;
-            float dist = glm::length(dir);
-
-            if (dist > 1.5f) {
-                dir = glm::normalize(dir);
-                b2Vec2 force = { dir.x * 3.0f, dir.y * 3.0f };
-                b2Body_ApplyForceToCenter(bodyId, force, true);
-            } else if (dist < 1.0f) {
-                dir = -glm::normalize(dir);
-                b2Vec2 force = { dir.x * 2.0f, dir.y * 2.0f };
-                b2Body_ApplyForceToCenter(bodyId, force, true);
-            }
-
-            // Clamp velocity
-            PhysicsWorld::clampVelocity(bodyId, 4.0f);
-        }
-
-        (void)dt;
-    }
-
     // Override NPC update to also follow the player when `following` is enabled.
-    // Previously the follow behavior lived in updateBehavior() but it was never
-    // called from main, so the princess always walked on her schedule.
+    // (An earlier draft of the princess also had updateBehavior(); that whole
+    // block was dead code — never called from main — and has been removed.)
     void update(float dt, float gameTime) override {
         // Skip schedule/walk behavior when actively following the player.
         if (!following) {

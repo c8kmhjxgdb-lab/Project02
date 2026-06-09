@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 ParticleSystem::ParticleSystem(int maxP)
-    : maxParticles(maxP), firstFree(0) {
+    : maxParticles(maxP), firstFree(0), freeListValid(false) {
     particles.resize(static_cast<size_t>(maxParticles));
 }
 
@@ -15,25 +15,34 @@ ParticleSystem::~ParticleSystem() {
 void ParticleSystem::init() {
     particles.resize(static_cast<size_t>(maxParticles));
     firstFree = 0;
+    freeListValid = false;
+}
+
+void ParticleSystem::rebuildFreeList() {
+    freeList.clear();
+    freeList.reserve(static_cast<size_t>(maxParticles));
+    for (int i = 0; i < maxParticles; ++i) {
+        if (!particles[static_cast<size_t>(i)].active) {
+            freeList.push_back(i);
+        }
+    }
+    freeListValid = true;
 }
 
 Particle* ParticleSystem::findFree() {
-    // 从上次位置开始查找
-    int start = firstFree;
-    for (int i = start; i < maxParticles; ++i) {
-        if (!particles[static_cast<size_t>(i)].active) {
-            firstFree = i + 1;
-            return &particles[static_cast<size_t>(i)];
-        }
+    // Fast path: use free list for O(1) lookup
+    if (!freeListValid) {
+        rebuildFreeList();
     }
-    // 回绕到开头
-    for (int i = 0; i < start; ++i) {
-        if (!particles[static_cast<size_t>(i)].active) {
-            firstFree = i + 1;
-            return &particles[static_cast<size_t>(i)];
-        }
+
+    if (freeList.empty()) {
+        return nullptr;  // Particle pool is full
     }
-    return nullptr;  // 粒子池已满
+
+    int idx = freeList.back();
+    freeList.pop_back();
+    firstFree = freeList.empty() ? 0 : freeList.back();
+    return &particles[static_cast<size_t>(idx)];
 }
 
 void ParticleSystem::emit(const glm::vec2& pos, const glm::vec2& vel,
@@ -55,6 +64,9 @@ void ParticleSystem::emit(const glm::vec2& pos, const glm::vec2& vel,
     if (type == ParticleType::Spark) {
         p->gravity = -9.8f;  // 向下的重力（屏幕空间中向下为负Y）
     }
+
+    // Mark free list as invalid since we just allocated a particle
+    freeListValid = false;
 }
 
 void ParticleSystem::emitBurst(const glm::vec2& pos, int count,
@@ -85,6 +97,7 @@ void ParticleSystem::emitRing(const glm::vec2& pos, int count,
 }
 
 void ParticleSystem::update(float dt) {
+    bool anyExpired = false;
     for (auto& p : particles) {
         if (!p.active) continue;
 
@@ -92,6 +105,7 @@ void ParticleSystem::update(float dt) {
         p.lifetime -= dt;
         if (p.lifetime <= 0.0f) {
             p.active = false;
+            anyExpired = true;
             continue;
         }
 
@@ -105,6 +119,11 @@ void ParticleSystem::update(float dt) {
 
         // 阻力（轻量空气阻力）
         p.velocity *= 0.98f;
+    }
+
+    // Invalidate free list if any particles expired
+    if (anyExpired) {
+        freeListValid = false;
     }
 }
 
@@ -121,4 +140,6 @@ void ParticleSystem::clear() {
         p.active = false;
     }
     firstFree = 0;
+    freeList.clear();
+    freeListValid = false;
 }

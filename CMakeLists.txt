@@ -29,7 +29,12 @@ message(STATUS "GLM include dir: ${GLM_INCLUDE_DIR}")
 # Main executable
 add_executable(Starchild2D
     src/main.cpp
+    src/App/Application.cpp
+    src/App/GameBootstrap.cpp
+    src/App/GameLoop.cpp
+    src/App/WindowEvents.cpp
     src/Engine/Renderer/Draw2D.cpp
+    src/Engine/Renderer/TextRenderer.cpp
     src/Engine/Renderer/ParticleSystem.cpp
     src/Engine/Renderer/PostProcess.cpp
     src/Engine/Renderer/DialogueUI.cpp
@@ -41,11 +46,22 @@ add_executable(Starchild2D
     src/Game/World/TerrainGenerator.cpp
     src/Game/World/DecorationGen.cpp
     src/Game/World/MapRegion.cpp
+    src/Game/World/RegionFactory.cpp
     src/Game/World/RegionManager.cpp
     src/Game/World/TimeSystem.cpp
+    src/Game/World/WeatherTypes.cpp
     src/Game/World/WeatherSystem.cpp
     src/Engine/Renderer/DecorRenderer.cpp
     src/Engine/Renderer/MiniMap.cpp
+    src/Game/Data/DialogueScriptLoader.cpp
+    src/Game/Data/EmotionConfigLoader.cpp
+    src/Game/Data/FurnitureDefinitionLoader.cpp
+    src/Game/Data/QuestDefinitionLoader.cpp
+    src/Game/Data/TimeConfigLoader.cpp
+    src/Game/Data/ToyDefinitionLoader.cpp
+    src/Game/Data/WeatherConfigLoader.cpp
+    src/Game/Data/SaveRepository.cpp
+    src/Game/Data/SaveSerializer.cpp
     src/Game/Health.cpp
     src/Game/Drop.cpp
     src/Game/Ability/Projectile.cpp
@@ -53,6 +69,55 @@ add_executable(Starchild2D
     src/Game/Ability/Shield.cpp
     src/Game/Ability/Lightning.cpp
     src/Game/Ability/BondTechnique.cpp
+    src/Game/Building/BuildingPlacementRules.cpp
+    src/Game/Building/BuildingPhysicsSync.cpp
+    src/Game/Building/BuildingStats.cpp
+    src/Game/Building/Furniture.cpp
+    src/Game/Building/BuildingSystem.cpp
+    src/Game/Inventory/Inventory.cpp
+    src/Game/Toy/MiniCarGame.cpp
+    src/Game/Toy/ToySystem.cpp
+    src/Game/Quest/QuestSystem.cpp
+    src/Game/Controllers/AbilityInputController.cpp
+    src/Game/Controllers/BuildingInputController.cpp
+    src/Game/Controllers/InputController.cpp
+    src/Game/Controllers/InteractionInputController.cpp
+    src/Game/Controllers/MainMenuInputController.cpp
+    src/Game/Services/AbilityUpdateService.cpp
+    src/Game/Services/CombatCollisionService.cpp
+    src/Game/Services/CombatService.cpp
+    src/Game/Services/EnemySpawnService.cpp
+    src/Game/Services/GameSessionService.cpp
+    src/Game/Services/PlayerInputQuery.cpp
+    src/Game/Services/PlayerLifecycleService.cpp
+    src/Game/Services/PlayerMotionService.cpp
+    src/Game/Services/ProgressionUpdateService.cpp
+    src/Game/Services/ProjectileTrailService.cpp
+    src/Game/Services/RegionUpdateService.cpp
+    src/Game/Services/SaveApplier.cpp
+    src/Game/Services/SaveGameService.cpp
+    src/Game/Services/SaveSnapshotBuilder.cpp
+    src/Game/Services/SessionService.cpp
+    src/Game/Services/WorldCombatUpdateService.cpp
+    src/Game/Services/WorldNpcUiUpdateService.cpp
+    src/Game/Services/WorldQuery.cpp
+    src/Game/Services/WorldUpdateService.cpp
+    src/Game/Presentation/AbilityView.cpp
+    src/Game/Presentation/AimReticleView.cpp
+    src/Game/Presentation/BuildingView.cpp
+    src/Game/Presentation/EntityView.cpp
+    src/Game/Presentation/GameRenderer.cpp
+    src/Game/Presentation/HudView.cpp
+    src/Game/Presentation/MainMenuView.cpp
+    src/Game/Presentation/MiniMapPresenter.cpp
+    src/Game/Presentation/ParticleView.cpp
+    src/Game/Presentation/PresentationModelBuilder.cpp
+    src/Game/Presentation/WindowTitlePresenter.cpp
+    src/Game/Presentation/WorldRenderer.cpp
+    src/Game/Presentation/WorldSignView.cpp
+    src/Game/Scenes/MainMenuScene.cpp
+    src/Game/Scenes/SceneManager.cpp
+    src/Game/Scenes/WorldScene.cpp
     src/Game/AI/Enemy.cpp
     src/Game/AI/PathfindingSystem.cpp
     src/Game/Social/NPC.cpp
@@ -92,6 +157,10 @@ target_link_libraries(Starchild2D PRIVATE
     sol2::sol2
     nlohmann_json::nlohmann_json
 )
+
+if(WIN32)
+    target_link_libraries(Starchild2D PRIVATE gdi32)
+endif()
 
 # LuaJIT doesn't provide CMake config, link directly
 find_path(LUAJIT_INCLUDE_DIR NAMES lua.h PATH_SUFFIXES luajit)

@@ -7,11 +7,11 @@
 
 namespace Draw2D {
 
-    // ========== 内部状态 ==========
+    // ========== Internal state ==========
 
     struct Vertex {
         float x, y;
-        float r, g, b;
+        float r, g, b, a;
     };
 
     static GLuint sVAO = 0;
@@ -23,14 +23,14 @@ namespace Draw2D {
     static bool sInitialized = false;
     static glm::mat4 sCurrentViewProj(1.0f);
 
-    // ========== 着色器 ==========
+    // ========== Shaders ==========
 
     static const char* VERT_SHADER = R"(
 #version 330 core
 layout(location = 0) in vec2 aPos;
-layout(location = 1) in vec3 aColor;
+layout(location = 1) in vec4 aColor;
 uniform mat4 uViewProj;
-out vec3 vColor;
+out vec4 vColor;
 void main() {
     gl_Position = uViewProj * vec4(aPos, 0.0, 1.0);
     vColor = aColor;
@@ -39,10 +39,10 @@ void main() {
 
     static const char* FRAG_SHADER = R"(
 #version 330 core
-in vec3 vColor;
+in vec4 vColor;
 out vec4 FragColor;
 void main() {
-    FragColor = vec4(vColor, 1.0);
+    FragColor = vColor;
 }
 )";
 
@@ -82,7 +82,7 @@ void main() {
         return prog;
     }
 
-    // ========== 公共API ==========
+    // ========== Public API ==========
 
     bool init() {
         if (sInitialized) return true;
@@ -102,9 +102,11 @@ void main() {
         glBindBuffer(GL_ARRAY_BUFFER, sVBO);
         glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
 
+        // location 0: vec2 aPos
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2 * sizeof(float)));
+        // location 1: vec4 aColor (RGBA, includes alpha for translucent shapes)
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
         glBindVertexArray(0);
@@ -151,69 +153,63 @@ void main() {
         sVertices.clear();
     }
 
-    // ========== 辅助函数 ==========
+    // ========== Helpers ==========
 
+    // Single triangle, all 3 vertices share the same color/alpha.
     static void addTriangle(float x1, float y1, float x2, float y2, float x3, float y3,
-                            float r1, float g1, float b1,
-                            float r2, float g2, float b2,
-                            float r3, float g3, float b3) {
+                            float r, float g, float b, float a) {
         if (sVertices.size() + 3 > static_cast<size_t>(MAX_VERTICES)) {
             fprintf(stderr, "Draw2D: vertex buffer overflow\n");
             return;
         }
-        sVertices.push_back({x1, y1, r1, g1, b1});
-        sVertices.push_back({x2, y2, r2, g2, b2});
-        sVertices.push_back({x3, y3, r3, g3, b3});
+        sVertices.push_back({x1, y1, r, g, b, a});
+        sVertices.push_back({x2, y2, r, g, b, a});
+        sVertices.push_back({x3, y3, r, g, b, a});
     }
 
     // Quad with 4 corners: bl(0), br(1), tr(2), tl(3)
-    // Triangles: (0,1,3) and (1,2,3)
+    // Triangles: (0,1,3) and (1,2,3). All vertices share the same color/alpha.
     static void addQuad(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3,
-                        float r0, float g0, float b0,
-                        float r1, float g1, float b1,
-                        float r2, float g2, float b2,
-                        float r3, float g3, float b3) {
+                        float r, float g, float b, float a) {
         if (sVertices.size() + 6 > static_cast<size_t>(MAX_VERTICES)) {
             fprintf(stderr, "Draw2D: vertex buffer overflow\n");
             return;
         }
-        // Triangle 1: bl, br, tl
-        sVertices.push_back({x0, y0, r0, g0, b0});
-        sVertices.push_back({x1, y1, r1, g1, b1});
-        sVertices.push_back({x3, y3, r3, g3, b3});
-        // Triangle 2: br, tr, tl
-        sVertices.push_back({x1, y1, r1, g1, b1});
-        sVertices.push_back({x2, y2, r2, g2, b2});
-        sVertices.push_back({x3, y3, r3, g3, b3});
+        sVertices.push_back({x0, y0, r, g, b, a});
+        sVertices.push_back({x1, y1, r, g, b, a});
+        sVertices.push_back({x3, y3, r, g, b, a});
+        sVertices.push_back({x1, y1, r, g, b, a});
+        sVertices.push_back({x2, y2, r, g, b, a});
+        sVertices.push_back({x3, y3, r, g, b, a});
     }
 
-    // ========== 绘图函数实现 ==========
+    // ========== Draw functions ==========
 
-    void drawRect(float x, float y, float w, float h, const glm::vec3& color, float thickness) {
+    void drawRect(float x, float y, float w, float h, const glm::vec3& color, float thickness, float alpha) {
         float t = thickness;
         float r = color.r, g = color.g, b = color.b;
 
         // Top edge
         addQuad(x, y + h - t, x + w, y + h - t, x + w, y + h, x, y + h,
-                r, g, b, r, g, b, r, g, b, r, g, b);
+                r, g, b, alpha);
         // Bottom edge
         addQuad(x, y, x + w, y, x + w, y + t, x, y + t,
-                r, g, b, r, g, b, r, g, b, r, g, b);
-        // Left edge (between top and bottom)
+                r, g, b, alpha);
+        // Left edge
         addQuad(x, y + t, x + t, y + t, x + t, y + h - t, x, y + h - t,
-                r, g, b, r, g, b, r, g, b, r, g, b);
-        // Right edge (between top and bottom)
+                r, g, b, alpha);
+        // Right edge
         addQuad(x + w - t, y + t, x + w, y + t, x + w, y + h - t, x + w - t, y + h - t,
-                r, g, b, r, g, b, r, g, b, r, g, b);
+                r, g, b, alpha);
     }
 
-    void drawRectFilled(float x, float y, float w, float h, const glm::vec3& color) {
-        float r = color.r, g = color.g, b = color.b;
+    void drawRectFilled(float x, float y, float w, float h, const glm::vec3& color, float alpha) {
         addQuad(x, y, x + w, y, x + w, y + h, x, y + h,
-                r, g, b, r, g, b, r, g, b, r, g, b);
+                color.r, color.g, color.b, alpha);
     }
 
-    void drawCircleFilled(float cx, float cy, float r, const glm::vec3& color, int segments) {
+    void drawCircleFilled(float cx, float cy, float r, const glm::vec3& color, float alpha) {
+        const int segments = 32;
         for (int i = 0; i < segments; ++i) {
             float a1 = 2.0f * 3.14159265f * i / segments;
             float a2 = 2.0f * 3.14159265f * (i + 1) / segments;
@@ -222,13 +218,11 @@ void main() {
             float x2 = cx + r * cosf(a2);
             float y2 = cy + r * sinf(a2);
             addTriangle(cx, cy, x1, y1, x2, y2,
-                        color.r, color.g, color.b,
-                        color.r, color.g, color.b,
-                        color.r, color.g, color.b);
+                        color.r, color.g, color.b, alpha);
         }
     }
 
-    void drawCircle(float cx, float cy, float r, const glm::vec3& color, float thickness, int segments) {
+    void drawCircle(float cx, float cy, float r, const glm::vec3& color, float thickness, int segments, float alpha) {
         for (int i = 0; i < segments; ++i) {
             float a1 = 2.0f * 3.14159265f * i / segments;
             float a2 = 2.0f * 3.14159265f * (i + 1) / segments;
@@ -238,14 +232,12 @@ void main() {
             float ix2 = cx + innerR * cosf(a2), iy2 = cy + innerR * sinf(a2);
             float ox1 = cx + outerR * cosf(a1), oy1 = cy + outerR * sinf(a1);
             float ox2 = cx + outerR * cosf(a2), oy2 = cy + outerR * sinf(a2);
-            // Quad segment
             addQuad(ix1, iy1, ox1, oy1, ox2, oy2, ix2, iy2,
-                    color.r, color.g, color.b, color.r, color.g, color.b,
-                    color.r, color.g, color.b, color.r, color.g, color.b);
+                    color.r, color.g, color.b, alpha);
         }
     }
 
-    void drawLine(float x1, float y1, float x2, float y2, const glm::vec3& color, float thickness) {
+    void drawLine(float x1, float y1, float x2, float y2, const glm::vec3& color, float thickness, float alpha) {
         glm::vec2 dir(x2 - x1, y2 - y1);
         float len = glm::length(dir);
         if (len < 0.0001f) return;
@@ -253,19 +245,27 @@ void main() {
         float hx = normal.x * thickness * 0.5f;
         float hy = normal.y * thickness * 0.5f;
         addQuad(x1 + hx, y1 + hy, x1 - hx, y1 - hy, x2 - hx, y2 - hy, x2 + hx, y2 + hy,
-                color.r, color.g, color.b, color.r, color.g, color.b,
-                color.r, color.g, color.b, color.r, color.g, color.b);
+                color.r, color.g, color.b, alpha);
     }
 
     void drawRectGradient(float x, float y, float w, float h,
                           const glm::vec3& topLeft, const glm::vec3& topRight,
                           const glm::vec3& bottomLeft, const glm::vec3& bottomRight) {
-        // bl(0), br(1), tr(2), tl(3)
-        addQuad(x, y, x + w, y, x + w, y + h, x, y + h,
-                bottomLeft.r, bottomLeft.g, bottomLeft.b,
-                bottomRight.r, bottomRight.g, bottomRight.b,
-                topRight.r, topRight.g, topRight.b,
-                topLeft.r, topLeft.g, topLeft.b);
+        // Per-vertex colors. We use a different path here because each corner has its own color.
+        // We push 6 vertices manually with their own color/alpha (alpha=1.0 for gradients).
+        if (sVertices.size() + 6 > static_cast<size_t>(MAX_VERTICES)) {
+            fprintf(stderr, "Draw2D: vertex buffer overflow\n");
+            return;
+        }
+        const float a = 1.0f;
+        // Triangle 1: bl, br, tl
+        sVertices.push_back({x,     y,     bottomLeft.r,  bottomLeft.g,  bottomLeft.b,  a});
+        sVertices.push_back({x + w, y,     bottomRight.r, bottomRight.g, bottomRight.b, a});
+        sVertices.push_back({x,     y + h, topLeft.r,     topLeft.g,     topLeft.b,     a});
+        // Triangle 2: br, tr, tl
+        sVertices.push_back({x + w, y,     bottomRight.r, bottomRight.g, bottomRight.b, a});
+        sVertices.push_back({x + w, y + h, topRight.r,    topRight.g,    topRight.b,    a});
+        sVertices.push_back({x,     y + h, topLeft.r,     topLeft.g,     topLeft.b,     a});
     }
 
     void drawCircleGradient(float cx, float cy, float r,
@@ -276,10 +276,14 @@ void main() {
             float a2 = 2.0f * 3.14159265f * (i + 1) / segments;
             float x1 = cx + r * cosf(a1), y1 = cy + r * sinf(a1);
             float x2 = cx + r * cosf(a2), y2 = cy + r * sinf(a2);
-            addTriangle(cx, cy, x1, y1, x2, y2,
-                        innerColor.r, innerColor.g, innerColor.b,
-                        outerColor.r, outerColor.g, outerColor.b,
-                        outerColor.r, outerColor.g, outerColor.b);
+            if (sVertices.size() + 3 > static_cast<size_t>(MAX_VERTICES)) {
+                fprintf(stderr, "Draw2D: vertex buffer overflow\n");
+                return;
+            }
+            // Center vertex uses inner color, edge vertices use outer.
+            sVertices.push_back({cx, cy, innerColor.r, innerColor.g, innerColor.b, 1.0f});
+            sVertices.push_back({x1, y1, outerColor.r, outerColor.g, outerColor.b, 1.0f});
+            sVertices.push_back({x2, y2, outerColor.r, outerColor.g, outerColor.b, 1.0f});
         }
     }
 

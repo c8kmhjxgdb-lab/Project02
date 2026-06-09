@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 #include <vector>
 #include <cstdint>
+#include <functional>
 
 /**
  * 掉落物类型
@@ -78,6 +79,9 @@ public:
     // 玩家拾取
     void collect(DropId id);
 
+    using CollectCallback = std::function<void(const Drop&)>;
+    void setCollectCallback(CollectCallback cb) { onCollect = std::move(cb); }
+
     // 强制销毁
     void destroy(DropId id);
 
@@ -95,6 +99,7 @@ private:
     std::vector<Drop> drops;
     int nextId;
     float collectRange;
+    CollectCallback onCollect;
 
     Drop* find(DropId id);
     const Drop* find(DropId id) const;

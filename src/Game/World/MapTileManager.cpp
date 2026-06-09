@@ -76,6 +76,23 @@ void MapTileManager::shutdown() {
     tileMap = nullptr;
 }
 
+bool MapTileManager::replayModifications(const std::vector<TileModification>& savedModifications) {
+    if (!tileMap) return false;
+
+    bool allApplied = true;
+    bool previousReplayState = isReplaying;
+    isReplaying = true;
+    for (const TileModification& mod : savedModifications) {
+        if (!setTile(mod.x, mod.y, mod.newType)) {
+            allApplied = false;
+        }
+    }
+    isReplaying = previousReplayState;
+
+    modifications = savedModifications;
+    return allApplied;
+}
+
 void MapTileManager::createBodyFor(int x, int y) {
     if (!tileMap || !b2World_IsValid(worldId)) return;
 

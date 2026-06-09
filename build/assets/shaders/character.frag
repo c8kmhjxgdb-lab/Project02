@@ -2,15 +2,13 @@
 
 in vec2 vWorldPos;
 
-uniform vec2 uPosition;      // 角色世界位置
-uniform float uTime;         // 动画时间（秒）
-uniform vec3 uBodyColor;     // 备用
-uniform int uExpression;     // 0=普通, 1=开心, 2=委屈
-uniform float uArmAngle;     // 手臂角度
+uniform vec2 uPosition;
+uniform float uTime;
+uniform vec3 uBodyColor;
+uniform int uExpression;
+uniform float uArmAngle;
 
 out vec4 FragColor;
-
-// ========== SDF 形状函数 ==========
 
 float sdCircle(vec2 p, float r) {
     return length(p) - r;
@@ -26,9 +24,25 @@ float sdRoundedBox(vec2 p, vec2 b, float r) {
     return length(max(q, 0.0)) - r + min(max(q.x, q.y), 0.0);
 }
 
-float sdCapsule(vec2 p, float len, float rad) {
-    p.y = abs(p.y) - len;
-    return length(max(vec2(p.x, p.y), 0.0)) + min(max(p.x, p.y), 0.0) - rad;
+float sdCapsule(vec2 p, vec2 a, vec2 b, float r) {
+    vec2 pa = p - a;
+    vec2 ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h) - r;
+}
+
+float sdTriangle(vec2 p, float r) {
+    p.x = abs(p.x);
+    return max(p.x * 0.866025 + p.y * 0.5, -p.y) - r * 0.5;
+}
+
+float sdStar(vec2 p, float r1, float r2, int n) {
+    float a = atan(p.y, p.x);
+    float r = length(p);
+    float k = 3.14159265 / float(n);
+    float m = cos(floor(0.5 + a / k) * k - a);
+    float target = mix(r1, r2, step(0.5, mod(floor(0.5 + a / k), 2.0)));
+    return r * m - target;
 }
 
 vec2 rotate2D(vec2 p, float a) {
@@ -37,169 +51,153 @@ vec2 rotate2D(vec2 p, float a) {
     return vec2(p.x * c - p.y * s, p.x * s + p.y * c);
 }
 
+vec3 shadeColor(vec3 color, float amount) {
+    return color * (1.0 - amount);
+}
+
+vec3 tintColor(vec3 color, float amount) {
+    return color + (vec3(1.0) - color) * amount;
+}
+
+void paint(inout vec3 color, inout float alpha, float d, vec3 layerColor) {
+    float aa = max(fwidth(d) * 1.6, 0.006);
+    float coverage = 1.0 - smoothstep(-aa, aa, d);
+    color = mix(color, layerColor, coverage);
+    alpha = max(alpha, coverage);
+}
+
 void main() {
     vec2 uv = vWorldPos - uPosition;
+    float bob = sin(uTime * 7.0) * 0.025;
+    vec2 p = uv - vec2(0.0, bob);
 
-    // ===== 超级玛丽风格角色 =====
-    // 坐标系统：原点(0,0)在角色中心，y轴向上
-    // 角色总高度约3.0单位
+    vec3 outline = vec3(0.055, 0.060, 0.075);
+    vec3 skin = vec3(0.96, 0.78, 0.64);
+    vec3 blush = vec3(0.92, 0.34, 0.34);
+    vec3 hair = vec3(0.20, 0.12, 0.09);
+    vec3 hairLight = vec3(0.42, 0.25, 0.16);
+    vec3 tunic = vec3(0.17, 0.48, 0.88);
+    vec3 tunicLight = vec3(0.35, 0.66, 0.98);
+    vec3 cape = vec3(0.24, 0.20, 0.54);
+    vec3 capeDeep = vec3(0.12, 0.10, 0.32);
+    vec3 scarf = vec3(0.96, 0.48, 0.28);
+    vec3 belt = vec3(0.26, 0.16, 0.09);
+    vec3 gold = vec3(1.00, 0.78, 0.22);
+    vec3 boot = vec3(0.21, 0.14, 0.10);
+    vec3 eye = vec3(0.055, 0.070, 0.085);
 
-    // 颜色定义
-    vec3 hatRed = vec3(0.9, 0.15, 0.15);
-    vec3 skinColor = vec3(0.95, 0.78, 0.65);
-    vec3 shirtRed = vec3(0.85, 0.2, 0.2);
-    vec3 overallBlue = vec3(0.2, 0.4, 0.85);
-    vec3 mustacheBrown = vec3(0.35, 0.22, 0.12);
-    vec3 bootBrown = vec3(0.35, 0.2, 0.1);
-    vec3 buttonYellow = vec3(0.9, 0.85, 0.2);
-    vec3 eyeWhite = vec3(1.0, 1.0, 1.0);
-    vec3 pupilBlack = vec3(0.05, 0.05, 0.05);
-    vec3 mouthColor = vec3(0.6, 0.1, 0.1);
-    vec3 hairBrown = vec3(0.28, 0.18, 0.12);
-
-    vec3 finalColor = vec3(0.0);
+    vec3 color = vec3(0.0);
     float alpha = 0.0;
 
-    // ---- 渲染顺序：从后到前，从下到上 ----
+    float armSwing = sin(uArmAngle + uTime * 5.0) * 0.10;
+    vec2 leftHand = vec2(-0.58, -0.34) + vec2(armSwing * 0.35, 0.0);
+    vec2 rightHand = vec2(0.58, -0.34) - vec2(armSwing * 0.35, 0.0);
 
-    // 1. 靴子
-    float leftBoot = sdRoundedBox(uv - vec2(-0.22, -1.25), vec2(0.13, 0.1), 0.025);
-    float rightBoot = sdRoundedBox(uv - vec2(0.22, -1.25), vec2(0.13, 0.1), 0.025);
-    if (leftBoot < 0.0) { finalColor = bootBrown; alpha = 1.0; }
-    if (rightBoot < 0.0) { finalColor = bootBrown; alpha = 1.0; }
+    float capeShape = min(
+        sdRoundedBox(p - vec2(0.0, -0.34), vec2(0.55, 0.72), 0.16),
+        sdTriangle(p - vec2(0.0, -0.98), 0.96)
+    );
+    float body = sdRoundedBox(p - vec2(0.0, -0.30), vec2(0.42, 0.48), 0.12);
+    float head = sdRoundedBox(p - vec2(0.0, 0.50), vec2(0.36, 0.34), 0.11);
+    float neck = sdRoundedBox(p - vec2(0.0, 0.12), vec2(0.12, 0.11), 0.04);
+    float leftLeg = sdCapsule(p, vec2(-0.18, -0.72), vec2(-0.22, -1.15), 0.11);
+    float rightLeg = sdCapsule(p, vec2(0.18, -0.72), vec2(0.22, -1.15), 0.11);
+    float leftBoot = sdRoundedBox(p - vec2(-0.25, -1.28), vec2(0.20, 0.09), 0.04);
+    float rightBoot = sdRoundedBox(p - vec2(0.25, -1.28), vec2(0.20, 0.09), 0.04);
+    float leftArm = sdCapsule(p, vec2(-0.36, -0.04), leftHand, 0.075);
+    float rightArm = sdCapsule(p, vec2(0.36, -0.04), rightHand, 0.075);
+    float leftPalm = sdCircle(p - leftHand, 0.105);
+    float rightPalm = sdCircle(p - rightHand, 0.105);
 
-    // 2. 腿（蓝色裤子）
-    float leftLeg = sdRoundedBox(uv - vec2(-0.22, -0.95), vec2(0.12, 0.25), 0.04);
-    float rightLeg = sdRoundedBox(uv - vec2(0.22, -0.95), vec2(0.12, 0.25), 0.04);
-    if (leftLeg < 0.0 && alpha == 0.0) { finalColor = overallBlue; alpha = 1.0; }
-    if (rightLeg < 0.0 && alpha == 0.0) { finalColor = overallBlue; alpha = 1.0; }
+    float shadow = sdCircle((uv - vec2(0.0, -1.34)) * vec2(1.0, 2.8), 0.44);
 
-    // 3. 背带裤（身体下半部分）
-    float overalls = sdRoundedBox(uv - vec2(0.0, -0.55), vec2(0.38, 0.28), 0.07);
-    if (overalls < 0.0 && alpha == 0.0) { finalColor = overallBlue; alpha = 1.0; }
+    float silhouette = capeShape;
+    silhouette = min(silhouette, body);
+    silhouette = min(silhouette, head);
+    silhouette = min(silhouette, neck);
+    silhouette = min(silhouette, min(leftLeg, rightLeg));
+    silhouette = min(silhouette, min(leftBoot, rightBoot));
+    silhouette = min(silhouette, min(leftArm, rightArm));
+    silhouette = min(silhouette, min(leftPalm, rightPalm));
+    silhouette = min(silhouette, shadow);
 
-    // 4. 背带
-    float strapLeft = sdBox(uv - vec2(-0.22, -0.35), vec2(0.06, 0.18));
-    float strapRight = sdBox(uv - vec2(0.22, -0.35), vec2(0.06, 0.18));
-    if (strapLeft < 0.0 && alpha == 0.0) { finalColor = overallBlue; alpha = 1.0; }
-    if (strapRight < 0.0 && alpha == 0.0) { finalColor = overallBlue; alpha = 1.0; }
+    float aa = max(fwidth(silhouette) * 1.6, 0.006);
+    float outlineAlpha = 1.0 - smoothstep(0.035, 0.035 + aa, silhouette);
+    if (outlineAlpha < 0.01) discard;
+    color = outline;
+    alpha = outlineAlpha;
 
-    // 5. 扣子
-    float buttonLeft = sdCircle(uv - vec2(-0.22, -0.3), 0.035);
-    float buttonRight = sdCircle(uv - vec2(0.22, -0.3), 0.035);
-    if (buttonLeft < 0.0 && alpha == 0.0) { finalColor = buttonYellow; alpha = 1.0; }
-    if (buttonRight < 0.0 && alpha == 0.0) { finalColor = buttonYellow; alpha = 1.0; }
+    paint(color, alpha, shadow, vec3(0.018, 0.022, 0.028));
 
-    // 6. 身体（红色上衣）
-    float body = sdRoundedBox(uv - vec2(0.0, -0.15), vec2(0.4, 0.3), 0.08);
-    if (body < 0.0 && alpha == 0.0) { finalColor = shirtRed; alpha = 1.0; }
+    vec3 capeShade = mix(capeDeep, cape, smoothstep(-0.95, 0.28, p.y));
+    paint(color, alpha, capeShape, capeShade);
+    paint(color, alpha, sdCapsule(p, vec2(-0.34, -0.80), vec2(-0.10, -0.10), 0.025), vec3(0.47, 0.42, 0.78));
+    paint(color, alpha, sdCapsule(p, vec2(0.34, -0.80), vec2(0.10, -0.10), 0.025), vec3(0.47, 0.42, 0.78));
 
-    // 7. 手臂（从肩膀两侧自然垂下）
-    // 左臂 - 从肩膀位置向下
-    vec2 shoulderLeft = vec2(-0.38, -0.05);
-    vec2 armLeftOffset = uv - shoulderLeft;
-    float armSwingL = sin(uArmAngle + uTime * 2.0) * 0.1;
-    vec2 armLeftRot = rotate2D(armLeftOffset, armSwingL);
-    float leftArm = sdCapsule(vec2(armLeftRot.x, armLeftRot.y + 0.12), 0.12, 0.035);
+    paint(color, alpha, leftLeg, shadeColor(tunic, 0.18));
+    paint(color, alpha, rightLeg, shadeColor(tunic, 0.18));
+    paint(color, alpha, leftBoot, boot);
+    paint(color, alpha, rightBoot, boot);
 
-    // 右臂 - 从肩膀位置向下
-    vec2 shoulderRight = vec2(0.38, -0.05);
-    vec2 armRightOffset = uv - shoulderRight;
-    float armSwingR = sin(uArmAngle + uTime * 2.0 + 3.14) * 0.1;
-    vec2 armRightRot = rotate2D(armRightOffset, armSwingR);
-    float rightArm = sdCapsule(vec2(armRightRot.x, armRightRot.y + 0.12), 0.12, 0.035);
+    paint(color, alpha, leftArm, skin);
+    paint(color, alpha, rightArm, skin);
+    paint(color, alpha, leftPalm, skin);
+    paint(color, alpha, rightPalm, skin);
 
-    if (leftArm < 0.0 && alpha == 0.0) { finalColor = skinColor; alpha = 1.0; }
-    if (rightArm < 0.0 && alpha == 0.0) { finalColor = skinColor; alpha = 1.0; }
+    vec3 bodyShade = mix(tunic, tunicLight, smoothstep(-0.74, 0.18, p.y));
+    paint(color, alpha, body, bodyShade);
+    paint(color, alpha, sdRoundedBox(p - vec2(0.0, -0.38), vec2(0.44, 0.08), 0.03), belt);
+    paint(color, alpha, sdRoundedBox(p - vec2(0.0, -0.38), vec2(0.075, 0.055), 0.02), gold);
+    paint(color, alpha, sdCapsule(p, vec2(-0.30, -0.02), vec2(0.18, -0.58), 0.030), tintColor(tunicLight, 0.22));
+    paint(color, alpha, sdCapsule(p, vec2(0.30, -0.02), vec2(-0.18, -0.58), 0.030), tintColor(tunicLight, 0.22));
 
-    // 9. 头部（方形，勇者风格）
-    float head = sdRoundedBox(uv - vec2(0.0, 0.38), vec2(0.38, 0.35), 0.08);
-    if (head < 0.0 && alpha == 0.0) { finalColor = skinColor; alpha = 1.0; }
+    float scarfBand = sdCapsule(p, vec2(-0.29, 0.07), vec2(0.30, 0.07), 0.075);
+    float scarfTail = sdCapsule(p, vec2(0.23, 0.04), vec2(0.50, -0.27), 0.060);
+    paint(color, alpha, min(scarfBand, scarfTail), scarf);
+    paint(color, alpha, neck, skin);
 
-    // ---- 脸部特征（叠加在头部上） ----
-    if (head < 0.0 && alpha > 0.5) {
-        // 46分立体背头（像帽子一样高，蓬松有型）
-        // 头发顶部 - 高高隆起，像帽子
-        float hairTop = sdRoundedBox(uv - vec2(-0.02, 0.75), vec2(0.35, 0.18), 0.07);
-        // 46分分界线 - 偏左，创造立体感
-        float hairPartLine = sdBox(uv - vec2(-0.06, 0.7), vec2(0.015, 0.2));
-        // 左侧头发（6分，较多）- 向左后方梳
-        float hairLeft = sdRoundedBox(uv - vec2(-0.15, 0.68), vec2(0.22, 0.15), 0.05);
-        // 右侧头发（4分，较少）- 向右后方梳
-        float hairRight = sdRoundedBox(uv - vec2(0.12, 0.68), vec2(0.18, 0.12), 0.05);
-        // 后脑勺头发
-        float hairBack = sdRoundedBox(uv - vec2(0.0, 0.55), vec2(0.35, 0.12), 0.06);
-        // 鬓角 - 两侧
-        float sideburnLeft = sdBox(uv - vec2(-0.33, 0.42), vec2(0.06, 0.15));
-        float sideburnRight = sdBox(uv - vec2(0.33, 0.42), vec2(0.06, 0.15));
-        // 额前刘海 - 46分，略微翘起
-        float fringeLeft = sdRoundedBox(uv - vec2(-0.12, 0.58), vec2(0.15, 0.06), 0.03);
-        float fringeRight = sdRoundedBox(uv - vec2(0.08, 0.58), vec2(0.12, 0.05), 0.03);
+    paint(color, alpha, head, skin);
+    paint(color, alpha, sdCircle((p - vec2(-0.23, 0.43)) * vec2(1.0, 1.55), 0.055), blush);
+    paint(color, alpha, sdCircle((p - vec2(0.23, 0.43)) * vec2(1.0, 1.55), 0.055), blush);
 
-        float hair = min(min(min(min(hairTop, hairPartLine), min(hairLeft, hairRight)), min(hairBack, min(sideburnLeft, sideburnRight))), min(fringeLeft, fringeRight));
-        if (hair < 0.0 && alpha == 1.0) { finalColor = hairBrown; alpha = 1.0; }
+    float hairMass = min(
+        sdRoundedBox(p - vec2(0.0, 0.76), vec2(0.39, 0.18), 0.09),
+        sdRoundedBox(p - vec2(-0.16, 0.62), vec2(0.25, 0.15), 0.08)
+    );
+    hairMass = min(hairMass, sdRoundedBox(p - vec2(0.18, 0.63), vec2(0.22, 0.13), 0.07));
+    hairMass = min(hairMass, sdCapsule(p, vec2(-0.31, 0.62), vec2(-0.36, 0.34), 0.065));
+    hairMass = min(hairMass, sdCapsule(p, vec2(0.31, 0.62), vec2(0.36, 0.36), 0.060));
+    paint(color, alpha, hairMass, hair);
+    paint(color, alpha, sdCapsule(p, vec2(-0.26, 0.78), vec2(0.10, 0.83), 0.025), hairLight);
+    paint(color, alpha, sdCapsule(p, vec2(-0.18, 0.66), vec2(0.28, 0.70), 0.020), hairLight * 0.82);
 
-        // 眉毛（浓密，勇者风格）
-        float browLeft = sdBox(uv - vec2(-0.14, 0.48), vec2(0.1, 0.03));
-        float browRight = sdBox(uv - vec2(0.14, 0.48), vec2(0.1, 0.03));
-        // 眉毛稍微倾斜，显得英气
-        vec2 browL = rotate2D(uv - vec2(-0.14, 0.48), -0.1);
-        vec2 browR = rotate2D(uv - vec2(0.14, 0.48), 0.1);
-        float browL2 = sdBox(browL, vec2(0.1, 0.025));
-        float browR2 = sdBox(browR, vec2(0.1, 0.025));
-        if (browL2 < 0.0) { finalColor = hairBrown; alpha = 1.0; }
-        if (browR2 < 0.0) { finalColor = hairBrown; alpha = 1.0; }
+    float blink = smoothstep(0.94, 1.0, sin(uTime * 1.7));
+    float eyeH = mix(0.045, 0.010, blink);
+    paint(color, alpha, sdRoundedBox(p - vec2(-0.13, 0.49), vec2(0.075, eyeH), 0.018), vec3(0.98));
+    paint(color, alpha, sdRoundedBox(p - vec2(0.13, 0.49), vec2(0.075, eyeH), 0.018), vec3(0.98));
+    paint(color, alpha, sdCircle(p - vec2(-0.13, 0.49), 0.032), eye);
+    paint(color, alpha, sdCircle(p - vec2(0.13, 0.49), 0.032), eye);
+    paint(color, alpha, sdCircle(p - vec2(-0.115, 0.505), 0.012), vec3(1.0));
+    paint(color, alpha, sdCircle(p - vec2(0.145, 0.505), 0.012), vec3(1.0));
 
-        // 眼睛（勇者风格 - 更有神，蓝灰色虹膜）
-        float blink = smoothstep(0.93, 1.0, sin(uTime * 1.5));
-        float eyeScaleY = mix(1.0, 0.15, blink);
-
-        // 眼白
-        float leftEye = sdCircle((uv - vec2(-0.14, 0.4)) * vec2(1.0, eyeScaleY), 0.1);
-        float rightEye = sdCircle((uv - vec2(0.14, 0.4)) * vec2(1.0, eyeScaleY), 0.1);
-        if (leftEye < 0.0) { finalColor = eyeWhite; alpha = 1.0; }
-        if (rightEye < 0.0) { finalColor = eyeWhite; alpha = 1.0; }
-
-        // 虹膜（蓝灰色，勇者风格）
-        vec3 irisColor = vec3(0.2, 0.4, 0.7);
-        float pupilMove = sin(uTime * 0.8) * 0.02;
-        float leftIris = sdCircle(uv - vec2(-0.14 + pupilMove, 0.4), 0.06);
-        float rightIris = sdCircle(uv - vec2(0.14 + pupilMove, 0.4), 0.06);
-        if (leftIris < 0.0) { finalColor = irisColor; alpha = 1.0; }
-        if (rightIris < 0.0) { finalColor = irisColor; alpha = 1.0; }
-
-        // 瞳孔（黑色，居中）
-        float leftPupil = sdCircle(uv - vec2(-0.14 + pupilMove, 0.4), 0.03);
-        float rightPupil = sdCircle(uv - vec2(0.14 + pupilMove, 0.4), 0.03);
-        if (leftPupil < 0.0) { finalColor = pupilBlack; alpha = 1.0; }
-        if (rightPupil < 0.0) { finalColor = pupilBlack; alpha = 1.0; }
-
-        // 眼神高光（让眼睛更有神）
-        float leftHighlight = sdCircle(uv - vec2(-0.12, 0.42), 0.015);
-        float rightHighlight = sdCircle(uv - vec2(0.16, 0.42), 0.015);
-        if (leftHighlight < 0.0) { finalColor = vec3(1.0); alpha = 1.0; }
-        if (rightHighlight < 0.0) { finalColor = vec3(1.0); alpha = 1.0; }
+    if (uExpression == 1) {
+        paint(color, alpha, sdCapsule(p, vec2(-0.09, 0.32), vec2(0.09, 0.32), 0.020), vec3(0.48, 0.08, 0.07));
+    } else if (uExpression == 2) {
+        paint(color, alpha, sdCapsule(p, vec2(-0.08, 0.31), vec2(0.08, 0.31), 0.014), vec3(0.40, 0.08, 0.09));
+        paint(color, alpha, sdCapsule(p, vec2(-0.19, 0.57), vec2(-0.07, 0.53), 0.014), hair);
+        paint(color, alpha, sdCapsule(p, vec2(0.07, 0.53), vec2(0.19, 0.57), 0.014), hair);
+    } else {
+        paint(color, alpha, sdCapsule(p, vec2(-0.075, 0.32), vec2(0.075, 0.32), 0.015), vec3(0.42, 0.08, 0.07));
     }
 
-    // ===== 抗锯齿边缘 =====
-    float minDist = head;
-    if (body < minDist) minDist = body;
-    if (overalls < minDist) minDist = overalls;
-    if (leftLeg < minDist) minDist = leftLeg;
-    if (rightLeg < minDist) minDist = rightLeg;
-    if (leftBoot < minDist) minDist = leftBoot;
-    if (rightBoot < minDist) minDist = rightBoot;
-    if (leftArm < minDist) minDist = leftArm;
-    if (rightArm < minDist) minDist = rightArm;
+    float star = sdStar(p - vec2(0.0, -0.12), 0.050, 0.105, 5);
+    paint(color, alpha, star, gold);
+    paint(color, alpha, sdCircle(p - vec2(0.0, -0.12), 0.020), vec3(1.0, 0.94, 0.62));
 
-    // 如果所有形状都很远，就完全透明
-    if (minDist > 0.03) {
-        alpha = 0.0;
-    } else if (minDist > -0.005) {
-        float pixelSize = length(dFdx(vWorldPos)) + length(dFdy(vWorldPos));
-        float edgeWidth = max(pixelSize * 2.0, 0.03);
-        alpha *= smoothstep(edgeWidth, -0.005, minDist);
-    }
+    float rim = 1.0 - smoothstep(-0.03, 0.18, silhouette);
+    color = mix(color, color * 0.72, rim * 0.22);
+    float light = smoothstep(-1.25, 0.95, p.y);
+    color += vec3(0.06, 0.07, 0.09) * light * alpha;
 
-    FragColor = vec4(finalColor, alpha);
+    FragColor = vec4(color, alpha);
 }

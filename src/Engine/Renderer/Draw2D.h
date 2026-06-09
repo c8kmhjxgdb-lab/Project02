@@ -30,19 +30,23 @@ namespace Draw2D {
     // ========== Basic Shapes ==========
 
     // Hollow rectangle (stroke)
-    void drawRect(float x, float y, float w, float h, const glm::vec3& color, float thickness = 0.02f);
+    void drawRect(float x, float y, float w, float h, const glm::vec3& color, float thickness = 0.02f, float alpha = 1.0f);
 
     // Filled rectangle
-    void drawRectFilled(float x, float y, float w, float h, const glm::vec3& color);
+    void drawRectFilled(float x, float y, float w, float h, const glm::vec3& color, float alpha = 1.0f);
 
     // Hollow circle (stroke)
-    void drawCircle(float cx, float cy, float r, const glm::vec3& color, float thickness = 0.02f, int segments = 32);
+    void drawCircle(float cx, float cy, float r, const glm::vec3& color, float thickness = 0.02f, int segments = 32, float alpha = 1.0f);
 
-    // Filled circle
-    void drawCircleFilled(float cx, float cy, float r, const glm::vec3& color, int segments = 32);
+    // Filled circle.
+    // 5th param is ALPHA (0..1) — segments are fixed internally to 32.
+    // This is the function that 4 call sites were misusing as alpha (the
+    // previous 5th param `int segments` silently truncated to 0, hiding the
+    // bug). Renamed to alpha to match the actual call sites' intent.
+    void drawCircleFilled(float cx, float cy, float r, const glm::vec3& color, float alpha = 1.0f);
 
     // Line
-    void drawLine(float x1, float y1, float x2, float y2, const glm::vec3& color, float thickness = 0.02f);
+    void drawLine(float x1, float y1, float x2, float y2, const glm::vec3& color, float thickness = 0.02f, float alpha = 1.0f);
 
     // ========== Gradient Shapes ==========
 

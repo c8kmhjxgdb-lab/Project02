@@ -9,17 +9,22 @@
 struct DialogueUIState {
     bool visible;
     std::string speakerName;
+    std::string speakerNameEn;
     std::string dialogueText;
+    std::string dialogueTextEn;
     std::vector<std::string> choiceTexts;
+    std::vector<std::string> choiceTextsEn;
     int selectedChoice;
     float typewriterTimer;
     int typewriterIndex;  // 逐字显示的当前字符索引
+    glm::vec3 textColor;
 
     DialogueUIState()
         : visible(false)
         , selectedChoice(0)
         , typewriterTimer(0.0f)
         , typewriterIndex(0)
+        , textColor(1.0f, 1.0f, 1.0f)
     {}
 };
 

@@ -10,6 +10,7 @@ public:
     // 初始化
     void init();
     void shutdown();
+    void resetLoadedRegions();
 
     // 区域加载/卸载
     bool loadRegion(const std::string& regionId);
@@ -23,6 +24,10 @@ public:
 
     // 设置 Box2D 世界引用（在初始化时调用）
     void setWorldId(b2WorldId world) { worldId = world; }
+
+    // 设置玩家刚体（用于在区域切换时自动传送玩家）
+    // 在使用 transitionTo 之前必须调用一次。
+    void setPlayerBody(b2BodyId body) { playerBody = body; }
 
     // 获取当前区域
     MapRegion* getCurrentRegion();
@@ -41,6 +46,7 @@ public:
 
     // 区域过渡效果控制
     void setTransitionEffectEnabled(bool enabled) { useTransitionEffect = enabled; }
+    bool isTransitionEffectEnabled() const { return useTransitionEffect; }
     void setTransitionDuration(float duration) { transitionDuration = duration; }
 
     // 更新（处理区域过渡动画）
@@ -54,6 +60,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<MapRegion>> loadedRegions;
     std::vector<std::string> discoveredRegions;
     b2WorldId worldId;  // Box2D 世界引用（用于物理同步）
+    b2BodyId playerBody = b2_nullBodyId;  // 玩家刚体引用（用于过渡时传送）
 
     // 过渡效果
     bool useTransitionEffect = true;
@@ -67,11 +74,20 @@ private:
     std::string transitionTargetRegionId;
     glm::ivec2 transitionEntryTile;
 
-    // 固定种子表（确保跨运行一致性）
-    static int getRegionSeed(const std::string& regionId);
-
     // 过渡效果
     void beginTransition();
     void updateTransition(float dt);
     void completeTransition();
+
+    // 共享的内部工具：执行无过渡即时切换（无 fade 路径和 completeTransition 都用）
+    void performImmediateSwap(const std::string& targetRegionId);
+
+    // 共享的内部工具：把当前区域归档到缓存。读档清空区域后当前区可能为空。
+    void archiveCurrentRegion();
+
+    // 共享的内部工具：把玩家传送到新区域的入口瓦片
+    void teleportPlayerToEntry(const std::string& regionId, const glm::ivec2& entryTile);
+
+    // 强制上限：loadedRegions 数量 ≤ 5（多则淘汰最旧的）
+    void enforceLoadedCap();
 };

@@ -1,5 +1,6 @@
 #include "Projectile.h"
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 
 ProjectileManager::ProjectileManager() : nextId(0) {
@@ -68,6 +69,7 @@ ProjectileId ProjectileManager::fire(b2WorldId world, const glm::vec2& pos,
     proj.bodyId = bodyId;
     proj.id = makeProjectileId(nextId++);
     proj.type = type;
+    proj.previousPosition = pos;
     proj.velocity = normDir * speed;
     proj.damage = damage;
     proj.maxLifetime = 2.0f;
@@ -79,23 +81,31 @@ ProjectileId ProjectileManager::fire(b2WorldId world, const glm::vec2& pos,
     switch (type) {
     case ProjectileType::Fireball:
         proj.color = glm::vec3(1.0f, 0.5f, 0.0f);
-        proj.radius = 0.15f;
-        proj.particleEmitRate = 0.02f;
+        proj.radius = 0.17f;
+        proj.particleEmitRate = 0.018f;
         break;
     case ProjectileType::IceSpike:
         proj.color = glm::vec3(0.5f, 0.8f, 1.0f);
-        proj.radius = 0.12f;
-        proj.particleEmitRate = 0.05f;
+        proj.radius = 0.15f;
+        proj.particleEmitRate = 0.040f;
         break;
     case ProjectileType::Thunder:
         proj.color = glm::vec3(0.8f, 0.9f, 1.0f);
-        proj.radius = 0.08f;
-        proj.particleEmitRate = 0.03f;
+        proj.radius = 0.12f;
+        proj.particleEmitRate = 0.018f;
         break;
     }
 
     projectiles.push_back(proj);
     return proj.id;
+}
+
+void ProjectileManager::capturePreviousPositions() {
+    for (auto& proj : projectiles) {
+        if (!proj.active || !b2Body_IsValid(proj.bodyId)) continue;
+        b2Vec2 pos = b2Body_GetPosition(proj.bodyId);
+        proj.previousPosition = glm::vec2(pos.x, pos.y);
+    }
 }
 
 Projectile* ProjectileManager::find(ProjectileId id) {
@@ -115,6 +125,11 @@ const Projectile* ProjectileManager::find(ProjectileId id) const {
 void ProjectileManager::update(float dt, b2WorldId /*world*/) {
     for (auto& proj : projectiles) {
         if (!proj.active) continue;
+
+        if (!b2Body_IsValid(proj.bodyId)) {
+            proj.active = false;
+            continue;
+        }
 
         // 更新生命周期
         proj.lifetime -= dt;

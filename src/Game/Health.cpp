@@ -30,10 +30,19 @@ void HealthComponent::takeDamage(const DamageInfo& info) {
         break;
     }
 
-    // 击退效果（爆炸类型更强）
-    if (b2Body_IsValid(info.sourceBody)) {
-        b2Vec2 sourcePos = { info.sourcePosition.x, info.sourcePosition.y };
-        // 获取受伤物体的位置需要从外部传入，这里通过回调处理
+    // 击退效果：基于 source→victim 方向，爆炸类用更大力度
+    if (b2Body_IsValid(info.victimBody) && b2Body_IsValid(info.sourceBody)) {
+        b2Vec2 victimPos = b2Body_GetPosition(info.victimBody);
+        glm::vec2 victim(victimPos.x, victimPos.y);
+        glm::vec2 dir = victim - info.sourcePosition;
+        float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len > 0.0001f) {
+            dir.x /= len;
+            dir.y /= len;
+            float knockback = (info.type == DamageType::Explosion) ? 15.0f : 8.0f;
+            b2Body_ApplyLinearImpulseToCenter(info.victimBody,
+                b2Vec2{dir.x * knockback, dir.y * knockback}, true);
+        }
     }
 
     // 触发受伤回调
@@ -52,6 +61,16 @@ void HealthComponent::takeDamage(const DamageInfo& info) {
 void HealthComponent::heal(float amount) {
     if (!isAlive()) return;
     currentHealth = std::min(maxHealth, currentHealth + amount);
+}
+
+void HealthComponent::restore(float health, float newMaxHealth) {
+    maxHealth = std::max(1.0f, newMaxHealth);
+    currentHealth = std::clamp(health, 0.0f, maxHealth);
+    invincibleTimer = 0.0f;
+    burnTimer = 0.0f;
+    burnDamageTimer = 0.0f;
+    slowTimer = 0.0f;
+    speedMultiplier = 1.0f;
 }
 
 void HealthComponent::setInvincible(float duration) {

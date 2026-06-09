@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "name": "Win64",
+      "intelliSenseMode": "windows-msvc-x64",
+      "includePath": [
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/src/**",
+        "${workspaceFolder}/build/vcpkg_installed/x64-windows/include",
+        "${workspaceFolder}/build/vcpkg_installed/x64-windows/include/SDL2",
+        "${workspaceFolder}/build/vcpkg_installed/x64-windows/include/luajit",
+        "e:/visual studio/18/community/vc/tools/msvc/14.50.35717/include",
+        "e:/visual studio/18/community/vc/tools/msvc/14.50.35717/atlmfc/include",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE",
+        "WIN32",
+        "_WINDOWS"
+      ],
+      "compilerPath": "e:/visual studio/18/community/vc/tools/msvc/14.50.35717/bin/hostx64/x64/cl.exe",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "windowsSdkVersion": "10.0.26100.0"
+    }
+  ],
+  "version": 4
+}

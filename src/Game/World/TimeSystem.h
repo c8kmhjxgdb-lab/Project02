@@ -1,8 +1,13 @@
 #pragma once
 
+#include "Game/World/TimeTypes.h"
+
 #include <glm/vec3.hpp>
 #include <functional>
 #include <string>
+#include <vector>
+
+class LuaVM;
 
 /**
  * TimeSystem — 游戏时间系统
@@ -14,14 +19,17 @@ class TimeSystem {
 public:
     // 初始化
     void init(float startHour = 6.0f);  // 默认从早上6点开始
+    bool loadConfig(LuaVM& lua, const char* path);
 
     // 更新
     void update(float dt);
 
     // 时间控制
     void setHour(float hour);
+    void setDay(int day);
     void setDaySpeed(float multiplier);  // 1.0 = 真实时间速度
-    void pauseDayNightCycle(bool paused);
+    void pauseDayNightCycle(bool shouldPause);
+    void restUntil(float hour);
 
     // 获取当前时间
     float getHour() const { return currentHour; }
@@ -36,10 +44,17 @@ public:
     glm::vec3 getSkyColor() const;
 
     // 判断时间段
-    bool isDaytime() const { return currentHour >= 6.0f && currentHour < 18.0f; }
-    bool isNighttime() const { return !isDaytime(); }
-    bool isDawn() const { return currentHour >= 5.0f && currentHour < 7.0f; }
-    bool isDusk() const { return currentHour >= 17.0f && currentHour < 19.0f; }
+    bool isDaytime() const;
+    bool isNighttime() const;
+    bool isDawn() const;
+    bool isDusk() const;
+    TimePeriod getPeriod() const;
+    TimeSnapshot getSnapshot() const;
+    bool consumeHourChangedFlag();
+    bool consumeNewDayFlag();
+    float getRestUntilHour() const { return restUntilHour; }
+    float getRestChildlikeHeartReward() const { return restChildlikeHeartReward; }
+    float getNightBonusStartHour() const { return nightBonusStartHour; }
 
     // 回调
     using TimeCallback = std::function<void(float hour)>;
@@ -47,6 +62,7 @@ public:
 
     // 获取时间描述字符串
     std::string getTimeString() const;
+    static const char* getPeriodName(TimePeriod period);
 
 private:
     float currentHour;
@@ -55,8 +71,16 @@ private:
     bool paused;
 
     float lastHourInt;
+    bool hourChangedFlag = false;
+    bool newDayFlag = false;
     TimeCallback onHourChange;
+    std::vector<TimePeriodRule> periodRules;
+    float nightBonusStartHour = 19.0f;
+    float restUntilHour = 7.0f;
+    float restChildlikeHeartReward = 20.0f;
 
     // 根据时间计算光照
     glm::vec3 computeAmbientLight() const;
+    void resetDefaultPeriodRules();
+    static bool hourInRange(float hour, float start, float finish);
 };

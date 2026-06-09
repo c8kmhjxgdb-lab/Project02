@@ -99,6 +99,7 @@ public:
     // 装饰物
     std::vector<Decoration>& getDecorations() { return decorations; }
     const std::vector<Decoration>& getDecorations() const { return decorations; }
+    void setDecorations(const std::vector<Decoration>& savedDecorations) { decorations = savedDecorations; }
 
     // 连接
     void addConnection(const MapConnection& conn);
@@ -107,6 +108,7 @@ public:
     // POI
     void addPOI(const PointOfInterest& poi);
     const std::vector<PointOfInterest>& getPOIs() const { return pois; }
+    void setPOIs(const std::vector<PointOfInterest>& savedPOIs) { pois = savedPOIs; }
     PointOfInterest* findPOI(const std::string& poiId);
 
     // 区域尺寸

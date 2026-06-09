@@ -34,6 +34,7 @@ struct Projectile {
     b2BodyId bodyId;
     ProjectileId id;
     ProjectileType type;
+    glm::vec2 previousPosition;
     glm::vec2 velocity;
     float damage;
     float lifetime;       // 剩余生存时间
@@ -51,7 +52,7 @@ struct Projectile {
 
     Projectile()
         : bodyId(b2_nullBodyId), id(PROJECTILE_NULL), type(ProjectileType::Fireball)
-        , velocity(0, 0), damage(0), lifetime(0), maxLifetime(0)
+        , previousPosition(0, 0), velocity(0, 0), damage(0), lifetime(0), maxLifetime(0)
         , ownerBodyId(b2_nullBodyId), active(false)
         , color(1, 0.5, 0), radius(0.15f)
         , particleEmitTimer(0), particleEmitRate(0.02f) {}
@@ -77,6 +78,10 @@ public:
 
     // 更新所有投射物
     void update(float dt, b2WorldId world);
+
+    // Capture positions immediately before stepping physics. Collision code
+    // uses previousPosition -> current body position for swept hit tests.
+    void capturePreviousPositions();
 
     // 获取活跃投射物列表（用于渲染）
     const std::vector<Projectile>& getActive() const { return projectiles; }

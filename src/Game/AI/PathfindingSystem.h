@@ -6,6 +6,7 @@
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
+#include <cmath>
 
 /**
  * A* 寻路节点
@@ -64,12 +65,11 @@ struct PathResult {
             // 找到偏离当前方向最远的点
             glm::ivec2 dir = path[i] - simplified.back();
             size_t furthest = i;
-            float maxDist = 0.0f;
 
             while (i < path.size() - 1) {
                 glm::ivec2 newDir = path[i + 1] - simplified.back();
                 // 如果方向变化超过阈值，停止
-                float cross = std::abs(dir.x * newDir.y - dir.y * newDir.x);
+                float cross = static_cast<float>(std::abs(dir.x * newDir.y - dir.y * newDir.x));
                 float len = std::sqrt(static_cast<float>(dir.x * dir.x + dir.y * dir.y));
                 if (len > 0) cross /= len;
 

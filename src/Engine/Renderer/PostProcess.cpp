@@ -12,10 +12,7 @@ PostProcess::PostProcess()
 {}
 
 PostProcess::~PostProcess() {
-    if (quadVAO) glDeleteVertexArrays(1, &quadVAO);
-    if (quadVBO) glDeleteBuffers(1, &quadVBO);
-    if (colorTexture) glDeleteTextures(1, &colorTexture);
-    if (fbo) glDeleteFramebuffers(1, &fbo);
+    shutdown();
 }
 
 bool PostProcess::init(int w, int h) {
@@ -62,6 +59,20 @@ bool PostProcess::init(int w, int h) {
     glBindVertexArray(0);
 
     return true;
+}
+
+void PostProcess::shutdown() {
+    if (quadVAO) glDeleteVertexArrays(1, &quadVAO);
+    if (quadVBO) glDeleteBuffers(1, &quadVBO);
+    if (colorTexture) glDeleteTextures(1, &colorTexture);
+    if (fbo) glDeleteFramebuffers(1, &fbo);
+    quadVAO = 0;
+    quadVBO = 0;
+    colorTexture = 0;
+    fbo = 0;
+    width = 0;
+    height = 0;
+    vignetteIntensity = 0.0f;
 }
 
 void PostProcess::resize(int w, int h) {

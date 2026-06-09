@@ -34,6 +34,8 @@ void NPC::createBody(b2WorldId world, const glm::vec2& pos) {
 }
 
 void NPC::update(float dt, float gameTime) {
+    (void)dt;
+
     if (currentSchedule.empty()) return;
     if (!hasBody()) return;
 
@@ -76,10 +78,38 @@ void NPC::render(const glm::mat4& viewProj) {
 
     Draw2D::beginFrame(viewProj);
 
-    float s = 0.3f;
-    float sh = 0.6f;
-    Draw2D::drawRectFilled(pos.x - s, pos.y - sh, s * 2.0f, sh * 2.0f, bodyColor);
-    Draw2D::drawRect(pos.x - s, pos.y - sh, s * 2.0f, sh * 2.0f, bodyColor * 0.6f, 0.02f);
+    glm::vec3 skin(0.95f, 0.78f, 0.65f);
+    glm::vec3 hair(0.25f, 0.16f, 0.10f);
+    glm::vec3 outline(0.08f, 0.07f, 0.06f);
+    glm::vec3 trouser(0.22f, 0.34f, 0.58f);
+    glm::vec3 shoe(0.18f, 0.13f, 0.09f);
+    glm::vec3 eye(0.04f, 0.05f, 0.06f);
+
+    float x = pos.x;
+    float y = pos.y;
+    float bob = std::sin(x * 1.7f + y * 0.9f) * 0.015f;
+
+    Draw2D::drawCircleFilled(x, y - 0.58f, 0.38f, glm::vec3(0.0f), 0.18f);
+
+    Draw2D::drawRectFilled(x - 0.22f, y - 0.58f + bob, 0.16f, 0.34f, trouser);
+    Draw2D::drawRectFilled(x + 0.06f, y - 0.58f - bob, 0.16f, 0.34f, trouser);
+    Draw2D::drawRectFilled(x - 0.25f, y - 0.75f + bob, 0.22f, 0.09f, shoe);
+    Draw2D::drawRectFilled(x + 0.03f, y - 0.75f - bob, 0.22f, 0.09f, shoe);
+
+    Draw2D::drawRectFilled(x - 0.32f, y - 0.26f, 0.64f, 0.52f, bodyColor);
+    Draw2D::drawRect(x - 0.32f, y - 0.26f, 0.64f, 0.52f, outline, 0.025f, 0.7f);
+
+    Draw2D::drawLine(x - 0.34f, y + 0.12f, x - 0.50f, y - 0.28f, skin, 0.08f);
+    Draw2D::drawLine(x + 0.34f, y + 0.12f, x + 0.50f, y - 0.28f, skin, 0.08f);
+
+    Draw2D::drawCircleFilled(x, y + 0.48f, 0.34f, skin);
+    Draw2D::drawCircle(x, y + 0.48f, 0.34f, outline, 0.025f, 24, 0.7f);
+    Draw2D::drawRectFilled(x - 0.30f, y + 0.62f, 0.60f, 0.16f, hair);
+    Draw2D::drawCircleFilled(x - 0.18f, y + 0.66f, 0.15f, hair);
+    Draw2D::drawCircleFilled(x + 0.12f, y + 0.66f, 0.13f, hair);
+    Draw2D::drawCircleFilled(x - 0.11f, y + 0.48f, 0.035f, eye);
+    Draw2D::drawCircleFilled(x + 0.11f, y + 0.48f, 0.035f, eye);
+    Draw2D::drawRectFilled(x - 0.08f, y + 0.33f, 0.16f, 0.025f, glm::vec3(0.50f, 0.12f, 0.12f));
 
     Draw2D::endFrame();
 }
@@ -97,9 +127,6 @@ void NPC::onInteract() {
 void NPC::setSchedule(const std::vector<ScheduleEntry>& schedule) {
     currentSchedule = schedule;
     currentScheduleIndex = 0;
-}
-
-void NPC::setCurrentSchedule(const std::string&) {
 }
 
 glm::vec2 NPC::getPosition() const {

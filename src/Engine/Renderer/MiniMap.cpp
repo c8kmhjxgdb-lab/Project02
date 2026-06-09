@@ -16,15 +16,15 @@ void MiniMap::init(int size) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // Create quad VBO (screen-space, bottom-right corner)
+    // Create quad VBO (screen-space)
     float quadVerts[] = {
         // pos (0-1)     // tex coord
-        0.0f, 0.0f,      0.0f, 1.0f,
-        1.0f, 0.0f,      1.0f, 1.0f,
-        1.0f, 1.0f,      1.0f, 0.0f,
-        0.0f, 0.0f,      0.0f, 1.0f,
-        1.0f, 1.0f,      1.0f, 0.0f,
-        0.0f, 1.0f,      0.0f, 0.0f,
+        0.0f, 0.0f,      0.0f, 0.0f,
+        1.0f, 0.0f,      1.0f, 0.0f,
+        1.0f, 1.0f,      1.0f, 1.0f,
+        0.0f, 0.0f,      0.0f, 0.0f,
+        1.0f, 1.0f,      1.0f, 1.0f,
+        0.0f, 1.0f,      0.0f, 1.0f,
     };
 
     glGenVertexArrays(1, &vao);
@@ -70,7 +70,7 @@ void MiniMap::update(float deltaTime, const glm::vec2& playerPos) {
 
         // Only update if player moved significantly
         float dist = glm::distance(playerPos, lastPlayerPos);
-        if (dist > 2.0f || isDirty) {
+        if (dist > 0.35f || isDirty) {
             forceUpdate(playerPos);
             lastPlayerPos = playerPos;
             isDirty = false;
@@ -80,22 +80,29 @@ void MiniMap::update(float deltaTime, const glm::vec2& playerPos) {
 
 uint8_t MiniMap::tileToColorIndex(uint8_t tileType) {
     // Match TileType enum values from TileMap.h
-    // Grass=0, Dirt=1, Stone=2, Water=3, Wall=4, Path=5, Sand=6, Lava=8, DeepWater=9, ...
+    // Color values mapped to shader thresholds in MiniMap::render():
+    //   r < 0.12  → deep water (dark blue)   → values 0-30
+    //   r < 0.24  → water (blue)             → values 31-61
+    //   r < 0.40  → grass (green)            → values 62-102
+    //   r < 0.52  → dirt/sand (brown/yellow) → values 103-132
+    //   r < 0.68  → stone/path (gray)        → values 133-173
+    //   r < 0.80  → wall/door (dark gray)    → values 174-204
+    //   r >= 0.80 → lava/snow/portal (bright)→ values 205-255
     switch (tileType) {
-        case 0:  return 80;   // Grass
-        case 1:  return 120;  // Dirt
-        case 2:  return 160;  // Stone
-        case 3:  return 50;   // Water
-        case 4:  return 200;  // Wall
-        case 5:  return 150;  // Path
-        case 6:  return 180;  // Sand
-        case 7:  return 250;  // Snow
-        case 8:  return 220;  // Lava
-        case 9:  return 30;   // DeepWater
-        case 10: return 140;  // Bridge
-        case 11: return 190;  // Door
-        case 12: return 240;  // Portal
-        default: return 100;
+        case 0:  return 85;   // Grass → green
+        case 1:  return 115;  // Dirt → brown-yellow
+        case 2:  return 155;  // Stone → gray
+        case 3:  return 55;   // Water → blue
+        case 4:  return 185;  // Wall → dark gray
+        case 5:  return 145;  // Path → light gray
+        case 6:  return 125;  // Sand → yellow-brown
+        case 7:  return 230;  // Snow → bright white-yellow
+        case 8:  return 220;  // Lava → bright orange-red
+        case 9:  return 20;   // DeepWater → very dark blue
+        case 10: return 140;  // Bridge → gray
+        case 11: return 180;  // Door → dark gray
+        case 12: return 240;  // Portal → bright purple-white
+        default: return 0;    // Unknown → black (unexplored)
     }
 }
 
@@ -108,32 +115,22 @@ glm::ivec2 MiniMap::worldToMinimap(const glm::vec2& worldPos) {
 }
 
 void MiniMap::forceUpdate(const glm::vec2& playerPos) {
+    (void)playerPos; // Player position is now handled via entity markers
     if (!tileGetter) return;
+    if (mapWidth <= 0 || mapHeight <= 0) return;
 
-    // Clear to black
-    std::memset(minimapData.data(), 0, minimapData.size());
-
-    // Draw tiles
-    for (int y = 0; y < mapHeight; ++y) {
-        for (int x = 0; x < mapWidth; ++x) {
-            uint8_t type = tileGetter(x, y);
-            uint8_t color = tileToColorIndex(type);
-
-            int mx = static_cast<int>(static_cast<float>(x) / mapWidth * mapSize);
-            int my = static_cast<int>(static_cast<float>(y) / mapHeight * mapSize);
-            mx = mx < 0 ? 0 : (mx >= mapSize ? mapSize - 1 : mx);
-            my = my < 0 ? 0 : (my >= mapSize ? mapSize - 1 : my);
-
-            minimapData[static_cast<size_t>(my) * mapSize + mx] = color;
+    // Fill every minimap texture pixel by sampling the source map. The old
+    // code wrote one texture pixel per map tile, leaving most of the texture
+    // black when mapSize was larger than mapWidth/mapHeight.
+    for (int my = 0; my < mapSize; ++my) {
+        int tileY = static_cast<int>(static_cast<float>(my) / mapSize * mapHeight);
+        tileY = tileY < 0 ? 0 : (tileY >= mapHeight ? mapHeight - 1 : tileY);
+        for (int mx = 0; mx < mapSize; ++mx) {
+            int tileX = static_cast<int>(static_cast<float>(mx) / mapSize * mapWidth);
+            tileX = tileX < 0 ? 0 : (tileX >= mapWidth ? mapWidth - 1 : tileX);
+            minimapData[static_cast<size_t>(my) * mapSize + mx] =
+                tileToColorIndex(tileGetter(tileX, tileY));
         }
-    }
-
-    // Draw player position (bright white)
-    glm::ivec2 pp = worldToMinimap(playerPos);
-    if (pp.x >= 0 && pp.x < mapSize && pp.y >= 0 && pp.y < mapSize) {
-        minimapData[static_cast<size_t>(pp.y) * mapSize + pp.x] = 255;
-        if (pp.x + 1 < mapSize) minimapData[pp.y * mapSize + pp.x + 1] = 255;
-        if (pp.y + 1 < mapSize) minimapData[(pp.y + 1) * mapSize + pp.x] = 255;
     }
 
     // Upload to GPU
@@ -142,14 +139,19 @@ void MiniMap::forceUpdate(const glm::vec2& playerPos) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void MiniMap::render(const glm::mat4& orthoProj, int screenWidth, int /*screenHeight*/) {
+void MiniMap::render(const glm::mat4& orthoProj, int screenWidth, int screenHeight) {
     if (!m_visible || !texture) return;
 
-    const int margin = 10;
-    const int size = 120;
+    const int margin = 16;
+    int size = static_cast<int>(screenHeight * 0.13f);
+    size = size < 92 ? 92 : (size > 142 ? 142 : size);
 
+    // Position: top-right corner
     float x0 = static_cast<float>(screenWidth - size - margin);
-    float y0 = static_cast<float>(margin);
+    float y0 = static_cast<float>(screenHeight - size - margin);
+    if (x0 < margin) x0 = static_cast<float>(margin);
+    if (y0 < margin) y0 = static_cast<float>(margin);
+    float sizeF = static_cast<float>(size);
 
     if (!shaderReady) {
         const char* vs = R"(
@@ -173,13 +175,32 @@ out vec4 FragColor;
 void main() {
     float r = texture(uTex, vTexCoord).r;
     vec3 color;
-    if (r < 0.15) color = vec3(0.15, 0.15, 0.2);
-    else if (r < 0.3) color = vec3(0.08, 0.3, 0.5);
-    else if (r < 0.5) color = vec3(0.2, 0.55, 0.18);
-    else if (r < 0.65) color = vec3(0.5, 0.38, 0.15);
-    else if (r < 0.85) color = vec3(0.55, 0.55, 0.5);
-    else color = vec3(0.95, 0.95, 0.3);
-    FragColor = vec4(color, 0.85);
+    if (r < 0.02) {
+        // Black — unexplored / void
+        color = vec3(0.05, 0.05, 0.08);
+    } else if (r < 0.12) {
+        // Deep water — dark blue
+        color = vec3(0.06, 0.15, 0.35);
+    } else if (r < 0.24) {
+        // Water — blue
+        color = vec3(0.1, 0.3, 0.55);
+    } else if (r < 0.40) {
+        // Grass — green
+        color = vec3(0.18, 0.5, 0.15);
+    } else if (r < 0.52) {
+        // Dirt / Sand — brown / yellow-brown
+        color = vec3(0.5, 0.38, 0.2);
+    } else if (r < 0.68) {
+        // Stone / Path — gray
+        color = vec3(0.5, 0.5, 0.48);
+    } else if (r < 0.80) {
+        // Wall / Door — dark gray
+        color = vec3(0.35, 0.32, 0.35);
+    } else {
+        // Lava / Snow / Portal — bright
+        color = vec3(0.85, 0.7, 0.3);
+    }
+    FragColor = vec4(color, 0.78);
 }
 )";
 
@@ -205,17 +226,17 @@ void main() {
 
     if (!shaderReady) return;
 
+    Draw2D::beginFrame(orthoProj);
+    Draw2D::drawRectFilled(x0 - 6.0f, y0 - 6.0f, sizeF + 12.0f, sizeF + 12.0f,
+                           glm::vec3(0.02f, 0.025f, 0.03f), 0.34f);
+    Draw2D::endFrame();
+
     glUseProgram(shader);
     glUniformMatrix4fv(uniformProj, 1, GL_FALSE, &orthoProj[0][0]);
-    glUniform4f(uniformRect, x0, y0, size, size);
+    glUniform4f(uniformRect, x0, y0, sizeF, sizeF);
     glUniform1i(uniformTex, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-
-    // Draw border
-    Draw2D::beginFrame(orthoProj);
-    Draw2D::drawRect(x0 - 2, y0 - 2, size + 4, size + 4, glm::vec3(0.0f), 0.005f);
-    Draw2D::endFrame();
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -223,4 +244,48 @@ void main() {
 
     glUseProgram(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    auto clamp01Local = [](float v) {
+        return v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v);
+    };
+
+    auto toScreen = [&](const glm::vec2& worldPos) {
+        float mapWorldW = mapWidth * mapTileSize;
+        float mapWorldH = mapHeight * mapTileSize;
+        float nx = mapWorldW > 0.0f ? clamp01Local(worldPos.x / mapWorldW) : 0.0f;
+        float ny = mapWorldH > 0.0f ? clamp01Local(worldPos.y / mapWorldH) : 0.0f;
+        return glm::vec2(x0 + nx * sizeF, y0 + ny * sizeF);
+    };
+
+    Draw2D::beginFrame(orthoProj);
+    Draw2D::drawRect(x0 - 2.0f, y0 - 2.0f, sizeF + 4.0f, sizeF + 4.0f,
+                     glm::vec3(0.72f, 0.82f, 0.78f), 2.0f, 0.75f);
+    Draw2D::drawRect(x0, y0, sizeF, sizeF, glm::vec3(0.0f), 1.0f, 0.38f);
+
+    for (const auto& entity : m_entities) {
+        glm::vec2 p = toScreen(entity.worldPos);
+        glm::vec3 color(1.0f);
+        float radius = 3.0f;
+        switch (entity.type) {
+            case EntityMarker::Type::Player:
+                color = glm::vec3(1.0f, 0.95f, 0.72f);
+                radius = 4.5f;
+                break;
+            case EntityMarker::Type::Princess:
+                color = glm::vec3(1.0f, 0.48f, 0.78f);
+                radius = 3.6f;
+                break;
+            case EntityMarker::Type::Enemy:
+                color = glm::vec3(1.0f, 0.25f, 0.18f);
+                radius = 3.2f;
+                break;
+            case EntityMarker::Type::NPC:
+                color = glm::vec3(0.94f, 0.78f, 0.28f);
+                radius = 3.2f;
+                break;
+        }
+        Draw2D::drawCircleFilled(p.x, p.y, radius, color, 0.92f);
+        Draw2D::drawCircle(p.x, p.y, radius + 2.0f, glm::vec3(0.0f), 1.0f, 16, 0.45f);
+    }
+    Draw2D::endFrame();
 }

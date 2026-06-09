@@ -72,8 +72,10 @@ void DecorRenderer::shutdown() {
     vao = vbo = instanceVBO = shader = 0;
 }
 
-void DecorRenderer::beginFrame(const glm::mat4& viewProj) {
-    currentTime += 0.016f; // approximate dt
+void DecorRenderer::beginFrame(const glm::mat4& viewProj, float dt) {
+    // Previously this used a hardcoded 0.016f which desynced from real frame
+    // time on non-60fps displays. Accept dt from the caller.
+    currentTime += dt;
     glUseProgram(shader);
     glUniformMatrix4fv(uniformViewProj, 1, GL_FALSE, &viewProj[0][0]);
     glUniform1f(uniformTime, currentTime);

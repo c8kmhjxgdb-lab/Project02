@@ -125,6 +125,9 @@ void DropManager::update(float dt, const glm::vec2& playerPos) {
         if (dist < collectRange) {
             drop.collecting = true;
             drop.collected = true;
+            if (onCollect) {
+                onCollect(drop);
+            }
         }
     }
 
@@ -146,8 +149,13 @@ void DropManager::collect(DropId id) {
     Drop* drop = find(id);
     if (!drop) return;
 
-    drop->collecting = true;
-    drop->collected = true;
+    if (!drop->collecting) {
+        drop->collecting = true;
+        drop->collected = true;
+        if (onCollect) {
+            onCollect(*drop);
+        }
+    }
 }
 
 void DropManager::destroy(DropId id) {

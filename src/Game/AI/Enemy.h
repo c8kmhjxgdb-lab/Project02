@@ -70,6 +70,7 @@ struct Enemy {
     // 爆炸型专用
     float explosionRange;
     float explosionDamage;
+    bool explosionTriggered;
 
     // 减速效果（冰锥）
     float slowTimer;
@@ -85,13 +86,21 @@ struct Enemy {
         , state(State::Idle), stateTimer(0)
         , coinDropMin(1), coinDropMax(3)
         , color(1, 0, 0), radius(0.3f), deathTimer(0)
-        , explosionRange(1.5f), explosionDamage(20.0f)
+        , explosionRange(1.5f), explosionDamage(20.0f), explosionTriggered(false)
         , slowTimer(0), slowMultiplier(1.0f)
         , active(true) {}
 
     void applySlow(float duration, float multiplier) {
-        slowTimer = duration;
-        slowMultiplier = multiplier;
+        // Apply the strongest (lowest) multiplier seen this frame. If a new slow
+        // arrives and is weaker than the current one, ignore it; if it's stronger,
+        // take the new multiplier but keep the longer remaining time so a second
+        // hit can extend an existing slow rather than truncating it.
+        if (multiplier < slowMultiplier || slowTimer <= 0.0f) {
+            slowMultiplier = multiplier;
+        }
+        if (duration > slowTimer) {
+            slowTimer = duration;
+        }
     }
 
     void updateSlow(float dt) {
@@ -174,14 +183,6 @@ private:
     EnemyDeathCallback onEnemyDeath;
     EnemyShootCallback onShoot;
 
-    // AI行为函数
-    void updateChaser(Enemy& enemy, float dt, const glm::vec2& playerPos);
-    void updateShooter(Enemy& enemy, float dt, const glm::vec2& playerPos, b2WorldId world);
-    void updateExploder(Enemy& enemy, float dt, const glm::vec2& playerPos);
-
     // 创建Box2D刚体
     b2BodyId createBody(b2WorldId world, const glm::vec2& pos, EnemyType type);
-
-    // 死亡处理
-    void onDeath(Enemy& enemy);
 };

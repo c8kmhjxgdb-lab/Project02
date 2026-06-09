@@ -6,7 +6,15 @@
       "Bash(cmake -B build -G \"Visual Studio 17 2022\" -A x64)",
       "Bash(xargs grep -l -i \"flight\\\\|flying\\\\|altitude\\\\|height\")",
       "Bash(xargs grep -l -i \"shield\\\\|护盾\")",
-      "Bash(xargs grep -l -i \"bond\\\\|combo\\\\|羁绊\\\\|合体\")"
+      "Bash(xargs grep -l -i \"bond\\\\|combo\\\\|羁绊\\\\|合体\")",
+      "Bash(mmx auth *)",
+      "Bash(mmx image *)",
+      "Bash(bash gen_skills.sh)",
+      "Bash(bash /e/DouBao2/Project/KatCode/Project02/gen_skills.sh)",
+      "Bash(mmx music *)",
+      "Bash(mmx --version)",
+      "Bash(mmx video *)",
+      "Bash(mmx quota *)"
     ]
   }
 }

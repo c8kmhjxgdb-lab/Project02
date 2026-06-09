@@ -4,6 +4,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <chrono>
+#include <functional>
 
 /**
  * Shield - 护盾技能系统
@@ -23,6 +24,8 @@ public:
 
     // 更新护盾状态
     void update(float dt);
+
+    void reset();
 
     // 是否正在激活
     bool isActive() const { return active; }

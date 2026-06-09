@@ -19,7 +19,7 @@ public:
     void init();
     void shutdown();
 
-    void beginFrame(const glm::mat4& viewProj);
+    void beginFrame(const glm::mat4& viewProj, float dt = 0.016f);
     void addDecor(const glm::vec2& pos, DecorType type, int variant,
                   float rotation = 0.0f, float scale = 1.0f);
     void endFrame();

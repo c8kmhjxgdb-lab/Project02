@@ -1,0 +1,169 @@
+{
+  "emotion": {
+    "childlikeHeart": 979.0,
+    "grievance": 1.0,
+    "joy": 50.0,
+    "stress": 0.0
+  },
+  "environment": {
+    "day": 1,
+    "hour": 14.410685539245605,
+    "storyWeatherTag": "",
+    "weather": "Clear",
+    "weatherIntensity": 0.0
+  },
+  "homeBase": {
+    "furniture": [
+      {
+        "defId": "toy_shelf",
+        "instanceId": 3,
+        "rotation": 0,
+        "tileX": 13,
+        "tileY": 5
+      },
+      {
+        "defId": "flower_pot",
+        "instanceId": 4,
+        "rotation": 0,
+        "tileX": 13,
+        "tileY": 4
+      },
+      {
+        "defId": "flower_pot",
+        "instanceId": 5,
+        "rotation": 0,
+        "tileX": 13,
+        "tileY": 3
+      },
+      {
+        "defId": "flower_pot",
+        "instanceId": 6,
+        "rotation": 0,
+        "tileX": 14,
+        "tileY": 3
+      },
+      {
+        "defId": "flower_pot",
+        "instanceId": 7,
+        "rotation": 0,
+        "tileX": 15,
+        "tileY": 3
+      }
+    ]
+  },
+  "inventory": {
+    "coins": 8,
+    "furnitureStock": [
+      {
+        "count": 1,
+        "defId": "writing_desk"
+      },
+      {
+        "count": 1,
+        "defId": "childhood_poster"
+      },
+      {
+        "count": 2,
+        "defId": "star_lamp"
+      },
+      {
+        "count": 1,
+        "defId": "soft_rug"
+      },
+      {
+        "count": 1,
+        "defId": "simple_bed"
+      }
+    ]
+  },
+  "player": {
+    "coins": 8,
+    "health": 75.0,
+    "mana": 100.0,
+    "maxHealth": 100.0,
+    "maxMana": 100.0,
+    "position": [
+      11.834709167480469,
+      15.449089050292969
+    ],
+    "progress": {
+      "collectedItems": [
+        "mini_car"
+      ],
+      "completedQuests": [
+        "starchild_toy_shelf",
+        "flower_for_princess"
+      ],
+      "discoveredRegions": [
+        "starter_village",
+        "home_base"
+      ],
+      "maxHealth": 100,
+      "maxMana": 100,
+      "totalPlayTime": 14.410685539245605
+    },
+    "regionId": "starter_village"
+  },
+  "regions": [
+    {
+      "decorations": [],
+      "id": "starter_village",
+      "modifications": [],
+      "name": "新手村",
+      "pois": [
+        {
+          "displayName": "玩家之家 / Player Home",
+          "id": "player_home",
+          "metadata": 0,
+          "tileX": 5,
+          "tileY": 7,
+          "type": 4
+        },
+        {
+          "displayName": "新手村 / Starter Village",
+          "id": "starter_village_sign",
+          "metadata": 0,
+          "tileX": 8,
+          "tileY": 8,
+          "type": 7
+        }
+      ],
+      "seed": 42,
+      "size": [
+        60,
+        60
+      ],
+      "tileSize": 1.0
+    },
+    {
+      "decorations": [],
+      "id": "home_base",
+      "modifications": [],
+      "name": "秘密基地",
+      "pois": [
+        {
+          "displayName": "返回新手村 / Back to Starter Village",
+          "id": "base_exit",
+          "metadata": 0,
+          "tileX": 9,
+          "tileY": 12,
+          "type": 4
+        }
+      ],
+      "seed": 20260607,
+      "size": [
+        18,
+        14
+      ],
+      "tileSize": 1.0
+    }
+  ],
+  "timestamp": "2026-06-08T03:06:40",
+  "toys": {
+    "collected": [
+      "mini_car"
+    ],
+    "miniCarLastRewardDay": 0
+  },
+  "version": 3
+}

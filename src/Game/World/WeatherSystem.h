@@ -1,22 +1,16 @@
 #pragma once
 
+#include "Game/World/WeatherTypes.h"
+
 #include <glm/vec3.hpp>
 #include <random>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 class ParticleSystem;
 struct Camera2D;  // Forward declare as struct to match Camera2D.h
-
-/**
- * 天气类型
- */
-enum class WeatherType : uint8_t {
-    Clear,      // 晴天
-    Cloudy,     // 多云
-    Rain,       // 雨天
-    HeavyRain,  // 大雨
-    Fog,        // 雾天
-    Snow        // 雪天
-};
+class LuaVM;
 
 /**
  * WeatherSystem — 天气系统
@@ -28,20 +22,27 @@ class WeatherSystem {
 public:
     // 初始化（注入依赖）
     void init(ParticleSystem* particleSys, Camera2D* camera);
+    bool loadConfig(LuaVM& lua, const char* path);
 
     void update(float dt, const Camera2D& camera);
-    void render();
 
     // 天气控制
     void setWeather(WeatherType type);
+    void setWeatherImmediate(WeatherType type, float restoredIntensity = 1.0f);
     void setRandomWeather(float changeInterval = 300.0f);  // 每N秒随机变化
     void clearWeather();
+    void setRegionContext(const std::string& regionId, bool indoor, bool allowParticles = true);
 
     // 获取当前天气
     WeatherType getCurrentWeather() const { return currentWeather; }
+    bool isIndoorContext() const { return indoorContext; }
+    const std::string& getCurrentRegionId() const { return currentRegionId; }
+    const std::string& getCurrentSpecialTag() const { return currentSpecialTag; }
+    float getDefaultChangeInterval() const { return defaultChangeInterval; }
 
     // 天气效果强度（0-1）
     float getIntensity() const { return intensity; }
+    bool shouldEmitParticles() const;
 
     // 获取天气对移动的影响
     float getMovementMultiplier() const;
@@ -54,6 +55,8 @@ public:
 
     // 获取天气名称
     static const char* getWeatherName(WeatherType type);
+    static const char* getWeatherId(WeatherType type);
+    static WeatherType weatherFromId(const std::string& id);
 
 private:
     WeatherType currentWeather;
@@ -68,10 +71,13 @@ private:
 
     ParticleSystem* particleSystem;
     Camera2D* camera;  // 非拥有指针，仅用于获取视口信息
+    std::string currentRegionId;
+    bool indoorContext;
+    bool allowParticleEffects;
+    std::string currentSpecialTag;
+    float defaultChangeInterval;
 
-    // 粒子发射积分累积器
-    float rainAccumulator = 0.0f;
-    float snowAccumulator = 0.0f;
+    std::unordered_map<std::string, WeatherRegionRule> regionRules;
 
     // 天气过渡
     void updateTransition(float dt);
@@ -83,4 +89,5 @@ private:
 
     // 随机天气选择
     WeatherType chooseRandomWeather() const;
+    const WeatherRegionRule* findRegionRule(const std::string& regionId) const;
 };

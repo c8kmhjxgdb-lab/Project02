@@ -43,6 +43,7 @@ public:
     // 获取修改记录（用于存档）
     const std::vector<TileModification>& getModifications() const { return modifications; }
     void clearModifications() { modifications.clear(); }
+    bool replayModifications(const std::vector<TileModification>& savedModifications);
 
     // 加载时临时禁用修改记录
     void setReplayingMode(bool replaying) { isReplaying = replaying; }

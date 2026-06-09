@@ -48,14 +48,15 @@ std::vector<glm::ivec2> PathfindingSystem::getWalkableNeighbors(
 
 float PathfindingSystem::heuristic(const glm::ivec2& a, const glm::ivec2& b,
                                    bool diagonal) const {
+    float dx = static_cast<float>(std::abs(a.x - b.x));
+    float dy = static_cast<float>(std::abs(a.y - b.y));
+
     if (diagonal) {
         // 对角距离（Chebyshev距离）
-        float dx = std::abs(a.x - b.x);
-        float dy = std::abs(a.y - b.y);
         return dx + dy + (std::sqrt(2.0f) - 2.0f) * std::min(dx, dy);
     }
     // 曼哈顿距离
-    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+    return dx + dy;
 }
 
 PathResult PathfindingSystem::findPath(const TileMap& map,

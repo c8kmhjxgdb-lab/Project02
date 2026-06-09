@@ -1,30 +1,11 @@
 #include "RegionManager.h"
+#include "Game/World/RegionFactory.h"
+
 #include <algorithm>
-#include <functional>
 
 void RegionManager::init() {
     // 创建初始区域（新手村）
-    auto starterRegion = std::make_unique<MapRegion>();
-    starterRegion->generate("starter_village", "新手村",
-                           RegionType::Overworld, 42, 60, 60);
-
-    // 添加家的POI
-    PointOfInterest home;
-    home.type = PointOfInterest::Type::Home;
-    home.id = "player_home";
-    home.displayName = "玩家之家";
-    home.tilePos = {5, 5};
-    home.metadata = 0;
-    starterRegion->addPOI(home);
-
-    // 添加通往黑暗森林的连接
-    MapConnection forestConn;
-    forestConn.direction = MapConnection::Direction::East;
-    forestConn.targetRegionId = "dark_forest";
-    forestConn.sourceTile = {59, 30};  // 东边界
-    forestConn.targetTile = {0, 30};    // 西边界入口
-    starterRegion->addConnection(forestConn);
-
+    auto starterRegion = RegionFactory::createRegion("starter_village");
     currentRegionId = "starter_village";
     currentRegion = std::move(starterRegion);
     discoveredRegions.push_back("starter_village");
@@ -35,6 +16,17 @@ void RegionManager::shutdown() {
     currentRegion.reset();
     loadedRegions.clear();
     discoveredRegions.clear();
+    currentRegionId.clear();
+    isTransitioningFlag = false;
+    transitionProgress = 0.0f;
+    transitionAlpha = 0.0f;
+    transitionFadeOut = true;
+    transitionTargetRegionId.clear();
+    transitionEntryTile = glm::ivec2(0, 0);
+}
+
+void RegionManager::resetLoadedRegions() {
+    shutdown();
 }
 
 bool RegionManager::loadRegion(const std::string& regionId) {
@@ -46,10 +38,7 @@ bool RegionManager::loadRegion(const std::string& regionId) {
         return true;  // 已经加载
     }
 
-    // 创建新区域
-    auto region = std::make_unique<MapRegion>();
-    int seed = getRegionSeed(regionId);
-    region->generate(regionId, regionId, RegionType::Overworld, seed, 60, 60);
+    auto region = RegionFactory::createRegion(regionId);
 
     if (worldId.index1 != 0) {
         region->buildPhysics(worldId);
@@ -67,9 +56,19 @@ void RegionManager::unloadCurrentRegion() {
     if (!currentRegion) return;
 
     // 将当前区域存入加载列表
-    loadedRegions[currentRegionId] = std::move(currentRegion);
+    archiveCurrentRegion();
     currentRegion.reset();
     currentRegionId.clear();
+
+    // 限制已加载区域数量，防止物理体累积过多
+    const size_t maxLoadedRegions = 5;
+    while (loadedRegions.size() > maxLoadedRegions) {
+        auto it = loadedRegions.begin();
+        if (it->second) {
+            it->second->clearPhysics();  // 销毁 Box2D 物理体
+        }
+        loadedRegions.erase(it);
+    }
 }
 
 bool RegionManager::transitionTo(const std::string& targetRegionId,
@@ -82,17 +81,23 @@ bool RegionManager::transitionTo(const std::string& targetRegionId,
     // 如果目标区域已在加载列表中，仅交换所有权（物理体已存在，无需重建）
     auto it = loadedRegions.find(targetRegionId);
     if (it != loadedRegions.end()) {
-        // 将当前区域存入加载列表
-        loadedRegions[currentRegionId] = std::move(currentRegion);
-        // 从加载列表取出目标区域
+        // Archive current region, swap in target from cache.
+        archiveCurrentRegion();
         currentRegion = std::move(it->second);
         loadedRegions.erase(it);
         currentRegionId = targetRegionId;
+
+        enforceLoadedCap();
+        // Teleport the player to the entry tile in the now-current region.
+        teleportPlayerToEntry(targetRegionId, entryTile);
         return true;
     }
 
     // 否则开始过渡流程（创建新区域）
     if (useTransitionEffect) {
+        // Defer the actual region swap AND the player teleport to completeTransition().
+        // Returning false here tells the caller "not done yet, don't teleport on your
+        // behalf against the still-old current region".
         transitionTargetRegionId = targetRegionId;
         transitionEntryTile = entryTile;
         isTransitioningFlag = true;
@@ -100,20 +105,11 @@ bool RegionManager::transitionTo(const std::string& targetRegionId,
         transitionAlpha = 0.0f;
         transitionFadeOut = true;
         beginTransition();
-        return true;
+        return false;
     } else {
-        // 直接切换（无过渡效果）
-        // 将当前区域存入加载列表
-        loadedRegions[currentRegionId] = std::move(currentRegion);
-
-        currentRegionId = targetRegionId;
-        currentRegion = std::make_unique<MapRegion>();
-        // 使用固定种子表确保跨运行一致性
-        int seed = getRegionSeed(targetRegionId);
-        currentRegion->generate(targetRegionId, targetRegionId,
-                               RegionType::Overworld, seed, 60, 60);
-        currentRegion->buildPhysics(worldId);
-        discoveredRegions.push_back(targetRegionId);
+        // 直接切换（无过渡效果）：直接 swap 并传送玩家
+        performImmediateSwap(targetRegionId);
+        teleportPlayerToEntry(targetRegionId, entryTile);
         return true;
     }
 }
@@ -124,6 +120,59 @@ bool RegionManager::transitionTo(const MapConnection& connection, b2WorldId worl
 
 void RegionManager::beginTransition() {
     // 过渡开始，淡出
+}
+
+void RegionManager::performImmediateSwap(const std::string& targetRegionId) {
+    // Archive current region to the loaded cache, then create+load the target
+    // if it isn't already in the cache. Used by both the no-fade path and
+    // the deferred-fade path's completeTransition().
+    archiveCurrentRegion();
+
+    currentRegionId = targetRegionId;
+
+    auto it = loadedRegions.find(targetRegionId);
+    if (it != loadedRegions.end()) {
+        // Already cached — just swap ownership.
+        currentRegion = std::move(it->second);
+        loadedRegions.erase(it);
+    } else {
+        currentRegion = RegionFactory::createRegion(targetRegionId);
+        if (b2World_IsValid(worldId)) {
+            currentRegion->buildPhysics(worldId);
+        }
+    }
+
+    if (std::find(discoveredRegions.begin(), discoveredRegions.end(),
+                  currentRegionId) == discoveredRegions.end()) {
+        discoveredRegions.push_back(currentRegionId);
+    }
+
+    enforceLoadedCap();
+}
+
+void RegionManager::archiveCurrentRegion() {
+    if (!currentRegion || currentRegionId.empty()) return;
+    loadedRegions[currentRegionId] = std::move(currentRegion);
+}
+
+void RegionManager::teleportPlayerToEntry(const std::string& /*regionId*/,
+                                          const glm::ivec2& entryTile) {
+    if (!b2Body_IsValid(playerBody) || !currentRegion) return;
+    if (!currentRegion->getTileMap().isInBounds(entryTile.x, entryTile.y)) return;
+    glm::vec2 worldPos = currentRegion->getTileMap().tileToWorld(entryTile.x, entryTile.y);
+    b2Body_SetTransform(playerBody, b2Vec2{worldPos.x, worldPos.y}, b2Rot{0});
+    b2Body_SetLinearVelocity(playerBody, b2Vec2_zero);
+}
+
+void RegionManager::enforceLoadedCap() {
+    const size_t maxLoadedRegions = 5;
+    while (loadedRegions.size() > maxLoadedRegions) {
+        auto it = loadedRegions.begin();
+        if (it->second) {
+            it->second->clearPhysics();
+        }
+        loadedRegions.erase(it);
+    }
 }
 
 void RegionManager::updateTransition(float dt) {
@@ -153,23 +202,13 @@ void RegionManager::updateTransition(float dt) {
 }
 
 void RegionManager::completeTransition() {
-    // 将当前区域存入加载列表（所有权转移，不清除物理体）
-    loadedRegions[currentRegionId] = std::move(currentRegion);
-
-    // 创建新区域
-    currentRegionId = transitionTargetRegionId;
-    currentRegion = std::make_unique<MapRegion>();
-    // 使用固定种子表确保跨运行一致性
-    int seed = getRegionSeed(currentRegionId);
-    currentRegion->generate(currentRegionId, currentRegionId,
-                           RegionType::Overworld, seed, 60, 60);
-    // 为新区域创建物理刚体
-    currentRegion->buildPhysics(worldId);
-
-    if (std::find(discoveredRegions.begin(), discoveredRegions.end(),
-                  currentRegionId) == discoveredRegions.end()) {
-        discoveredRegions.push_back(currentRegionId);
-    }
+    // Defer-was-pending: do the actual swap now (deferred from transitionTo)
+    performImmediateSwap(transitionTargetRegionId);
+    // Teleport the player to the entry tile in the freshly-loaded region.
+    // This used to be the caller's responsibility, which broke when the caller
+    // teleported against the still-old region during the fade.
+    teleportPlayerToEntry(transitionTargetRegionId, transitionEntryTile);
+    transitionEntryTile = glm::ivec2(0, 0);
 }
 
 void RegionManager::update(float dt) {
@@ -205,28 +244,4 @@ const MapRegion* RegionManager::getRegion(const std::string& regionId) const {
     }
     auto it = loadedRegions.find(regionId);
     return it != loadedRegions.end() ? it->second.get() : nullptr;
-}
-
-// 固定种子表：确保跨运行一致性
-int RegionManager::getRegionSeed(const std::string& regionId) {
-    static const std::unordered_map<std::string, int> REGION_SEEDS = {
-        {"starter_village", 42},
-        {"dark_forest", 12345},
-        {"mountain_pass", 67890},
-        {"coastal_town", 11111},
-        // 默认种子：使用稳定的哈希函数
-    };
-
-    auto it = REGION_SEEDS.find(regionId);
-    if (it != REGION_SEEDS.end()) {
-        return it->second;
-    }
-
-    // 回退：使用稳定的哈希（FNV-1a）
-    unsigned int hash = 2166136261u;
-    for (char c : regionId) {
-        hash ^= static_cast<unsigned int>(c);
-        hash *= 16777619u;
-    }
-    return static_cast<int>(hash);
 }

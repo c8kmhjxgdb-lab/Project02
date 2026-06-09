@@ -26,7 +26,8 @@ public:
     // 按需更新（基于计时器）
     void update(float deltaTime, const glm::vec2& playerPos);
 
-    // 渲染小地图到屏幕（正交投影）
+    // Render minimap to screen (orthographic projection)
+    // Automatically scales based on screen resolution
     void render(const glm::mat4& orthoProj, int screenWidth, int screenHeight);
 
     // 强制立即更新
@@ -42,6 +43,15 @@ public:
     // Set map dimensions
     void setMapDimensions(int width, int height, float tileSize);
 
+    // Entity marker types for minimap display
+    struct EntityMarker {
+        glm::vec2 worldPos;
+        enum class Type : uint8_t { Player, Princess, Enemy, NPC } type;
+    };
+
+    // Set entities to display on minimap (called before update/render)
+    void setEntities(const std::vector<EntityMarker>& entities) { m_entities = entities; }
+
 private:
     GLuint texture = 0;
     GLuint vao = 0, vbo = 0;
@@ -55,7 +65,7 @@ private:
     std::vector<uint8_t> minimapData; // 每个瓦片的颜色索引
 
     float updateTimer = 0.0f;
-    float updateInterval = 1.0f;  // 每秒更新一次
+    float updateInterval = 0.2f;
     bool isDirty = false;
     bool m_visible = true;
 
@@ -68,6 +78,9 @@ private:
     float mapTileSize = 1.0f;
 
     TileGetter tileGetter;
+
+    // Entity markers for display on minimap
+    std::vector<EntityMarker> m_entities;
 
     void updateTexture(const glm::vec2& playerPos);
     glm::ivec2 worldToMinimap(const glm::vec2& worldPos);

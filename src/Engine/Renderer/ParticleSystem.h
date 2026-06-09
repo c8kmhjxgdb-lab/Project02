@@ -84,5 +84,10 @@ private:
     int maxParticles;
     int firstFree;  // 对象池空闲索引
 
+    // Free list for O(1) allocation
+    std::vector<int> freeList;
+    bool freeListValid;
+
+    void rebuildFreeList();
     Particle* findFree();
 };

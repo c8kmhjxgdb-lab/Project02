@@ -31,7 +31,6 @@ public:
     virtual void onInteract();
 
     void setSchedule(const std::vector<ScheduleEntry>& schedule);
-    void setCurrentSchedule(const std::string& scheduleId);
 
     const std::string& getName() const { return name; }
     glm::vec2 getPosition() const;

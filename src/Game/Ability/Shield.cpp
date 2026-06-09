@@ -42,6 +42,13 @@ void Shield::update(float dt) {
     }
 }
 
+void Shield::reset() {
+    active = false;
+    remainingTime = 0.0f;
+    rotationAngle = 0.0f;
+    hitCooldown = 0.0f;
+}
+
 float Shield::getIntensity() const {
     if (!active) return 0.0f;
     // 持续时间最后25%时开始闪烁
@@ -84,7 +91,7 @@ void Shield::repelEnemy(b2BodyId enemyBody,
                        const glm::vec2& playerPos, const glm::vec2& enemyPos,
                        float knockbackForce) {
     // 计算击退方向（从玩家指向敌人）
-    glm::vec2 repelDir = glm::normalize(enemyPos - playerPos);
+    glm::vec2 repelDir = Math::normalize(enemyPos - playerPos);
 
     // 施加击退力
     b2Vec2 repelForce = {repelDir.x * knockbackForce, repelDir.y * knockbackForce};
