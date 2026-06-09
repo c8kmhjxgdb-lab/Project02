@@ -32,18 +32,18 @@ glm::vec2 closestPointOnSegment(const glm::vec2& a, const glm::vec2& b, const gl
     return a + ab * t;
 }
 
-bool blockPlayerDamageWithShield(GameState& gs,
+bool blockPlayerDamageWithShield(CombatCollisionService::Context& context,
                                  const glm::vec2& playerPos,
                                  const glm::vec2& sourcePos,
                                  float sourceRadius) {
-    if (!gs.shield.isActive()) return false;
+    if (!context.shield.isActive()) return false;
 
-    float blockRange = gs.shield.getRadius() + std::max(0.35f, sourceRadius);
+    float blockRange = context.shield.getRadius() + std::max(0.35f, sourceRadius);
     if (glm::distance(playerPos, sourcePos) > blockRange) return false;
 
-    gs.particleSystem.emitRing(playerPos, 18,
-        glm::vec3(0.42f, 0.78f, 1.0f), gs.shield.getRadius(), 0.28f, 0.055f);
-    gs.particleSystem.emitBurst(sourcePos, 10,
+    context.particleSystem.emitRing(playerPos, 18,
+        glm::vec3(0.42f, 0.78f, 1.0f), context.shield.getRadius(), 0.28f, 0.055f);
+    context.particleSystem.emitBurst(sourcePos, 10,
         glm::vec3(0.62f, 0.88f, 1.0f), 3.2f, 0.20f, 0.055f);
     return true;
 }
@@ -52,7 +52,21 @@ bool blockPlayerDamageWithShield(GameState& gs,
 
 namespace CombatCollisionService {
 
-void handleCollisions(GameState& gs) {
+Context makeContext(GameState& gs) {
+    return {
+        gs.projectileManager,
+        gs.enemyManager,
+        gs.particleSystem,
+        gs.shield,
+        gs.playerHealth,
+        gs.playerBodyId,
+        gs.isDead,
+        gs.isFlying,
+        gs.deathTimer
+    };
+}
+
+void handleCollisions(Context& context) {
     struct HitInfo {
         ProjectileId projId;
         EnemyId enemyId;
@@ -63,8 +77,8 @@ void handleCollisions(GameState& gs) {
     };
     std::vector<HitInfo> hits;
 
-    const auto& projectiles = gs.projectileManager.getActive();
-    auto aliveEnemies = gs.enemyManager.getAlive();
+    const auto& projectiles = context.projectileManager.getActive();
+    auto aliveEnemies = context.enemyManager.getAlive();
 
     for (const auto& proj : projectiles) {
         if (!proj.active) continue;
@@ -93,25 +107,25 @@ void handleCollisions(GameState& gs) {
     }
 
     for (const auto& hit : hits) {
-        gs.projectileManager.onHit(hit.projId, hit.enemyBody);
-        gs.enemyManager.damage(hit.enemyId, hit.damage);
+        context.projectileManager.onHit(hit.projId, hit.enemyBody);
+        context.enemyManager.damage(hit.enemyId, hit.damage);
 
-        const Enemy* enemy = gs.enemyManager.find(hit.enemyId);
+        const Enemy* enemy = context.enemyManager.find(hit.enemyId);
         if (enemy) {
             if (hit.type == ProjectileType::IceSpike) {
                 const_cast<Enemy*>(enemy)->applySlow(3.0f, 0.4f);
             }
-            gs.particleSystem.emitBurst(hit.hitPos, 8,
+            context.particleSystem.emitBurst(hit.hitPos, 8,
                 hit.type == ProjectileType::IceSpike ? glm::vec3(0.5f, 0.8f, 1.0f) :
                 hit.type == ProjectileType::Thunder ? glm::vec3(0.8f, 0.9f, 1.0f) :
                 glm::vec3(1.0f, 0.5f, 0.0f), 3.0f, 0.3f, 0.1f);
         }
     }
 
-    b2Vec2 playerPos = b2Body_GetPosition(gs.playerBodyId);
+    b2Vec2 playerPos = b2Body_GetPosition(context.playerBodyId);
     glm::vec2 pPos2(playerPos.x, playerPos.y);
 
-    if (!gs.playerHealth.isInvincible() && !gs.isDead && !gs.isFlying) {
+    if (!context.playerHealth.isInvincible() && !context.isDead && !context.isFlying) {
         for (const Enemy* enemy : aliveEnemies) {
             if (!enemy->active) continue;
             if (enemy->state == Enemy::State::Dead) continue;
@@ -122,8 +136,8 @@ void handleCollisions(GameState& gs) {
 
             float dist = glm::distance(pPos2, ePos2);
             if (dist < (0.3f + enemy->radius)) {
-                if (blockPlayerDamageWithShield(gs, pPos2, ePos2, enemy->radius)) {
-                    gs.shield.checkAndRepelEnemy(enemy->bodyId, pPos2, 20.0f);
+                if (blockPlayerDamageWithShield(context, pPos2, ePos2, enemy->radius)) {
+                    context.shield.checkAndRepelEnemy(enemy->bodyId, pPos2, 20.0f);
                     break;
                 }
 
@@ -131,28 +145,28 @@ void handleCollisions(GameState& gs) {
                 info.amount = enemy->damage;
                 info.sourcePosition = ePos2;
                 info.sourceBody = enemy->bodyId;
-                info.victimBody = gs.playerBodyId;
+                info.victimBody = context.playerBodyId;
                 info.type = DamageType::Normal;
 
-                gs.playerHealth.takeDamage(info);
-                gs.playerHealth.setInvincible(0.5f);
+                context.playerHealth.takeDamage(info);
+                context.playerHealth.setInvincible(0.5f);
 
                 glm::vec2 kbDir = Math::normalize(pPos2 - ePos2);
                 b2Vec2 kbForce = { kbDir.x * 10.0f, kbDir.y * 10.0f };
-                b2Body_ApplyLinearImpulseToCenter(gs.playerBodyId, kbForce, true);
+                b2Body_ApplyLinearImpulseToCenter(context.playerBodyId, kbForce, true);
 
-                gs.particleSystem.emitBurst(pPos2, 5, glm::vec3(1, 0, 0), 2.0f, 0.2f, 0.08f);
+                context.particleSystem.emitBurst(pPos2, 5, glm::vec3(1, 0, 0), 2.0f, 0.2f, 0.08f);
 
-                if (!gs.playerHealth.isAlive()) {
-                    gs.isDead = true;
-                    gs.deathTimer = 3.0f;
+                if (!context.playerHealth.isAlive()) {
+                    context.isDead = true;
+                    context.deathTimer = 3.0f;
                 }
                 break;
             }
         }
     }
 
-    const auto& allEnemies = gs.enemyManager.getActive();
+    const auto& allEnemies = context.enemyManager.getActive();
     for (const Enemy& enemy : allEnemies) {
         if (!enemy.active || enemy.type != EnemyType::Exploder) continue;
         if (enemy.state != Enemy::State::Dead) continue;
@@ -160,20 +174,23 @@ void handleCollisions(GameState& gs) {
         if (enemy.explosionTriggered) continue;
 
         if (enemy.deathTimer > 0.0f) {
-            Enemy* mutableEnemy = gs.enemyManager.find(enemy.id);
+            Enemy* mutableEnemy = context.enemyManager.find(enemy.id);
             if (!mutableEnemy) continue;
             mutableEnemy->explosionTriggered = true;
 
             b2Vec2 enemyPos = b2Body_GetPosition(enemy.bodyId);
             glm::vec2 ePos3(enemyPos.x, enemyPos.y);
 
-            gs.particleSystem.emitBurst(ePos3, 30, glm::vec3(1, 0.5f, 0.1f), 5.0f, 0.5f, 0.2f);
-            gs.particleSystem.emitRing(ePos3, 20, glm::vec3(1, 0.3f, 0.0),
+            context.particleSystem.emitBurst(ePos3, 30, glm::vec3(1, 0.5f, 0.1f), 5.0f, 0.5f, 0.2f);
+            context.particleSystem.emitRing(ePos3, 20, glm::vec3(1, 0.3f, 0.0),
                 enemy.explosionRange, 0.3f, 0.15f);
 
             float distToPlayer = glm::distance(pPos2, ePos3);
-            if (distToPlayer < enemy.explosionRange && !gs.playerHealth.isInvincible() && !gs.isDead && !gs.isFlying) {
-                if (blockPlayerDamageWithShield(gs, pPos2, ePos3, enemy.explosionRange)) {
+            if (distToPlayer < enemy.explosionRange &&
+                !context.playerHealth.isInvincible() &&
+                !context.isDead &&
+                !context.isFlying) {
+                if (blockPlayerDamageWithShield(context, pPos2, ePos3, enemy.explosionRange)) {
                     continue;
                 }
 
@@ -181,23 +198,28 @@ void handleCollisions(GameState& gs) {
                 info.amount = enemy.explosionDamage;
                 info.sourcePosition = ePos3;
                 info.sourceBody = enemy.bodyId;
-                info.victimBody = gs.playerBodyId;
+                info.victimBody = context.playerBodyId;
                 info.type = DamageType::Explosion;
 
-                gs.playerHealth.takeDamage(info);
-                gs.playerHealth.setInvincible(0.5f);
+                context.playerHealth.takeDamage(info);
+                context.playerHealth.setInvincible(0.5f);
 
                 glm::vec2 kbDir = Math::normalize(pPos2 - ePos3);
                 b2Vec2 kbForce = { kbDir.x * 15.0f, kbDir.y * 15.0f };
-                b2Body_ApplyLinearImpulseToCenter(gs.playerBodyId, kbForce, true);
+                b2Body_ApplyLinearImpulseToCenter(context.playerBodyId, kbForce, true);
 
-                if (!gs.playerHealth.isAlive()) {
-                    gs.isDead = true;
-                    gs.deathTimer = 3.0f;
+                if (!context.playerHealth.isAlive()) {
+                    context.isDead = true;
+                    context.deathTimer = 3.0f;
                 }
             }
         }
     }
+}
+
+void handleCollisions(GameState& gs) {
+    Context context = makeContext(gs);
+    handleCollisions(context);
 }
 
 }  // namespace CombatCollisionService

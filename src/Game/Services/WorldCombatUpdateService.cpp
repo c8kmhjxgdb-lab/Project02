@@ -6,30 +6,44 @@
 
 namespace WorldCombatUpdateService {
 
-void updateAlive(GameState& gs, float dt, const glm::vec2& playerPos) {
-    gs.projectileManager.update(dt, gs.worldId);
-
-    ProjectileTrailService::emitTrails(gs);
-
-    gs.particleSystem.update(dt);
-
-    gs.enemyManager.update(dt, gs.worldId, playerPos);
-    gs.dropManager.update(dt, playerPos);
-
-    if (gs.fireballCooldown > 0.0f) {
-        gs.fireballCooldown -= dt;
-    }
-
-    CombatService::handleCollisions(gs);
-
-    gs.enemyManager.cleanup();
-
-    gs.playerHealth.update(dt);
+Context makeContext(GameState& gs) {
+    return {
+        gs.projectileManager,
+        gs.particleSystem,
+        gs.enemyManager,
+        gs.dropManager,
+        gs.playerHealth,
+        gs.fireballCooldown,
+        gs.worldId,
+        ProjectileTrailService::makeContext(gs),
+        CombatCollisionService::makeContext(gs)
+    };
 }
 
-void updateWhileDead(GameState& gs, float dt) {
-    gs.projectileManager.update(dt, gs.worldId);
-    gs.particleSystem.update(dt);
+void updateAlive(Context& context, float dt, const glm::vec2& playerPos) {
+    context.projectileManager.update(dt, context.worldId);
+
+    ProjectileTrailService::emitTrails(context.projectileTrail);
+
+    context.particleSystem.update(dt);
+
+    context.enemyManager.update(dt, context.worldId, playerPos);
+    context.dropManager.update(dt, playerPos);
+
+    if (context.fireballCooldown > 0.0f) {
+        context.fireballCooldown -= dt;
+    }
+
+    CombatService::handleCollisions(context.collision);
+
+    context.enemyManager.cleanup();
+
+    context.playerHealth.update(dt);
+}
+
+void updateWhileDead(Context& context, float dt) {
+    context.projectileManager.update(dt, context.worldId);
+    context.particleSystem.update(dt);
 }
 
 }  // namespace WorldCombatUpdateService

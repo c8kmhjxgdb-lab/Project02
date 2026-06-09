@@ -12,31 +12,49 @@
 
 namespace EnemySpawnService {
 
-void update(GameState& gs, float dt) {
-    bool inHomeBase = WorldQuery::isCurrentRegion(gs.regionManager, "home_base");
-    gs.enemySpawnTimer += dt;
+Context makeContext(GameState& gs) {
+    return {
+        gs.regionManager,
+        gs.enemyManager,
+        gs.playerBodyId,
+        gs.enemySpawnTimer,
+        gs.enemySpawnInterval,
+        gs.maxEnemies,
+        gs.charTime,
+        CombatService::makeSpawnContext(gs)
+    };
+}
+
+void update(Context& context, float dt) {
+    bool inHomeBase = WorldQuery::isCurrentRegion(context.regionManager, "home_base");
+    context.enemySpawnTimer += dt;
     if (inHomeBase) {
-        gs.enemySpawnTimer = 0.0f;
+        context.enemySpawnTimer = 0.0f;
         return;
     }
 
-    if (gs.enemySpawnTimer < gs.enemySpawnInterval) {
+    if (context.enemySpawnTimer < context.enemySpawnInterval) {
         return;
     }
 
-    gs.enemySpawnTimer = 0.0f;
+    context.enemySpawnTimer = 0.0f;
 
-    auto spawnAliveEnemies = gs.enemyManager.getAlive();
-    if (static_cast<int>(spawnAliveEnemies.size()) >= gs.maxEnemies) {
+    auto spawnAliveEnemies = context.enemyManager.getAlive();
+    if (static_cast<int>(spawnAliveEnemies.size()) >= context.maxEnemies) {
         return;
     }
 
-    b2Vec2 pPosSpawn = b2Body_GetPosition(gs.playerBodyId);
+    b2Vec2 pPosSpawn = b2Body_GetPosition(context.playerBodyId);
     glm::vec2 playerPosSpawn(pPosSpawn.x, pPosSpawn.y);
-    float angle = Math::hashRandom(static_cast<unsigned int>(gs.charTime * 777)) * 6.28318f;
-    float dist = 8.0f + Math::hashRandom(static_cast<unsigned int>(gs.charTime * 333)) * 5.0f;
+    float angle = Math::hashRandom(static_cast<unsigned int>(context.charTime * 777)) * 6.28318f;
+    float dist = 8.0f + Math::hashRandom(static_cast<unsigned int>(context.charTime * 333)) * 5.0f;
     glm::vec2 spawnPos = playerPosSpawn + glm::vec2(std::cos(angle), std::sin(angle)) * dist;
-    CombatService::spawnEnemy(gs, spawnPos);
+    CombatService::spawnEnemy(context.combatSpawn, spawnPos);
+}
+
+void update(GameState& gs, float dt) {
+    Context context = makeContext(gs);
+    update(context, dt);
 }
 
 }  // namespace EnemySpawnService

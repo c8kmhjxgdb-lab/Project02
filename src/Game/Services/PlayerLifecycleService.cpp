@@ -10,44 +10,64 @@ namespace PlayerLifecycleService {
 
 namespace {
 
-void updateNoticeTimer(GameState& gs, float dt) {
-    if (gs.stage7NoticeTimer > 0.0f) {
-        gs.stage7NoticeTimer = std::max(0.0f, gs.stage7NoticeTimer - dt);
+void updateNoticeTimer(Context& context, float dt) {
+    if (context.stage7NoticeTimer > 0.0f) {
+        context.stage7NoticeTimer = std::max(0.0f, context.stage7NoticeTimer - dt);
     }
 }
 
 }  // namespace
 
-void updateAlive(GameState& gs, float dt) {
-    if (gs.flightCooldown > 0.0f) {
-        gs.flightCooldown -= dt;
+Context makeContext(GameState& gs) {
+    return {
+        gs.flightCooldown,
+        gs.shieldCooldown,
+        gs.stage7NoticeTimer,
+        gs.playerMana,
+        gs.playerMaxMana,
+        gs.manaRegen,
+        gs.deathTimer,
+        gs.isDead,
+        gs.playerBodyId,
+        gs.spawnPoint,
+        gs.camera,
+        gs.playerHealth
+    };
+}
+
+void updateAlive(Context& context, float dt) {
+    if (context.flightCooldown > 0.0f) {
+        context.flightCooldown -= dt;
     }
-    if (gs.shieldCooldown > 0.0f) {
-        gs.shieldCooldown -= dt;
+    if (context.shieldCooldown > 0.0f) {
+        context.shieldCooldown -= dt;
     }
 
-    updateNoticeTimer(gs, dt);
+    updateNoticeTimer(context, dt);
 
-    if (gs.playerMana < gs.playerMaxMana) {
-        gs.playerMana = std::min(gs.playerMaxMana, gs.playerMana + gs.manaRegen * dt);
+    if (context.playerMana < context.playerMaxMana) {
+        context.playerMana = std::min(context.playerMaxMana,
+                                      context.playerMana + context.manaRegen * dt);
     }
 }
 
-void updateDeathRespawn(GameState& gs, float dt) {
-    gs.deathTimer -= dt;
-    if (gs.deathTimer > 0.0f) {
+void updateDeathRespawn(Context& context, float dt) {
+    context.deathTimer -= dt;
+    if (context.deathTimer > 0.0f) {
         return;
     }
 
-    gs.isDead = false;
-    b2Body_SetTransform(gs.playerBodyId, { gs.spawnPoint.x, gs.spawnPoint.y }, b2Rot_identity);
-    b2Body_SetLinearVelocity(gs.playerBodyId, b2Vec2_zero);
-    gs.playerHealth.respawn(0.5f);
-    gs.camera.position = gs.spawnPoint;
+    context.isDead = false;
+    b2Body_SetTransform(context.playerBodyId,
+                        { context.spawnPoint.x, context.spawnPoint.y },
+                        b2Rot_identity);
+    b2Body_SetLinearVelocity(context.playerBodyId, b2Vec2_zero);
+    context.playerHealth.respawn(0.5f);
+    context.camera.position = context.spawnPoint;
 }
 
-void updateWhileDead(GameState& gs, float dt) {
-    updateNoticeTimer(gs, dt);
+void updateWhileDead(Context& context, float dt) {
+    updateNoticeTimer(context, dt);
 }
 
 }  // namespace PlayerLifecycleService

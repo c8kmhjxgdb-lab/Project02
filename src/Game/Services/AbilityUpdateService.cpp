@@ -8,37 +8,47 @@
 
 namespace AbilityUpdateService {
 
-void update(GameState& gs, float dt) {
-    gs.shield.update(dt);
-    gs.lightning.update(dt);
-    gs.lightning.updateCooldown(dt);
-    gs.bondTechnique.update(dt);
-    gs.bondTechnique.updateCooldown(dt);
+Context makeContext(GameState& gs) {
+    return {
+        gs.shield,
+        gs.lightning,
+        gs.bondTechnique,
+        gs.enemyManager,
+        gs.playerBodyId
+    };
+}
 
-    auto aliveEnemies = gs.enemyManager.getAlive();
+void update(Context& context, float dt) {
+    context.shield.update(dt);
+    context.lightning.update(dt);
+    context.lightning.updateCooldown(dt);
+    context.bondTechnique.update(dt);
+    context.bondTechnique.updateCooldown(dt);
 
-    if (gs.bondTechnique.isActive()) {
-        BondTechnique& tech = gs.bondTechnique.getCurrentTechnique();
+    auto aliveEnemies = context.enemyManager.getAlive();
+
+    if (context.bondTechnique.isActive()) {
+        BondTechnique& tech = context.bondTechnique.getCurrentTechnique();
         if (!tech.hasDealtDamage() && tech.radius > tech.maxRadius * 0.3f && !tech.waveFronts.empty()) {
             for (const Enemy* enemy : aliveEnemies) {
                 if (!enemy || !b2Body_IsValid(enemy->bodyId)) continue;
                 b2Vec2 ePos = b2Body_GetPosition(enemy->bodyId);
                 glm::vec2 enemyPos(ePos.x, ePos.y);
                 if (glm::distance(tech.waveFronts[0], enemyPos) < tech.radius) {
-                    gs.enemyManager.damage(enemy->id, tech.damage);
+                    context.enemyManager.damage(enemy->id, tech.damage);
                 }
             }
             tech.markDamaged();
         }
     }
 
-    if (gs.shield.isActive()) {
-        b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+    if (context.shield.isActive()) {
+        b2Vec2 pPos = b2Body_GetPosition(context.playerBodyId);
         glm::vec2 playerPos(pPos.x, pPos.y);
 
         for (const Enemy* enemy : aliveEnemies) {
             if (enemy && b2Body_IsValid(enemy->bodyId)) {
-                gs.shield.checkAndRepelEnemy(enemy->bodyId, playerPos, 15.0f);
+                context.shield.checkAndRepelEnemy(enemy->bodyId, playerPos, 15.0f);
             }
         }
     }

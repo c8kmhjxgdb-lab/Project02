@@ -10,8 +10,16 @@
 
 namespace ProjectileTrailService {
 
-void emitTrails(GameState& gs) {
-    for (const auto& proj : gs.projectileManager.getActive()) {
+Context makeContext(GameState& gs) {
+    return {
+        gs.projectileManager,
+        gs.particleSystem,
+        gs.charTime
+    };
+}
+
+void emitTrails(Context& context) {
+    for (const auto& proj : context.projectileManager.getActive()) {
         if (!proj.active) continue;
         if (!b2Body_IsValid(proj.bodyId)) continue;
 
@@ -19,7 +27,7 @@ void emitTrails(GameState& gs) {
             continue;
         }
 
-        gs.projectileManager.resetParticleTimer(proj.id);
+        context.projectileManager.resetParticleTimer(proj.id);
 
         b2Vec2 pPos = b2Body_GetPosition(proj.bodyId);
         glm::vec2 pos(pPos.x, pPos.y);
@@ -31,12 +39,12 @@ void emitTrails(GameState& gs) {
             dir = glm::vec2(1.0f, 0.0f);
         }
         glm::vec2 side(-dir.y, dir.x);
-        float r1 = Math::hashRandom(static_cast<unsigned>(gs.charTime * 13000.0f + proj.id.id * 17));
-        float r2 = Math::hashRandom(static_cast<unsigned>(gs.charTime * 17000.0f + proj.id.id * 31));
+        float r1 = Math::hashRandom(static_cast<unsigned>(context.charTime * 13000.0f + proj.id.id * 17));
+        float r2 = Math::hashRandom(static_cast<unsigned>(context.charTime * 17000.0f + proj.id.id * 31));
 
         switch (proj.type) {
             case ProjectileType::Fireball:
-                gs.particleSystem.emit(
+                context.particleSystem.emit(
                     pos - dir * 0.18f + side * ((r1 - 0.5f) * 0.16f),
                     -dir * (0.9f + r2 * 0.8f) + side * ((r1 - 0.5f) * 0.6f),
                     glm::vec3(1.0f, 0.46f + r2 * 0.22f, 0.08f),
@@ -45,7 +53,7 @@ void emitTrails(GameState& gs) {
                     ParticleType::Spark
                 );
                 if (r2 > 0.48f) {
-                    gs.particleSystem.emit(
+                    context.particleSystem.emit(
                         pos - dir * 0.28f,
                         -dir * 0.45f + side * ((r2 - 0.5f) * 0.35f),
                         glm::vec3(1.0f, 0.22f, 0.04f),
@@ -56,7 +64,7 @@ void emitTrails(GameState& gs) {
                 }
                 break;
             case ProjectileType::IceSpike:
-                gs.particleSystem.emit(
+                context.particleSystem.emit(
                     pos - dir * 0.10f + side * ((r1 - 0.5f) * 0.20f),
                     -dir * (0.25f + r1 * 0.35f) + side * ((r2 - 0.5f) * 0.50f),
                     glm::vec3(0.62f, 0.88f, 1.0f),
@@ -66,7 +74,7 @@ void emitTrails(GameState& gs) {
                 );
                 break;
             case ProjectileType::Thunder:
-                gs.particleSystem.emit(
+                context.particleSystem.emit(
                     pos + side * ((r1 - 0.5f) * 0.22f),
                     side * ((r2 - 0.5f) * 1.6f) - dir * (0.25f + r1 * 0.45f),
                     glm::vec3(0.82f, 0.94f, 1.0f),
@@ -77,6 +85,11 @@ void emitTrails(GameState& gs) {
                 break;
         }
     }
+}
+
+void emitTrails(GameState& gs) {
+    Context context = makeContext(gs);
+    emitTrails(context);
 }
 
 }  // namespace ProjectileTrailService

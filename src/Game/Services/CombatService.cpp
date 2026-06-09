@@ -138,13 +138,24 @@ bool tryCastLightning(GameState& gs) {
     return true;
 }
 
-void spawnEnemy(GameState& gs, const glm::vec2& pos) {
+SpawnContext makeSpawnContext(GameState& gs) {
+    return {
+        gs.playerBodyId,
+        gs.charTime,
+        gs.enemiesKilled,
+        gs.enemyManager,
+        gs.worldId
+    };
+}
+
+void spawnEnemy(SpawnContext& context, const glm::vec2& pos) {
     // Pick random type based on distance from spawn
-    b2Vec2 playerPos = b2Body_GetPosition(gs.playerBodyId);
+    b2Vec2 playerPos = b2Body_GetPosition(context.playerBodyId);
     float dist = glm::distance(glm::vec2(playerPos.x, playerPos.y), pos);
 
     EnemyType type;
-    float r = Math::hashRandom(static_cast<unsigned int>(gs.charTime * 1000.0f + gs.enemiesKilled));
+    float r = Math::hashRandom(static_cast<unsigned int>(context.charTime * 1000.0f +
+                                                          context.enemiesKilled));
     if (dist > 15.0f && r < 0.3f) {
         type = EnemyType::Shooter;
     } else if (r < 0.6f) {
@@ -153,7 +164,16 @@ void spawnEnemy(GameState& gs, const glm::vec2& pos) {
         type = EnemyType::Chaser;
     }
 
-    gs.enemyManager.spawn(gs.worldId, pos, type);
+    context.enemyManager.spawn(context.worldId, pos, type);
+}
+
+void spawnEnemy(GameState& gs, const glm::vec2& pos) {
+    SpawnContext context = makeSpawnContext(gs);
+    spawnEnemy(context, pos);
+}
+
+void handleCollisions(CombatCollisionService::Context& context) {
+    CombatCollisionService::handleCollisions(context);
 }
 
 void handleCollisions(GameState& gs) {

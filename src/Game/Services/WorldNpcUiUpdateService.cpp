@@ -7,22 +7,33 @@
 
 namespace WorldNpcUiUpdateService {
 
-void update(GameState& gs, float dt) {
-    if (gs.isVenting) {
-        gs.ventAnimation.update(dt);
-        if (!gs.ventAnimation.isActive()) {
-            gs.isVenting = false;
+Context makeContext(GameState& gs) {
+    return {
+        gs.isVenting,
+        gs.ventAnimation,
+        gs.dialogueUI,
+        gs.princess.get(),
+        gs.playerBodyId,
+        gs.gameTime
+    };
+}
+
+void update(Context& context, float dt) {
+    if (context.isVenting) {
+        context.ventAnimation.update(dt);
+        if (!context.ventAnimation.isActive()) {
+            context.isVenting = false;
         }
     }
 
-    if (gs.dialogueUI.isVisible()) {
-        gs.dialogueUI.update(dt);
+    if (context.dialogueUI.isVisible()) {
+        context.dialogueUI.update(dt);
     }
 
-    if (gs.princess) {
-        b2Vec2 playerPos = b2Body_GetPosition(gs.playerBodyId);
-        gs.princess->setLastPlayerPos(glm::vec2(playerPos.x, playerPos.y));
-        gs.princess->update(dt, gs.gameTime);
+    if (context.princess) {
+        b2Vec2 playerPos = b2Body_GetPosition(context.playerBodyId);
+        context.princess->setLastPlayerPos(glm::vec2(playerPos.x, playerPos.y));
+        context.princess->update(dt, context.gameTime);
     }
 }
 
