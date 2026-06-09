@@ -74,9 +74,7 @@ void handleDebugKey(GameState& gs, SDL_Scancode scancode) {
 bool handleKeyDown(GameState& gs,
                    SDL_Scancode scancode,
                    const InputController::Callbacks& callbacks) {
-    if (scancode < SDL_NUM_SCANCODES && scancode >= 0) {
-        gs.keys[scancode] = true;
-    }
+    gs.input.setKey(scancode, true);
 
     if (gs.appMode == AppMode::MainMenu) {
         return MainMenuInputController::handleKeyDown(gs, scancode, callbacks);
@@ -129,8 +127,8 @@ bool handleKeyDown(GameState& gs,
 bool handleMouseButtonDown(GameState& gs,
                            const SDL_MouseButtonEvent& buttonEvent,
                            const InputController::Callbacks& callbacks) {
-    gs.mousePos = glm::vec2(static_cast<float>(buttonEvent.x),
-                            static_cast<float>(buttonEvent.y));
+    gs.input.mousePos = glm::vec2(static_cast<float>(buttonEvent.x),
+                                  static_cast<float>(buttonEvent.y));
 
     if (gs.appMode == AppMode::MainMenu) {
         return MainMenuInputController::handleMouseButtonDown(gs, buttonEvent, callbacks);
@@ -158,9 +156,7 @@ bool handleEvent(GameState& gs, const SDL_Event& e, const Callbacks& callbacks) 
 
     if (e.type == SDL_KEYUP) {
         SDL_Scancode scancode = e.key.keysym.scancode;
-        if (scancode < SDL_NUM_SCANCODES && scancode >= 0) {
-            gs.keys[scancode] = false;
-        }
+        gs.input.setKey(scancode, false);
     } else if (e.type == SDL_MOUSEWHEEL) {
         if (BuildingInputController::handleMouseWheel(gs, e.wheel.y)) {
             // Building controller consumed the wheel.
@@ -170,8 +166,8 @@ bool handleEvent(GameState& gs, const SDL_Event& e, const Callbacks& callbacks) 
             gs.camera.setZoom(gs.camera.zoom / 1.15f);
         }
     } else if (e.type == SDL_MOUSEMOTION) {
-        gs.mousePos = glm::vec2(static_cast<float>(e.motion.x),
-                                static_cast<float>(e.motion.y));
+        gs.input.mousePos = glm::vec2(static_cast<float>(e.motion.x),
+                                      static_cast<float>(e.motion.y));
     } else if (e.type == SDL_MOUSEBUTTONDOWN) {
         return handleMouseButtonDown(gs, e.button, callbacks);
     }

@@ -17,7 +17,7 @@ glm::vec2 getPlayerPosition(const GameState& gs) {
 glm::vec2 getMouseWorldPoint(const GameState& gs) {
     float screenW = static_cast<float>(std::max(gs.screenWidth, 1));
     float screenH = static_cast<float>(std::max(gs.screenHeight, 1));
-    return gs.camera.screenToWorld(gs.mousePos.x, gs.mousePos.y, screenW, screenH);
+    return gs.camera.screenToWorld(gs.input.mousePos.x, gs.input.mousePos.y, screenW, screenH);
 }
 
 glm::vec2 getAimDirection(const GameState& gs, const glm::vec2& origin) {

@@ -37,10 +37,10 @@ void update(GameState& gs, float dt, const glm::vec2& playerPos, State& state) {
 
     ToyReward toyReward = gs.toySystem.updateMiniCar(
         dt,
-        gs.keys[SDL_SCANCODE_W] || gs.keys[SDL_SCANCODE_UP],
-        gs.keys[SDL_SCANCODE_S] || gs.keys[SDL_SCANCODE_DOWN],
-        gs.keys[SDL_SCANCODE_A] || gs.keys[SDL_SCANCODE_LEFT],
-        gs.keys[SDL_SCANCODE_D] || gs.keys[SDL_SCANCODE_RIGHT],
+        gs.input.isDown(SDL_SCANCODE_W) || gs.input.isDown(SDL_SCANCODE_UP),
+        gs.input.isDown(SDL_SCANCODE_S) || gs.input.isDown(SDL_SCANCODE_DOWN),
+        gs.input.isDown(SDL_SCANCODE_A) || gs.input.isDown(SDL_SCANCODE_LEFT),
+        gs.input.isDown(SDL_SCANCODE_D) || gs.input.isDown(SDL_SCANCODE_RIGHT),
         gs.timeSystem.getDay());
     if (toyReward.granted) {
         gs.inventory.addCoins(toyReward.coins);

@@ -62,6 +62,7 @@ add_executable(Starchild2D
     src/Game/Data/WeatherConfigLoader.cpp
     src/Game/Data/SaveRepository.cpp
     src/Game/Data/SaveSerializer.cpp
+    src/Game/StateContexts.cpp
     src/Game/Health.cpp
     src/Game/Drop.cpp
     src/Game/Ability/Projectile.cpp

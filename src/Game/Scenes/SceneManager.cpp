@@ -106,4 +106,8 @@ void updateAndRenderCurrent(SDL_Window* window, GameState& gs, float dt, State& 
     state.currentScene->render(window, gs, dt);
 }
 
+void requestMode(GameState& gs, AppMode mode) {
+    gs.appMode = mode;
+}
+
 }  // namespace SceneManager

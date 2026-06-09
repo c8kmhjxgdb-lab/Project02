@@ -21,6 +21,7 @@
 #include "Game/Ability/Shield.h"
 #include "Game/Ability/SuperStrength.h"
 #include "Game/Building/BuildingSystem.h"
+#include "Game/Controllers/InputState.h"
 #include "Game/Drop.h"
 #include "Game/Emotion/EmotionSystem.h"
 #include "Game/Emotion/VentAnimation.h"
@@ -28,6 +29,7 @@
 #include "Game/Inventory/Inventory.h"
 #include "Game/Quest/QuestSystem.h"
 #include "Game/SaveSystem.h"
+#include "Game/Scenes/AppMode.h"
 #include "Game/Social/DialogueTree.h"
 #include "Game/Social/Princess.h"
 #include "Game/Toy/ToySystem.h"
@@ -42,11 +44,6 @@
 #include <string>
 #include <vector>
 
-enum class AppMode {
-    MainMenu,
-    Playing
-};
-
 struct GameState {
     // Box2D
     b2WorldId worldId;
@@ -54,9 +51,7 @@ struct GameState {
     b2BodyId playerBodyId;
 
     // Input
-    bool keys[SDL_NUM_SCANCODES];
-    glm::vec2 mousePos;
-    bool mouseLeft;
+    InputState input;
 
     // Player physics
     float playerForce = 15.0f;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Game/Controllers/InputController.h"
-#include "Game/GameState.h"
+#include "Game/Scenes/AppMode.h"
 #include "Game/Scenes/IScene.h"
 #include "Game/Scenes/WorldScene.h"
 
@@ -28,5 +28,6 @@ bool handleEventCurrent(GameState& gs,
                         const InputController::Callbacks& callbacks,
                         State& state);
 void updateAndRenderCurrent(SDL_Window* window, GameState& gs, float dt, State& state);
+void requestMode(GameState& gs, AppMode mode);
 
 }  // namespace SceneManager

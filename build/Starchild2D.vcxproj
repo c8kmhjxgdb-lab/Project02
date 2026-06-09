@@ -463,6 +463,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\WeatherConfigLoader.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveRepository.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveSerializer.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\StateContexts.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Health.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Drop.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Ability\Projectile.cpp" />

@@ -55,7 +55,7 @@ void updateFlight(GameState& gs, float dt) {
         gs.shadowScale = 0.4f;
     }
 
-    if (!gs.keys[SDL_SCANCODE_SPACE] && gs.isFlying) {
+    if (!gs.input.isDown(SDL_SCANCODE_SPACE) && gs.isFlying) {
         gs.isFlying = false;
         gs.flightHeightTarget = 0.0f;
         gs.flightCooldown = gs.flightCooldownMax;
@@ -66,10 +66,18 @@ b2Vec2 buildMovementForce(GameState& gs) {
     b2Vec2 force;
     force.x = 0.0f;
     force.y = 0.0f;
-    if (gs.keys[SDL_SCANCODE_W] || gs.keys[SDL_SCANCODE_UP])    force.y += gs.playerForce;
-    if (gs.keys[SDL_SCANCODE_S] || gs.keys[SDL_SCANCODE_DOWN])  force.y -= gs.playerForce;
-    if (gs.keys[SDL_SCANCODE_A] || gs.keys[SDL_SCANCODE_LEFT])  force.x -= gs.playerForce;
-    if (gs.keys[SDL_SCANCODE_D] || gs.keys[SDL_SCANCODE_RIGHT]) force.x += gs.playerForce;
+    if (gs.input.isDown(SDL_SCANCODE_W) || gs.input.isDown(SDL_SCANCODE_UP)) {
+        force.y += gs.playerForce;
+    }
+    if (gs.input.isDown(SDL_SCANCODE_S) || gs.input.isDown(SDL_SCANCODE_DOWN)) {
+        force.y -= gs.playerForce;
+    }
+    if (gs.input.isDown(SDL_SCANCODE_A) || gs.input.isDown(SDL_SCANCODE_LEFT)) {
+        force.x -= gs.playerForce;
+    }
+    if (gs.input.isDown(SDL_SCANCODE_D) || gs.input.isDown(SDL_SCANCODE_RIGHT)) {
+        force.x += gs.playerForce;
+    }
 
     float speedMult = gs.emotionSystem.getSpeedMultiplier();
     force.x *= speedMult;

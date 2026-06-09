@@ -170,7 +170,7 @@ void initRuntimeRenderState(GameState& gs, SDL_Window* window) {
     if (actualH <= 0) actualH = 600;
     gs.screenWidth = actualW;
     gs.screenHeight = actualH;
-    gs.mousePos = glm::vec2(actualW * 0.5f, actualH * 0.5f);
+    gs.input.mousePos = glm::vec2(actualW * 0.5f, actualH * 0.5f);
 
     gs.postProcess.init(gs.screenWidth, gs.screenHeight);
     glViewport(0, 0, gs.screenWidth, gs.screenHeight);
@@ -289,9 +289,7 @@ void deleteGlResources(GameState& gs) {
 namespace GameBootstrap {
 
 bool initialize(GameState& gs, SDL_Window* window) {
-    for (int i = 0; i < SDL_NUM_SCANCODES; ++i) {
-        gs.keys[i] = false;
-    }
+    gs.input.clear();
 
     if (!initRendererServices()) return false;
 

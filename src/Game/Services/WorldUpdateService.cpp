@@ -24,7 +24,12 @@ void update(GameState& gs, float dt, State& state) {
 
         WorldCombatUpdateService::updateAlive(gs, dt, motion.playerPos);
 
-        RegionUpdateService::update(gs, dt, motion.playerPos, motion.currentRegion, state.regionState);
+        RegionUpdateService::Context regionContext = RegionUpdateService::makeContext(gs);
+        RegionUpdateService::update(regionContext,
+                                    dt,
+                                    motion.playerPos,
+                                    motion.currentRegion,
+                                    state.regionState);
 
         ProgressionUpdateService::update(gs, dt, motion.playerPos, state.progressionState);
 

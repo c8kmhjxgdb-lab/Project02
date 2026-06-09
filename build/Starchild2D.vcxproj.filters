@@ -103,6 +103,9 @@
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Data\SaveSerializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\StateContexts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Health.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

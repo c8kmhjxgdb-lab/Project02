@@ -1,6 +1,7 @@
 #include "Game/Services/GameSessionService.h"
 
 #include "Game/GameState.h"
+#include "Game/Scenes/SceneManager.h"
 #include "Game/Services/CombatService.h"
 #include "Game/Services/SaveGameService.h"
 #include "Game/Services/SessionService.h"
@@ -113,7 +114,7 @@ void startNewGame(GameState& gs) {
         glm::vec2 spawnPos = gs.spawnPoint + glm::vec2(std::cos(angle), std::sin(angle)) * 10.0f;
         CombatService::spawnEnemy(gs, spawnPos);
     }
-    gs.appMode = AppMode::Playing;
+    SceneManager::requestMode(gs, AppMode::Playing);
     SessionService::showNotice(gs, "新游戏开始 New Game");
 }
 

@@ -1,9 +1,9 @@
 #include "Game/Services/SaveApplier.h"
 
 #include "Game/GameState.h"
+#include "Game/Scenes/SceneManager.h"
 #include "Game/Services/SessionService.h"
 
-#include <SDL2/SDL.h>
 #include <algorithm>
 #include <box2d/box2d.h>
 
@@ -32,10 +32,7 @@ namespace SaveApplier {
 
 void resetSessionState(GameState& gs) {
     SessionService::clearTransientCombat(gs);
-    for (int i = 0; i < SDL_NUM_SCANCODES; ++i) {
-        gs.keys[i] = false;
-    }
-    gs.mouseLeft = false;
+    gs.input.clear();
     gs.buildingSystem.setBuildMode(false);
     gs.toySystem.stopMiniCar();
     gs.dialogueTree.end();
@@ -138,7 +135,7 @@ bool applySaveData(GameState& gs, const SaveData& saveData) {
             region->getTileMap().tileSize);
         gs.miniMap.forceUpdate(saveData.player.position);
     }
-    gs.appMode = AppMode::Playing;
+    SceneManager::requestMode(gs, AppMode::Playing);
     SessionService::showNotice(gs, "读档完成 Loaded");
     return true;
 }
