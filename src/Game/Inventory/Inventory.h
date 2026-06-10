@@ -10,12 +10,24 @@ struct FurnitureStock {
     int count = 0;
 };
 
+struct ItemStack {
+    std::string itemId;
+    int count = 0;
+};
+
 class Inventory {
 public:
     void setCoins(int value);
     int getCoins() const { return coins; }
     bool spendCoins(int amount);
     void addCoins(int amount);
+
+    int getItemCount(const std::string& itemId) const;
+    void setItemCount(const std::string& itemId, int count);
+    void addItem(const std::string& itemId, int count = 1);
+    bool consumeItem(const std::string& itemId, int count = 1);
+    std::vector<ItemStack> getItemStacks() const;
+    void loadItemStacks(const std::vector<ItemStack>& stacks);
 
     int getFurnitureCount(const std::string& defId) const;
     void setFurnitureCount(const std::string& defId, int count);
@@ -32,6 +44,7 @@ public:
 
 private:
     int coins = 0;
+    std::unordered_map<std::string, int> itemCounts;
     std::unordered_map<std::string, int> furnitureCounts;
     std::unordered_set<std::string> unlockedFurniture;
 };

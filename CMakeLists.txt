@@ -78,6 +78,7 @@ add_library(StarchildGame STATIC
     src/Game/Emotion/EmotionSystem.cpp
     src/Game/Emotion/VentAnimation.cpp
     src/Game/Health.cpp
+    src/Game/Inventory/ItemCatalog.cpp
     src/Game/Inventory/Inventory.cpp
     src/Game/Presentation/AbilityView.cpp
     src/Game/Presentation/AimReticleView.cpp
@@ -282,4 +283,11 @@ if(BUILD_TESTING)
     configure_starchild_target(InputControllerBoundaryTest)
     target_link_libraries(InputControllerBoundaryTest PRIVATE StarchildGame)
     add_test(NAME InputControllerBoundaryTest COMMAND InputControllerBoundaryTest)
+
+    add_executable(InventoryItemTest
+        tests/InventoryItemTest.cpp
+    )
+    configure_starchild_target(InventoryItemTest)
+    target_link_libraries(InventoryItemTest PRIVATE StarchildGame)
+    add_test(NAME InventoryItemTest COMMAND InventoryItemTest)
 endif()

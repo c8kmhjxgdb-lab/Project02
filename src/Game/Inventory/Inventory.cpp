@@ -18,6 +18,53 @@ void Inventory::addCoins(int amount) {
     coins = std::max(0, coins + amount);
 }
 
+int Inventory::getItemCount(const std::string& itemId) const {
+    auto it = itemCounts.find(itemId);
+    return it == itemCounts.end() ? 0 : it->second;
+}
+
+void Inventory::setItemCount(const std::string& itemId, int count) {
+    if (itemId.empty()) return;
+    if (count <= 0) {
+        itemCounts.erase(itemId);
+    } else {
+        itemCounts[itemId] = count;
+    }
+}
+
+void Inventory::addItem(const std::string& itemId, int count) {
+    if (itemId.empty() || count <= 0) return;
+    setItemCount(itemId, getItemCount(itemId) + count);
+}
+
+bool Inventory::consumeItem(const std::string& itemId, int count) {
+    if (itemId.empty() || count <= 0) return false;
+    int current = getItemCount(itemId);
+    if (current < count) return false;
+    setItemCount(itemId, current - count);
+    return true;
+}
+
+std::vector<ItemStack> Inventory::getItemStacks() const {
+    std::vector<ItemStack> stacks;
+    stacks.reserve(itemCounts.size());
+    for (const auto& pair : itemCounts) {
+        if (pair.second > 0) {
+            stacks.push_back({pair.first, pair.second});
+        }
+    }
+    std::sort(stacks.begin(), stacks.end(),
+        [](const ItemStack& a, const ItemStack& b) { return a.itemId < b.itemId; });
+    return stacks;
+}
+
+void Inventory::loadItemStacks(const std::vector<ItemStack>& stacks) {
+    itemCounts.clear();
+    for (const ItemStack& stack : stacks) {
+        setItemCount(stack.itemId, stack.count);
+    }
+}
+
 int Inventory::getFurnitureCount(const std::string& defId) const {
     auto it = furnitureCounts.find(defId);
     return it == furnitureCounts.end() ? 0 : it->second;
