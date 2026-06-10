@@ -1,5 +1,6 @@
 #include "Game/Services/CombatCollisionService.h"
 
+#include "Game/Ability/ChildlikeSkillProfile.h"
 #include "Game/GameState.h"
 #include "Utils/Math.h"
 
@@ -62,7 +63,8 @@ Context makeContext(GameState& gs) {
         gs.playerBodyId,
         gs.isDead,
         gs.isFlying,
-        gs.deathTimer
+        gs.deathTimer,
+        gs.emotionSystem.getChildlikeHeartTier()
     };
 }
 
@@ -113,7 +115,8 @@ void handleCollisions(Context& context) {
         const Enemy* enemy = context.enemyManager.find(hit.enemyId);
         if (enemy) {
             if (hit.type == ProjectileType::IceSpike) {
-                const_cast<Enemy*>(enemy)->applySlow(3.0f, 0.4f);
+                const SkillTierProfile profile = ChildlikeSkillProfile::forTier(context.childlikeTier);
+                const_cast<Enemy*>(enemy)->applySlow(3.0f, profile.iceSlowMultiplier);
             }
             context.particleSystem.emitBurst(hit.hitPos, 8,
                 hit.type == ProjectileType::IceSpike ? glm::vec3(0.5f, 0.8f, 1.0f) :

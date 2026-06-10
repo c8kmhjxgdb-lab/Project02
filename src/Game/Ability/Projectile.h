@@ -74,7 +74,8 @@ public:
     // 创建投射物
     ProjectileId fire(b2WorldId world, const glm::vec2& pos,
                       const glm::vec2& dir, ProjectileType type,
-                      float damage, float speed, b2BodyId owner);
+                      float damage, float speed, b2BodyId owner,
+                      float radiusScale = 1.0f);
 
     // 更新所有投射物
     void update(float dt, b2WorldId world);

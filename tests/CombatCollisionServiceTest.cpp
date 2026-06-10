@@ -3,6 +3,7 @@
 #include "Game/Ability/Projectile.h"
 #include "Game/Ability/Shield.h"
 #include "Game/Drop.h"
+#include "Game/Emotion/EmotionSystem.h"
 #include "Game/Health.h"
 #include "Game/Services/CombatCollisionService.h"
 #include "TestSupport.h"
@@ -25,6 +26,7 @@ struct Fixture {
     float deathTimer = 0.0f;
     int score = 0;
     int enemiesKilled = 0;
+    ChildlikeHeartTier tier = ChildlikeHeartTier::Normal;
 
     Fixture() {
         b2WorldDef worldDef = b2DefaultWorldDef();
@@ -74,7 +76,8 @@ struct Fixture {
             playerBodyId,
             isDead,
             isFlying,
-            deathTimer
+            deathTimer,
+            tier
         };
     }
 
@@ -174,11 +177,38 @@ void deadPlayerIgnoresEnemyContactDamage() {
                          "dead player ignored contact emits no particles");
 }
 
+void fadedTierUsesWeakerIceSlow() {
+    Fixture fixture;
+    fixture.tier = ChildlikeHeartTier::Faded;
+    EnemyId enemyId = fixture.enemyManager.spawn(
+        fixture.worldId,
+        glm::vec2(2.0f, 0.0f),
+        EnemyType::Chaser);
+    fixture.projectileManager.fire(
+        fixture.worldId,
+        glm::vec2(0.5f, 0.0f),
+        glm::vec2(1.0f, 0.0f),
+        ProjectileType::IceSpike,
+        1.0f,
+        18.0f,
+        fixture.playerBodyId);
+    fixture.advanceProjectileIntoEnemy();
+
+    CombatCollisionService::Context context = fixture.makeContext();
+    CombatCollisionService::handleCollisions(context);
+
+    const Enemy* enemy = fixture.enemyManager.find(enemyId);
+    TestSupport::require(enemy != nullptr, "ice target remains alive");
+    TestSupport::require(enemy->slowTimer > 0.0f, "ice hit applies slow");
+    TestSupport::require(enemy->slowMultiplier == 0.75f, "faded tier uses weaker ice slow");
+}
+
 }  // namespace
 
 int main() {
     playerProjectileKillsEnemyAndEmitsDeathSideEffects();
     projectileOwnerBodyCannotHitSameEnemy();
     deadPlayerIgnoresEnemyContactDamage();
+    fadedTierUsesWeakerIceSlow();
     return 0;
 }

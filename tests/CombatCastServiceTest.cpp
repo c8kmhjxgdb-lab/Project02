@@ -2,6 +2,7 @@
 #include "Game/AI/Enemy.h"
 #include "Game/Ability/Lightning.h"
 #include "Game/Ability/Projectile.h"
+#include "Game/Emotion/EmotionSystem.h"
 #include "Game/Services/CombatService.h"
 #include "TestSupport.h"
 
@@ -22,6 +23,7 @@ struct Fixture {
     Lightning lightning;
     float playerMana = 100.0f;
     EnemyManager enemyManager;
+    ChildlikeHeartTier tier = ChildlikeHeartTier::Normal;
 
     Fixture() {
         b2WorldDef worldDef = b2DefaultWorldDef();
@@ -59,7 +61,8 @@ struct Fixture {
             lightning,
             playerMana,
             enemyManager,
-            nullptr
+            nullptr,
+            tier
         };
     }
 };
@@ -130,6 +133,47 @@ void zeroAimFallsBackToRightDirection() {
         "zero aim falls back to right direction");
 }
 
+void radiantTierIncreasesProjectileDamageAndRadius() {
+    Fixture fixture;
+    fixture.tier = ChildlikeHeartTier::Radiant;
+    CombatService::CastContext context = fixture.makeCastContext();
+
+    bool cast = CombatService::tryCastProjectile(
+        context,
+        ProjectileType::Fireball,
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(1.0f, 0.0f));
+
+    TestSupport::require(cast, "radiant fireball cast succeeds");
+    const auto& projectiles = fixture.projectileManager.getActive();
+    TestSupport::require(projectiles.size() == 1, "radiant fireball creates one projectile");
+    TestSupport::require(projectiles.front().damage == 50.0f, "radiant fireball doubles damage");
+    TestSupport::require(projectiles.front().radius > 0.17f, "radiant fireball increases radius");
+}
+
+void radiantTierExtendsLightningChainCount() {
+    Fixture fixture;
+    fixture.tier = ChildlikeHeartTier::Radiant;
+    CombatService::CastContext context = fixture.makeCastContext();
+
+    for (int i = 0; i < 9; ++i) {
+        fixture.enemyManager.spawn(
+            fixture.worldId,
+            glm::vec2(2.0f + static_cast<float>(i), 0.0f),
+            EnemyType::Chaser);
+    }
+
+    bool cast = CombatService::tryCastLightning(
+        context,
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(1.0f, 0.0f));
+
+    TestSupport::require(cast, "radiant lightning cast succeeds");
+    TestSupport::require(
+        fixture.lightning.getCurrentChain().hitBodies.size() == 8,
+        "radiant lightning chains to eight targets");
+}
+
 }  // namespace
 
 int main() {
@@ -137,5 +181,7 @@ int main() {
     cooldownBlocksProjectileCast();
     deathBlocksProjectileCast();
     zeroAimFallsBackToRightDirection();
+    radiantTierIncreasesProjectileDamageAndRadius();
+    radiantTierExtendsLightningChainCount();
     return 0;
 }

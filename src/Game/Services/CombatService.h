@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/Ability/Projectile.h"
+#include "Game/Emotion/EmotionSystem.h"
 
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
@@ -31,6 +32,7 @@ struct CastContext {
     float& playerMana;
     EnemyManager& enemyManager;
     Engine::Audio::AudioSystem* audioSystem = nullptr;
+    ChildlikeHeartTier childlikeTier = ChildlikeHeartTier::Normal;
 };
 
 struct SpawnContext {

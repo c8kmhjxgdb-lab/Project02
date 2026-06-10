@@ -47,7 +47,8 @@ b2BodyId ProjectileManager::createBody(b2WorldId world, const glm::vec2& pos, Pr
 
 ProjectileId ProjectileManager::fire(b2WorldId world, const glm::vec2& pos,
                                      const glm::vec2& dir, ProjectileType type,
-                                     float damage, float speed, b2BodyId owner) {
+                                     float damage, float speed, b2BodyId owner,
+                                     float radiusScale) {
     // 归一化方向
     glm::vec2 normDir = dir;
     float len = sqrtf(dir.x * dir.x + dir.y * dir.y);
@@ -95,6 +96,7 @@ ProjectileId ProjectileManager::fire(b2WorldId world, const glm::vec2& pos,
         proj.particleEmitRate = 0.018f;
         break;
     }
+    proj.radius *= std::max(0.1f, radiusScale);
 
     projectiles.push_back(proj);
     return proj.id;

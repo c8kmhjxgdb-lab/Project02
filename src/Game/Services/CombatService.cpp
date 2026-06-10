@@ -1,6 +1,7 @@
 #include "Game/Services/CombatService.h"
 
 #include "Engine/Renderer/ParticleSystem.h"
+#include "Game/Ability/ChildlikeSkillProfile.h"
 #include "Game/Ability/Lightning.h"
 #include "Game/GameState.h"
 #include "Game/Services/AudioService.h"
@@ -69,7 +70,8 @@ CastContext makeCastContext(GameState& gs) {
         gs.lightning,
         gs.playerMana,
         gs.enemyManager,
-        &gs.audioSystem
+        &gs.audioSystem,
+        gs.emotionSystem.getChildlikeHeartTier()
     };
 }
 
@@ -81,13 +83,14 @@ bool tryCastProjectile(CastContext& context,
 
     context.facingDir = aimDir;
 
-    float damage = 25.0f;
-    float speed = 18.0f;
+    const SkillTierProfile profile = ChildlikeSkillProfile::forTier(context.childlikeTier);
+    float damage = 25.0f * profile.fireDamageMultiplier;
+    float speed = 18.0f * profile.projectileSpeedMultiplier;
     glm::vec3 particleColor(1.0f, 0.5f, 0.0f);
 
     if (type == ProjectileType::IceSpike) {
-        damage = 20.0f;
-        speed = 14.0f;
+        damage = 20.0f * profile.iceDamageMultiplier;
+        speed = 14.0f * profile.projectileSpeedMultiplier;
         particleColor = glm::vec3(0.4f, 0.7f, 1.0f);
     }
 
@@ -99,7 +102,8 @@ bool tryCastProjectile(CastContext& context,
         type,
         damage,
         speed,
-        context.playerBodyId);
+        context.playerBodyId,
+        profile.projectileRadiusMultiplier);
     context.fireballCooldown = context.fireballCooldownMax;
     if (type == ProjectileType::Fireball) {
         context.particleSystem.emitBurst(muzzlePos, 8, particleColor, 2.5f, 0.18f, 0.075f);
@@ -151,7 +155,8 @@ bool tryCastLightning(CastContext& context,
     float range = context.lightning.getChainRange();
     auto aliveEnemies = context.enemyManager.getAlive();
 
-    for (int chainIndex = 0; chainIndex < context.lightning.getMaxChains(); ++chainIndex) {
+    const SkillTierProfile profile = ChildlikeSkillProfile::forTier(context.childlikeTier);
+    for (int chainIndex = 0; chainIndex < profile.lightningMaxChains; ++chainIndex) {
         const Enemy* target = findLightningTarget(
             aliveEnemies,
             context.lightning.getCurrentChain(),

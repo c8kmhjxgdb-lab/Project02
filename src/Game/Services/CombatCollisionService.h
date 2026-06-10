@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Game/Emotion/EmotionSystem.h"
+
 #include <box2d/box2d.h>
 
 class EnemyManager;
@@ -21,6 +23,7 @@ struct Context {
     bool& isDead;
     bool& isFlying;
     float& deathTimer;
+    ChildlikeHeartTier childlikeTier = ChildlikeHeartTier::Normal;
 };
 
 Context makeContext(GameState& gs);
