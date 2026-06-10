@@ -10,6 +10,7 @@ class LuaVM;
 class QuestSystem {
 public:
     void init();
+    void initWithDefinitions(const std::vector<QuestDef>& questDefs);
     bool loadDefinitions(LuaVM& lua, const char* path);
     std::vector<QuestReward> update(const QuestSnapshot& snapshot);
 

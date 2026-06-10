@@ -251,6 +251,13 @@ if(BUILD_TESTING)
     target_link_libraries(QuestSystemFlowTest PRIVATE StarchildGame)
     add_test(NAME QuestSystemFlowTest COMMAND QuestSystemFlowTest)
 
+    add_executable(QuestObjectiveFlowTest
+        tests/QuestObjectiveFlowTest.cpp
+    )
+    configure_starchild_target(QuestObjectiveFlowTest)
+    target_link_libraries(QuestObjectiveFlowTest PRIVATE StarchildGame)
+    add_test(NAME QuestObjectiveFlowTest COMMAND QuestObjectiveFlowTest)
+
     add_executable(RegionServiceDoorTest
         tests/RegionServiceDoorTest.cpp
     )

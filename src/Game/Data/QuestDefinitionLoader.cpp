@@ -34,6 +34,7 @@ bool load(LuaVM& lua, const char* path, std::vector<QuestDef>& outDefinitions) {
         quest.requiresLowChildlikeHeart = item.get_or("requiresLowChildlikeHeart", false);
         quest.requiresNight = item.get_or("requiresNight", false);
         quest.requiresTalk = item.get_or("requiresTalk", false);
+        quest.updateOutsideHomeBase = item.get_or("updateOutsideHomeBase", quest.updateOutsideHomeBase);
         std::string requiredWeather = item.get_or("requiresWeather", std::string{});
         quest.requiresRainy = requiredWeather == "rain" || requiredWeather == "Rain";
 
@@ -50,6 +51,26 @@ bool load(LuaVM& lua, const char* path, std::vector<QuestDef>& outDefinitions) {
             }
         }
 
+        sol::optional<sol::table> objectives = item.get<sol::optional<sol::table>>("objectives");
+        if (objectives) {
+            for (auto& objectivePair : *objectives) {
+                if (!objectivePair.second.is<sol::table>()) continue;
+                sol::table objectiveTable = objectivePair.second.as<sol::table>();
+
+                QuestObjectiveDef objective;
+                objective.type = objectiveTable.get_or("type", std::string{});
+                objective.targetId = objectiveTable.get_or("target", std::string{});
+                if (objective.targetId.empty()) {
+                    objective.targetId = objectiveTable.get_or("targetId", std::string{});
+                }
+                objective.required = objectiveTable.get_or("required", 0);
+
+                if (!objective.type.empty() && !objective.targetId.empty() && objective.required > 0) {
+                    quest.objectives.push_back(objective);
+                }
+            }
+        }
+
         quest.reward.questId = quest.id;
         quest.reward.completed = true;
         sol::optional<sol::table> reward = item.get<sol::optional<sol::table>>("reward");
@@ -59,6 +80,26 @@ bool load(LuaVM& lua, const char* path, std::vector<QuestDef>& outDefinitions) {
             quest.reward.reduceGrievance = reward->get_or("reduceGrievance", 0.0f);
             quest.reward.affection = reward->get_or("affection", 0.0f);
             quest.reward.unlockFurniture = reward->get_or("unlockFurniture", std::string{});
+
+            sol::optional<sol::table> itemRewards =
+                reward->get<sol::optional<sol::table>>("itemRewards");
+            if (itemRewards) {
+                for (auto& itemRewardPair : *itemRewards) {
+                    if (!itemRewardPair.second.is<sol::table>()) continue;
+                    sol::table itemRewardTable = itemRewardPair.second.as<sol::table>();
+
+                    QuestItemReward itemReward;
+                    itemReward.itemId = itemRewardTable.get_or("item", std::string{});
+                    if (itemReward.itemId.empty()) {
+                        itemReward.itemId = itemRewardTable.get_or("itemId", std::string{});
+                    }
+                    itemReward.count = itemRewardTable.get_or("count", 0);
+
+                    if (!itemReward.itemId.empty() && itemReward.count > 0) {
+                        quest.reward.itemRewards.push_back(itemReward);
+                    }
+                }
+            }
         }
 
         loaded.push_back(quest);

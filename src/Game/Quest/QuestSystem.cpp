@@ -6,7 +6,7 @@
 #include <utility>
 
 static std::vector<QuestDef> createDefaultQuestDefs() {
-    return {
+    std::vector<QuestDef> quests = {
         {"organize_home_base", "整理秘密基地",
             {"simple_bed", "writing_desk", "star_lamp"}, false, false, false, false, false,
             {"organize_home_base", 20, 20.0f, 5.0f, 5.0f, "toy_shelf", true}},
@@ -23,11 +23,30 @@ static std::vector<QuestDef> createDefaultQuestDefs() {
             {"simple_bed"}, false, false, false, true, false,
             {"childlike_heart_alarm", 0, 80.0f, 15.0f, 0.0f, "", true}},
     };
+
+    for (QuestDef& quest : quests) {
+        quest.updateOutsideHomeBase = false;
+    }
+    return quests;
+}
+
+static int maxFactCount(const QuestSnapshot& snapshot, const std::string& type, const std::string& targetId) {
+    int count = 0;
+    for (const QuestFact& fact : snapshot.facts) {
+        if (fact.type == type && fact.targetId == targetId) {
+            count = std::max(count, fact.count);
+        }
+    }
+    return count;
 }
 
 void QuestSystem::init() {
+    initWithDefinitions(createDefaultQuestDefs());
+}
+
+void QuestSystem::initWithDefinitions(const std::vector<QuestDef>& questDefs) {
     completedQuests.clear();
-    definitions = createDefaultQuestDefs();
+    definitions = questDefs;
     questEntries.clear();
     for (const QuestDef& quest : definitions) {
         ensureEntry(quest);
@@ -40,11 +59,7 @@ bool QuestSystem::loadDefinitions(LuaVM& lua, const char* path) {
         return false;
     }
 
-    definitions = std::move(loaded);
-    questEntries.clear();
-    for (const QuestDef& quest : definitions) {
-        ensureEntry(quest);
-    }
+    initWithDefinitions(loaded);
     return true;
 }
 
@@ -142,9 +157,10 @@ bool QuestSystem::rewardOnce(const std::string& questId) {
 
 std::vector<QuestReward> QuestSystem::update(const QuestSnapshot& snapshot) {
     std::vector<QuestReward> rewards;
-    if (!snapshot.inHomeBase) return rewards;
 
     for (const QuestDef& quest : definitions) {
+        if (!snapshot.inHomeBase && !quest.updateOutsideHomeBase) continue;
+
         QuestSaveEntry& entry = ensureEntry(quest);
         if (entry.rewardClaimed) continue;
 
@@ -178,6 +194,11 @@ bool QuestSystem::isSatisfied(const QuestDef& quest, const QuestSnapshot& snapsh
     if (quest.requiresLowChildlikeHeart &&
         snapshot.childlikeHeart >= snapshot.lowChildlikeHeartThreshold) return false;
     if (quest.requiresTalk && !snapshot.talkedWithPrincessAtBase) return false;
+    for (const QuestObjectiveDef& objective : quest.objectives) {
+        if (maxFactCount(snapshot, objective.type, objective.targetId) < objective.required) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -214,6 +235,14 @@ std::vector<QuestObjectiveProgress> QuestSystem::buildObjectives(const QuestDef&
     if (quest.requiresTalk) {
         objectives.push_back({"talk", "active_princess", 1,
             snapshot.talkedWithPrincessAtBase ? 1 : 0});
+    }
+    for (const QuestObjectiveDef& objective : quest.objectives) {
+        objectives.push_back({
+            objective.type,
+            objective.targetId,
+            objective.required,
+            maxFactCount(snapshot, objective.type, objective.targetId)
+        });
     }
 
     return objectives;

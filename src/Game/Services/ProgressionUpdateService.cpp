@@ -1,10 +1,12 @@
 #include "Game/Services/ProgressionUpdateService.h"
 
 #include "Game/GameState.h"
+#include "Game/Inventory/Inventory.h"
 #include "Game/Quest/QuestSystem.h"
 #include "Game/Services/NoticeService.h"
 #include "Game/Services/WorldQuery.h"
 #include "Game/Toy/ToySystem.h"
+#include "Game/World/MapRegion.h"
 #include "Game/World/WeatherSystem.h"
 
 #include <SDL2/SDL.h>
@@ -82,11 +84,19 @@ QuestSnapshot buildQuestSnapshot(const Context& context) {
     questSnapshot.talkedWithPrincessAtBase = context.talkedWithPrincessAtBaseThisFrame;
     questSnapshot.childlikeHeart = context.emotionSystem.getState().childlikeHeart;
     questSnapshot.lowChildlikeHeartThreshold = context.emotionSystem.getLowChildlikeHeartThreshold();
+    const MapRegion* currentRegion = context.regionManager.getCurrentRegion();
+    if (currentRegion) {
+        questSnapshot.currentRegionId = currentRegion->getId();
+        questSnapshot.facts.push_back({"enter_region", questSnapshot.currentRegionId, 1});
+    }
     return questSnapshot;
 }
 
 void applyQuestReward(Context& context, const QuestReward& reward) {
     context.inventory.addCoins(reward.coins);
+    for (const QuestItemReward& itemReward : reward.itemRewards) {
+        context.inventory.addItem(itemReward.itemId, itemReward.count);
+    }
     if (!reward.unlockFurniture.empty()) {
         context.inventory.unlockFurniture(reward.unlockFurniture);
         context.inventory.addFurniture(reward.unlockFurniture, 1);
