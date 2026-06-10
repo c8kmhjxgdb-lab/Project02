@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdint>
 #include <functional>
+#include <string>
 
 /**
  * 敌人类型枚举
@@ -35,6 +36,8 @@ struct Enemy {
     b2BodyId bodyId;
     EnemyId id;
     EnemyType type;
+    std::string definitionId;
+    uint8_t specialEffect;
 
     // 状态
     float health;
@@ -81,6 +84,7 @@ struct Enemy {
 
     Enemy()
         : bodyId(b2_nullBodyId), id(ENEMY_NULL), type(EnemyType::Chaser)
+        , definitionId(), specialEffect(0)
         , health(0), maxHealth(0), damage(0), speed(0)
         , detectionRange(8.0f), attackRange(2.0f), attackCooldown(1.0f), attackTimer(0)
         , state(State::Idle), stateTimer(0)
@@ -142,6 +146,7 @@ public:
 
     // 生成敌人
     EnemyId spawn(b2WorldId world, const glm::vec2& pos, EnemyType type);
+    EnemyId spawnByDefinition(b2WorldId world, const glm::vec2& pos, const std::string& enemyDefId);
 
     // 更新所有敌人
     void update(float dt, b2WorldId world, const glm::vec2& playerPos);

@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Engine/Physics/PhysicsWorld.h"
+#include "Game/AI/EnemyDefinition.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -109,6 +110,31 @@ EnemyId EnemyManager::spawn(b2WorldId world, const glm::vec2& pos, EnemyType typ
 
     enemies.push_back(enemy);
     return enemy.id;
+}
+
+EnemyId EnemyManager::spawnByDefinition(b2WorldId world, const glm::vec2& pos, const std::string& enemyDefId) {
+    const EnemyDef* def = EnemyDefinitions::find(enemyDefId);
+    if (!def) {
+        return ENEMY_NULL;
+    }
+
+    EnemyId enemyId = spawn(world, pos, def->baseType);
+    Enemy* enemy = find(enemyId);
+    if (!enemy) {
+        return ENEMY_NULL;
+    }
+
+    enemy->definitionId = def->id;
+    enemy->specialEffect = static_cast<uint8_t>(def->special);
+    enemy->health = def->maxHealth;
+    enemy->maxHealth = def->maxHealth;
+    enemy->damage = def->damage;
+    enemy->speed = def->speed;
+    enemy->radius = def->radius;
+    enemy->color = def->color;
+    enemy->coinDropMin = def->coinDropMin;
+    enemy->coinDropMax = def->coinDropMax;
+    return enemyId;
 }
 
 Enemy* EnemyManager::find(EnemyId id) {

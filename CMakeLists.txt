@@ -53,6 +53,7 @@ add_library(StarchildGame STATIC
     src/Game/Ability/Shield.cpp
     src/Game/Ability/SuperStrength.cpp
     src/Game/AI/Enemy.cpp
+    src/Game/AI/EnemyDefinition.cpp
     src/Game/AI/PathfindingSystem.cpp
     src/Game/Building/BuildingPhysicsSync.cpp
     src/Game/Building/BuildingPlacementRules.cpp
@@ -331,4 +332,11 @@ if(BUILD_TESTING)
     configure_starchild_target(ChildlikeSkillProfileTest)
     target_link_libraries(ChildlikeSkillProfileTest PRIVATE StarchildGame)
     add_test(NAME ChildlikeSkillProfileTest COMMAND ChildlikeSkillProfileTest)
+
+    add_executable(EnemyDefinitionTest
+        tests/EnemyDefinitionTest.cpp
+    )
+    configure_starchild_target(EnemyDefinitionTest)
+    target_link_libraries(EnemyDefinitionTest PRIVATE StarchildGame)
+    add_test(NAME EnemyDefinitionTest COMMAND EnemyDefinitionTest)
 endif()

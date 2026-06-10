@@ -4,6 +4,7 @@
 
 class EnemyManager;
 class RegionManager;
+class StoryProgress;
 struct GameState;
 
 namespace EnemySpawnService {
@@ -17,6 +18,7 @@ struct Context {
     int& maxEnemies;
     float& charTime;
     CombatService::SpawnContext combatSpawn;
+    StoryProgress& storyProgress;
 };
 
 Context makeContext(GameState& gs);
