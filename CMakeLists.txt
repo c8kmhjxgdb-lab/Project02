@@ -80,6 +80,7 @@ add_library(StarchildGame STATIC
     src/Game/Health.cpp
     src/Game/Inventory/ItemCatalog.cpp
     src/Game/Inventory/Inventory.cpp
+    src/Game/Progress/StoryProgress.cpp
     src/Game/Presentation/AbilityView.cpp
     src/Game/Presentation/AimReticleView.cpp
     src/Game/Presentation/BuildingView.cpp
@@ -227,6 +228,13 @@ if(BUILD_TESTING)
     configure_starchild_target(SaveDataRoundTripTest)
     target_link_libraries(SaveDataRoundTripTest PRIVATE StarchildGame)
     add_test(NAME SaveDataRoundTripTest COMMAND SaveDataRoundTripTest)
+
+    add_executable(StoryProgressTest
+        tests/StoryProgressTest.cpp
+    )
+    configure_starchild_target(StoryProgressTest)
+    target_link_libraries(StoryProgressTest PRIVATE StarchildGame)
+    add_test(NAME StoryProgressTest COMMAND StoryProgressTest)
 
     add_executable(CombatCastServiceTest
         tests/CombatCastServiceTest.cpp

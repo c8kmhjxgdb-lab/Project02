@@ -4,7 +4,7 @@
 
 namespace SaveMigration {
 
-inline constexpr int kCurrentVersion = 3;
+inline constexpr int kCurrentVersion = 4;
 
 void migrateToCurrent(SaveData& data);
 

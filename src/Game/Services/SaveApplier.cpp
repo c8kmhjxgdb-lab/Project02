@@ -92,7 +92,9 @@ bool applySaveData(GameState& gs, const SaveData& saveData) {
     gs.playerMana = std::clamp(saveData.player.mana, 0.0f, gs.playerMaxMana);
     gs.inventory.setCoins(saveData.player.coins);
     gs.inventory.loadFurnitureStock(saveData.furnitureStock);
+    gs.inventory.loadItemStacks(saveData.itemStacks);
     gs.inventory.loadUnlockedFurniture(saveData.unlockedFurniture);
+    gs.storyProgress.loadSnapshot(saveData.storyProgress);
 
     gs.camera.position = saveData.player.position;
     gs.spawnPoint = saveData.player.position;

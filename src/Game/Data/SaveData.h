@@ -2,6 +2,7 @@
 
 #include "Game/Building/Furniture.h"
 #include "Game/Inventory/Inventory.h"
+#include "Game/Progress/StoryProgress.h"
 #include "Game/Quest/QuestTypes.h"
 #include "Game/Toy/ToyTypes.h"
 #include "Game/World/MapRegion.h"
@@ -26,7 +27,7 @@ struct PlayerProgress {
  * 存档数据
  */
 struct SaveData {
-    int version = 3;
+    int version = 4;
     std::string timestamp;
 
     // 玩家数据
@@ -82,9 +83,11 @@ struct SaveData {
     // 阶段7：秘密基地家具布局
     std::vector<FurnitureInstance> homeFurniture;
     std::vector<FurnitureStock> furnitureStock;
+    std::vector<ItemStack> itemStacks;
     std::vector<std::string> unlockedFurniture;
     ToySaveData toyData;
     std::vector<QuestSaveEntry> quests;
+    StoryProgressSnapshot storyProgress;
 
     SaveData()
         : childlikeHeart(950.0f)

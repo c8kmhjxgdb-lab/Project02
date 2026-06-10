@@ -65,7 +65,9 @@ bool saveCurrentGame(GameState& gs, const std::string& slot) {
     data.environment.storyWeatherTag = gs.weatherSystem.getCurrentSpecialTag();
     data.homeFurniture = gs.buildingSystem.getInstances();
     data.furnitureStock = gs.inventory.getFurnitureStock();
+    data.itemStacks = gs.inventory.getItemStacks();
     data.unlockedFurniture = gs.inventory.getUnlockedFurniture();
+    data.storyProgress = gs.storyProgress.getSnapshot();
     data.toyData = gs.toySystem.getSaveData();
     data.quests = gs.questSystem.getSaveData();
 

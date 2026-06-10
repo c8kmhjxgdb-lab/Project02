@@ -28,6 +28,7 @@
 #include "Game/Emotion/VentAnimation.h"
 #include "Game/Health.h"
 #include "Game/Inventory/Inventory.h"
+#include "Game/Progress/StoryProgress.h"
 #include "Game/Quest/QuestSystem.h"
 #include "Game/Social/DialogueTree.h"
 #include "Game/Social/Princess.h"
@@ -251,6 +252,9 @@ struct GameState {
 
     // Stage 7: base quest loop
     QuestSystem questSystem;
+
+    // Story progression
+    StoryProgress storyProgress;
 
     // Main menu / persistent runtime state
     GameUiState ui;

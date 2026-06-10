@@ -3,9 +3,28 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 
 namespace SaveSerializer {
+
+namespace {
+
+bool readChapterState(const Json& value, ChapterState& outState) {
+    if (value.is_number_unsigned()) {
+        auto raw = value.get<Json::number_unsigned_t>();
+        if (raw > static_cast<Json::number_unsigned_t>(std::numeric_limits<long long>::max())) {
+            return false;
+        }
+        return tryParseChapterState(static_cast<long long>(raw), outState);
+    }
+    if (value.is_number_integer()) {
+        return tryParseChapterState(value.get<Json::number_integer_t>(), outState);
+    }
+    return false;
+}
+
+}  // namespace
 
 std::string currentTimestamp() {
     auto now = std::chrono::system_clock::now();
@@ -70,6 +89,37 @@ Json toJson(const SaveData& data) {
         j["inventory"]["furnitureStock"].push_back({
             {"defId", stock.defId},
             {"count", stock.count}
+        });
+    }
+    j["inventory"]["items"] = Json::array();
+    for (const ItemStack& stack : data.itemStacks) {
+        if (stack.itemId.empty() || stack.count <= 0) continue;
+        j["inventory"]["items"].push_back({
+            {"itemId", stack.itemId},
+            {"count", stack.count}
+        });
+    }
+
+    j["story"]["chapters"] = Json::array();
+    for (const ChapterProgressEntry& chapter : data.storyProgress.chapters) {
+        if (chapter.chapterId.empty() || !isValidChapterState(chapter.state)) continue;
+        j["story"]["chapters"].push_back({
+            {"chapterId", chapter.chapterId},
+            {"state", static_cast<int>(chapter.state)}
+        });
+    }
+    j["story"]["unlockedPartners"] = Json::array();
+    for (const std::string& partnerId : data.storyProgress.unlockedPartners) {
+        if (!partnerId.empty()) {
+            j["story"]["unlockedPartners"].push_back(partnerId);
+        }
+    }
+    j["story"]["flags"] = Json::array();
+    for (const StoryFlagEntry& flag : data.storyProgress.flags) {
+        if (flag.flagId.empty()) continue;
+        j["story"]["flags"].push_back({
+            {"flagId", flag.flagId},
+            {"value", flag.value}
         });
     }
 
@@ -227,6 +277,59 @@ SaveData fromJson(const Json& data) {
                 stock.count = item.value("count", 0);
                 if (!stock.defId.empty() && stock.count > 0) {
                     result.furnitureStock.push_back(stock);
+                }
+            }
+        }
+        if (inv.contains("items") && inv["items"].is_array()) {
+            for (const auto& item : inv["items"]) {
+                if (!item.is_object()) continue;
+                if (!item.contains("itemId") || !item["itemId"].is_string()) continue;
+                if (!item.contains("count") || !item["count"].is_number_integer()) continue;
+                ItemStack stack;
+                stack.itemId = item["itemId"].get<std::string>();
+                stack.count = item["count"].get<int>();
+                if (!stack.itemId.empty() && stack.count > 0) {
+                    result.itemStacks.push_back(stack);
+                }
+            }
+        }
+    }
+
+    if (data.contains("story")) {
+        const Json& story = data["story"];
+        if (story.contains("chapters") && story["chapters"].is_array()) {
+            for (const auto& chapterJson : story["chapters"]) {
+                if (!chapterJson.is_object()) continue;
+                if (!chapterJson.contains("chapterId") || !chapterJson["chapterId"].is_string()) continue;
+                if (!chapterJson.contains("state")) continue;
+                ChapterProgressEntry chapter;
+                chapter.chapterId = chapterJson["chapterId"].get<std::string>();
+                if (!chapter.chapterId.empty() && readChapterState(chapterJson["state"], chapter.state)) {
+                    result.storyProgress.chapters.push_back(chapter);
+                }
+            }
+        }
+        if (story.contains("unlockedPartners") && story["unlockedPartners"].is_array()) {
+            for (const auto& partnerJson : story["unlockedPartners"]) {
+                if (!partnerJson.is_string()) {
+                    continue;
+                }
+                std::string partnerId = partnerJson.get<std::string>();
+                if (!partnerId.empty()) {
+                    result.storyProgress.unlockedPartners.push_back(partnerId);
+                }
+            }
+        }
+        if (story.contains("flags") && story["flags"].is_array()) {
+            for (const auto& flagJson : story["flags"]) {
+                if (!flagJson.is_object()) continue;
+                if (!flagJson.contains("flagId") || !flagJson["flagId"].is_string()) continue;
+                if (!flagJson.contains("value") || !flagJson["value"].is_boolean()) continue;
+                StoryFlagEntry flag;
+                flag.flagId = flagJson["flagId"].get<std::string>();
+                flag.value = flagJson["value"].get<bool>();
+                if (!flag.flagId.empty()) {
+                    result.storyProgress.flags.push_back(flag);
                 }
             }
         }
