@@ -227,6 +227,13 @@ if(BUILD_TESTING)
     target_link_libraries(SaveDataRoundTripTest PRIVATE StarchildGame)
     add_test(NAME SaveDataRoundTripTest COMMAND SaveDataRoundTripTest)
 
+    add_executable(StoryProgressTest
+        tests/StoryProgressTest.cpp
+    )
+    configure_starchild_target(StoryProgressTest)
+    target_link_libraries(StoryProgressTest PRIVATE StarchildGame)
+    add_test(NAME StoryProgressTest COMMAND StoryProgressTest)
+
     add_executable(CombatCastServiceTest
         tests/CombatCastServiceTest.cpp
     )

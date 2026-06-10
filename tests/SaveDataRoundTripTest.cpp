@@ -16,6 +16,11 @@ int main() {
     data.environment.day = 2;
     data.environment.hour = 18.5f;
     data.environment.weather = "Rain";
+    data.itemStacks.push_back({"recovery_candy", 2});
+    data.itemStacks.push_back({"pixel_screw", 4});
+    data.storyProgress.chapters.push_back({"chapter_1_popup_arcade", ChapterState::Completed});
+    data.storyProgress.unlockedPartners.push_back("tieyi");
+    data.storyProgress.flags.push_back({"arcade_boss_defeated", true});
 
     SaveSerializer::Json json = SaveSerializer::toJson(data);
     SaveData restored = SaveSerializer::fromJson(json);
@@ -28,5 +33,14 @@ int main() {
     TestSupport::require(restored.player.coins == 7, "player coins round trips");
     TestSupport::require(restored.environment.day == 2, "environment day round trips");
     TestSupport::require(restored.environment.weather == "Rain", "environment weather round trips");
+    TestSupport::require(restored.itemStacks.size() == 2, "item stacks round trip");
+    TestSupport::require(restored.itemStacks[0].itemId == "recovery_candy", "item id round trips");
+    TestSupport::require(restored.itemStacks[0].count == 2, "item count round trips");
+    TestSupport::require(restored.storyProgress.chapters.size() == 1, "chapter progress round trips");
+    TestSupport::require(restored.storyProgress.chapters[0].state == ChapterState::Completed,
+        "chapter state round trips");
+    TestSupport::require(restored.storyProgress.unlockedPartners.size() == 1,
+        "partner progress round trips");
+    TestSupport::require(restored.storyProgress.flags.size() == 1, "story flag round trips");
     return 0;
 }
