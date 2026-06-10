@@ -110,6 +110,38 @@ bool EmotionSystem::isChildlikeHeartEmpty() const {
     return state.childlikeHeart <= childlikeHeartMin;
 }
 
+ChildlikeHeartTier EmotionSystem::getChildlikeHeartTier() const {
+    if (state.childlikeHeart >= 800.0f) {
+        return ChildlikeHeartTier::Radiant;
+    }
+    if (state.childlikeHeart >= 500.0f) {
+        return ChildlikeHeartTier::Vivid;
+    }
+    if (state.childlikeHeart >= 200.0f) {
+        return ChildlikeHeartTier::Normal;
+    }
+    return ChildlikeHeartTier::Faded;
+}
+
+std::string EmotionSystem::getChildlikeHeartTierName() const {
+    switch (getChildlikeHeartTier()) {
+    case ChildlikeHeartTier::Faded:
+        return "失色";
+    case ChildlikeHeartTier::Normal:
+        return "寻常";
+    case ChildlikeHeartTier::Vivid:
+        return "鲜活";
+    case ChildlikeHeartTier::Radiant:
+        return "绚烂";
+    }
+    return "寻常";
+}
+
+bool EmotionSystem::canSeeHiddenPickups() const {
+    ChildlikeHeartTier tier = getChildlikeHeartTier();
+    return tier == ChildlikeHeartTier::Vivid || tier == ChildlikeHeartTier::Radiant;
+}
+
 void EmotionSystem::setMood(CharacterMood newMood) {
     state.mood = newMood;
     notifyChange();

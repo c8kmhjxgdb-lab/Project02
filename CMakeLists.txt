@@ -47,6 +47,7 @@ add_library(StarchildEngine STATIC
 
 add_library(StarchildGame STATIC
     src/Game/Ability/BondTechnique.cpp
+    src/Game/Ability/ChildlikeSkillProfile.cpp
     src/Game/Ability/Lightning.cpp
     src/Game/Ability/Projectile.cpp
     src/Game/Ability/Shield.cpp
@@ -298,4 +299,18 @@ if(BUILD_TESTING)
     configure_starchild_target(InventoryItemTest)
     target_link_libraries(InventoryItemTest PRIVATE StarchildGame)
     add_test(NAME InventoryItemTest COMMAND InventoryItemTest)
+
+    add_executable(EmotionTierTest
+        tests/EmotionTierTest.cpp
+    )
+    configure_starchild_target(EmotionTierTest)
+    target_link_libraries(EmotionTierTest PRIVATE StarchildGame)
+    add_test(NAME EmotionTierTest COMMAND EmotionTierTest)
+
+    add_executable(ChildlikeSkillProfileTest
+        tests/ChildlikeSkillProfileTest.cpp
+    )
+    configure_starchild_target(ChildlikeSkillProfileTest)
+    target_link_libraries(ChildlikeSkillProfileTest PRIVATE StarchildGame)
+    add_test(NAME ChildlikeSkillProfileTest COMMAND ChildlikeSkillProfileTest)
 endif()

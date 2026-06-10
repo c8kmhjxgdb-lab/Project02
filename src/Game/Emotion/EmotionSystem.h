@@ -4,6 +4,7 @@
 #include <functional>
 #include <algorithm>
 #include <cstdint>
+#include <string>
 
 class LuaVM;
 
@@ -13,6 +14,13 @@ enum class CharacterMood : uint8_t {
     Worried,
     Inspired,
     Tired
+};
+
+enum class ChildlikeHeartTier : uint8_t {
+    Faded,
+    Normal,
+    Vivid,
+    Radiant
 };
 
 /**
@@ -62,6 +70,9 @@ public:
     float getChildlikeHeartPercent() const;
     bool isLowChildlikeHeart() const;
     bool isChildlikeHeartEmpty() const;
+    ChildlikeHeartTier getChildlikeHeartTier() const;
+    std::string getChildlikeHeartTierName() const;
+    bool canSeeHiddenPickups() const;
     float getLowChildlikeHeartThreshold() const { return childlikeHeartLowThreshold; }
 
     // 设置/查询人物心情
