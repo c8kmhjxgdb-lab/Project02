@@ -1,0 +1,119 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "StarchildEngine::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "StarchildGame::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "StarchildApp::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "AudioManifestTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "Starchild2D::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+	"isGeneratorProvided" : true,
+	"name" : "ALL_BUILD",
+	"orderDependencies" : 
+	[
+		{
+			"id" : "StarchildEngine::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "StarchildGame::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "StarchildApp::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "AudioManifestTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "Starchild2D::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df"
+		}
+	],
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

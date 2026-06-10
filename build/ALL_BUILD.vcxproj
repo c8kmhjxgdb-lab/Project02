@@ -182,9 +182,17 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{76488E4C-2F7F-31D7-98EB-DB7D15A80CF9}</Project>
       <Name>CombatCastServiceTest</Name>
     </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\CombatCollisionServiceTest.vcxproj">
+      <Project>{0440A889-38ED-30A1-BE5F-6FB38CA0AD7C}</Project>
+      <Name>CombatCollisionServiceTest</Name>
+    </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\DialogueServiceRewardTest.vcxproj">
       <Project>{2A4C7B50-E9D1-371C-AABD-7AD1BF1BA44D}</Project>
       <Name>DialogueServiceRewardTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\InputControllerBoundaryTest.vcxproj">
+      <Project>{D0D2017F-56D4-35DC-924C-541FF303F165}</Project>
+      <Name>InputControllerBoundaryTest</Name>
     </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\QuestSystemFlowTest.vcxproj">
       <Project>{D56968AE-2FE5-3391-9B47-89C3F302555C}</Project>
@@ -193,6 +201,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\RegionServiceDoorTest.vcxproj">
       <Project>{F128B4F0-92CD-3430-88F2-FC8ECACEF7C7}</Project>
       <Name>RegionServiceDoorTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\SaveApplierIntegrationTest.vcxproj">
+      <Project>{BE4C575F-B391-318D-A8B6-112BF9D1C618}</Project>
+      <Name>SaveApplierIntegrationTest</Name>
     </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\SaveDataRoundTripTest.vcxproj">
       <Project>{0A4260BA-4CD2-3312-84C9-5D31E0DFA8FA}</Project>

@@ -133,6 +133,9 @@
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WindowTitlePresenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldPresentationBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

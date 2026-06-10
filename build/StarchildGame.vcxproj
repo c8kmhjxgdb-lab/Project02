@@ -361,6 +361,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\ParticleView.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\PresentationModelBuilder.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WindowTitlePresenter.cpp" />
+    <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldPresentationBuilder.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldRenderer.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Presentation\WorldSignView.cpp" />
     <ClCompile Include="E:\DouBao2\Project\KatCode\Project02\src\Game\Quest\QuestSystem.cpp" />

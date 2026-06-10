@@ -1,11 +1,9 @@
 #include "Game/Scenes/WorldScene.h"
 
 #include "Game/Controllers/InputController.h"
-#include "Game/GameState.h"
 #include "Game/Presentation/GameRenderer.h"
 #include "Game/Presentation/MiniMapPresenter.h"
-#include "Game/Presentation/PresentationModelBuilder.h"
-#include "Game/Services/PlayerInputQuery.h"
+#include "Game/Presentation/WorldPresentationBuilder.h"
 
 #include <SDL2/SDL.h>
 
@@ -13,40 +11,27 @@ namespace WorldScene {
 
 namespace {
 
-GameRenderer::WorldRenderContext makeRenderContext(GameState& gs) {
-    return {
-        gs.camera,
-        gs.regionManager,
-        gs.decorRenderer,
-        gs.buildingSystem,
-        gs.toySystem,
-        gs.dropManager,
-        gs.enemyManager,
-        gs.projectileManager,
-        gs.particleSystem,
-        gs.postProcess,
-        gs.miniMap,
-        gs.dialogueUI,
-        gs.emotionSystem,
-        gs.timeSystem,
-        gs.princess.get(),
-        gs.playerBodyId,
-        gs.isDead,
-        gs.screenWidth,
-        gs.screenHeight,
-        gs.charTime,
-        gs.postProcessShader,
-        PlayerInputQuery::getMouseWorldPoint(gs),
-        PresentationModelBuilder::buildEnemyRenderResources(gs),
-        PresentationModelBuilder::buildCharacterRenderResources(gs),
-        PresentationModelBuilder::buildCharacterModel(gs),
-        PresentationModelBuilder::buildProjectileRenderResources(gs),
-        PresentationModelBuilder::buildAbilityEffectsModel(gs),
-        PresentationModelBuilder::buildVentTearsModel(gs),
-        PresentationModelBuilder::buildAimReticleModel(gs),
-        PresentationModelBuilder::buildHudModel(gs)
-    };
-}
+class Scene final : public IScene {
+public:
+    Scene() : state(createState()) {}
+
+    bool handleEvent(GameState& gs,
+                     const SDL_Event& event,
+                     const InputController::Callbacks& callbacks) override {
+        return WorldScene::handleEvent(gs, event, callbacks);
+    }
+
+    void update(GameState& gs, float dt) override {
+        WorldScene::update(nullptr, gs, dt, state);
+    }
+
+    void render(SDL_Window* window, GameState& gs, float dt) override {
+        WorldScene::render(window, gs, dt, state);
+    }
+
+private:
+    State state;
+};
 
 }  // namespace
 
@@ -54,6 +39,10 @@ State createState() {
     State state;
     state.titleState = WindowTitlePresenter::State{SDL_GetTicks(), 0};
     return state;
+}
+
+std::unique_ptr<IScene> create() {
+    return std::make_unique<Scene>();
 }
 
 bool handleEvent(GameState& gs,
@@ -68,7 +57,7 @@ void update(SDL_Window* /*window*/, GameState& gs, float dt, State& state) {
 }
 
 void render(SDL_Window* window, GameState& gs, float dt, State& state) {
-    GameRenderer::WorldRenderContext renderContext = makeRenderContext(gs);
+    GameRenderer::WorldRenderContext renderContext = WorldPresentationBuilder::buildRenderContext(gs);
     GameRenderer::renderWorld(renderContext, state.tileColors, dt);
     SDL_GL_SwapWindow(window);
     WindowTitlePresenter::update(window, gs, state.titleState);

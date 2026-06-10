@@ -15,6 +15,23 @@ namespace MainMenuScene {
 
 namespace {
 
+class Scene final : public IScene {
+public:
+    bool handleEvent(GameState& gs,
+                     const SDL_Event& event,
+                     const InputController::Callbacks& callbacks) override {
+        return MainMenuScene::handleEvent(gs, event, callbacks);
+    }
+
+    void update(GameState& gs, float dt) override {
+        MainMenuScene::update(gs, dt);
+    }
+
+    void render(SDL_Window* window, GameState& gs, float /*dt*/) override {
+        MainMenuScene::render(window, gs);
+    }
+};
+
 GameRenderer::MainMenuRenderContext makeRenderContext(GameState& gs) {
     return {
         PresentationModelBuilder::buildMainMenuModel(gs),
@@ -24,6 +41,10 @@ GameRenderer::MainMenuRenderContext makeRenderContext(GameState& gs) {
 }
 
 }  // namespace
+
+std::unique_ptr<IScene> create() {
+    return std::make_unique<Scene>();
+}
 
 bool handleEvent(GameState& gs,
                  const SDL_Event& event,

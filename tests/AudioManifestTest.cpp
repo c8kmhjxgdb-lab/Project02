@@ -10,6 +10,7 @@ int main() {
     TestSupport::require(audio.hasBgmAsset("bgm/starter_village"), "starter village bgm is registered");
     TestSupport::require(audio.hasBgmAsset("bgm/home_base"), "home base bgm is registered");
     TestSupport::require(audio.hasSfxAsset("sfx/skill/fireball"), "fireball sfx is registered");
+    TestSupport::require(audio.hasSfxAsset("sfx/ui/navigate"), "ui navigate sfx is registered");
     TestSupport::require(audio.hasSfxAsset("sfx/ui/confirm"), "ui confirm sfx is registered");
 
     audio.setMasterVolume(2.0f);

@@ -90,6 +90,7 @@ add_library(StarchildGame STATIC
     src/Game/Presentation/ParticleView.cpp
     src/Game/Presentation/PresentationModelBuilder.cpp
     src/Game/Presentation/WindowTitlePresenter.cpp
+    src/Game/Presentation/WorldPresentationBuilder.cpp
     src/Game/Presentation/WorldRenderer.cpp
     src/Game/Presentation/WorldSignView.cpp
     src/Game/Quest/QuestSystem.cpp
@@ -260,4 +261,25 @@ if(BUILD_TESTING)
     configure_starchild_target(AudioManifestTest)
     target_link_libraries(AudioManifestTest PRIVATE StarchildEngine)
     add_test(NAME AudioManifestTest COMMAND AudioManifestTest)
+
+    add_executable(SaveApplierIntegrationTest
+        tests/SaveApplierIntegrationTest.cpp
+    )
+    configure_starchild_target(SaveApplierIntegrationTest)
+    target_link_libraries(SaveApplierIntegrationTest PRIVATE StarchildGame)
+    add_test(NAME SaveApplierIntegrationTest COMMAND SaveApplierIntegrationTest)
+
+    add_executable(CombatCollisionServiceTest
+        tests/CombatCollisionServiceTest.cpp
+    )
+    configure_starchild_target(CombatCollisionServiceTest)
+    target_link_libraries(CombatCollisionServiceTest PRIVATE StarchildGame)
+    add_test(NAME CombatCollisionServiceTest COMMAND CombatCollisionServiceTest)
+
+    add_executable(InputControllerBoundaryTest
+        tests/InputControllerBoundaryTest.cpp
+    )
+    configure_starchild_target(InputControllerBoundaryTest)
+    target_link_libraries(InputControllerBoundaryTest PRIVATE StarchildGame)
+    add_test(NAME InputControllerBoundaryTest COMMAND InputControllerBoundaryTest)
 endif()

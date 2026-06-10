@@ -115,6 +115,7 @@ bool AudioSystem::loadManifest(const std::string& path) {
     ensureSfxFallback("sfx/skill/fireball");
     ensureSfxFallback("sfx/skill/ice_spike");
     ensureSfxFallback("sfx/skill/lightning");
+    ensureSfxFallback("sfx/ui/navigate");
     ensureSfxFallback("sfx/ui/confirm");
     ensureSfxFallback("sfx/ui/cancel");
 

@@ -1,49 +1,9 @@
 #include "Game/Scenes/SceneManager.h"
 
-#include "Game/GameState.h"
 #include "Game/Scenes/MainMenuScene.h"
 #include "Game/Scenes/WorldScene.h"
 
 namespace {
-
-class MainMenuSceneAdapter final : public IScene {
-public:
-    bool handleEvent(GameState& gs,
-                     const SDL_Event& event,
-                     const InputController::Callbacks& callbacks) override {
-        return MainMenuScene::handleEvent(gs, event, callbacks);
-    }
-
-    void update(GameState& gs, float dt) override {
-        MainMenuScene::update(gs, dt);
-    }
-
-    void render(SDL_Window* window, GameState& gs, float /*dt*/) override {
-        MainMenuScene::render(window, gs);
-    }
-};
-
-class WorldSceneAdapter final : public IScene {
-public:
-    explicit WorldSceneAdapter(WorldScene::State& state) : state(state) {}
-
-    bool handleEvent(GameState& gs,
-                     const SDL_Event& event,
-                     const InputController::Callbacks& callbacks) override {
-        return WorldScene::handleEvent(gs, event, callbacks);
-    }
-
-    void update(GameState& gs, float dt) override {
-        WorldScene::update(nullptr, gs, dt, state);
-    }
-
-    void render(SDL_Window* window, GameState& gs, float dt) override {
-        WorldScene::render(window, gs, dt, state);
-    }
-
-private:
-    WorldScene::State& state;
-};
 
 IScene* selectScene(SceneManager::State& state, AppMode mode) {
     if (mode == AppMode::MainMenu) {
@@ -75,9 +35,8 @@ namespace SceneManager {
 
 State createState(GameState& gs) {
     State state;
-    state.worldSceneState = std::make_unique<WorldScene::State>(WorldScene::createState());
-    state.mainMenuScene = std::make_unique<MainMenuSceneAdapter>();
-    state.worldScene = std::make_unique<WorldSceneAdapter>(*state.worldSceneState);
+    state.mainMenuScene = MainMenuScene::create();
+    state.worldScene = WorldScene::create();
     state.currentMode = state.requestedMode;
     state.currentScene = selectScene(state, state.requestedMode);
     if (state.currentScene) {

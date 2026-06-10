@@ -11,13 +11,22 @@
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\CombatCastServiceTest.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\CombatCollisionServiceTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\DialogueServiceRewardTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\InputControllerBoundaryTest.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\QuestSystemFlowTest.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\RegionServiceDoorTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\SaveApplierIntegrationTest.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\SaveDataRoundTripTest.exe</FullPath>

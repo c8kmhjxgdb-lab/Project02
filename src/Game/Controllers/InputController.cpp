@@ -4,6 +4,7 @@
 #include "Game/Controllers/BuildingInputController.h"
 #include "Game/Controllers/InteractionInputController.h"
 #include "Game/GameState.h"
+#include "Game/Services/AudioService.h"
 #include "Game/Services/CombatService.h"
 #include "Game/Services/NoticeService.h"
 #include "Game/Services/PlayerInputQuery.h"
@@ -77,8 +78,10 @@ bool handleKeyDown(GameState& gs,
 
     if (scancode == SDL_SCANCODE_ESCAPE) {
         if (gs.buildingSystem.isActive()) {
+            AudioService::playUiSfx(gs.audioSystem, "cancel");
             gs.buildingSystem.setBuildMode(false);
         } else {
+            AudioService::playUiSfx(gs.audioSystem, "cancel");
             return true;
         }
     }
@@ -115,6 +118,7 @@ bool handleKeyDown(GameState& gs,
 
     if (scancode == SDL_SCANCODE_F5) {
         NoticeService::Context noticeContext = NoticeService::makeContext(gs);
+        AudioService::playUiSfx(gs.audioSystem, "confirm");
         if (SaveGameService::saveCurrentGame(gs, "autosave")) {
             NoticeService::showNotice(noticeContext, "已保存 Saved");
         } else {
@@ -123,6 +127,7 @@ bool handleKeyDown(GameState& gs,
     }
 
     if (scancode == SDL_SCANCODE_F9) {
+        AudioService::playUiSfx(gs.audioSystem, "confirm");
         SaveGameService::loadGameSlot(gs, "autosave");
     }
 

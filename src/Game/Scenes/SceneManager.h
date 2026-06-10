@@ -3,7 +3,6 @@
 #include "Game/Controllers/InputController.h"
 #include "Game/Scenes/AppMode.h"
 #include "Game/Scenes/IScene.h"
-#include "Game/Scenes/WorldScene.h"
 
 #include <memory>
 
@@ -14,7 +13,6 @@ union SDL_Event;
 namespace SceneManager {
 
 struct State {
-    std::unique_ptr<WorldScene::State> worldSceneState;
     std::unique_ptr<IScene> mainMenuScene;
     std::unique_ptr<IScene> worldScene;
     IScene* currentScene = nullptr;

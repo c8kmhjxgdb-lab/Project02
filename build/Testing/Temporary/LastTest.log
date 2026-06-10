@@ -1,3 +1,140 @@
-Start testing: Jun 09 21:45 中国标准时间
+Start testing: Jun 10 09:21 中国标准时间
 ----------------------------------------------------------
-End testing: Jun 09 21:45 中国标准时间
+1/9 Testing: SaveDataRoundTripTest
+1/9 Test: SaveDataRoundTripTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/SaveDataRoundTripTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"SaveDataRoundTripTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"SaveDataRoundTripTest" end time: Jun 10 09:21 中国标准时间
+"SaveDataRoundTripTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/9 Testing: CombatCastServiceTest
+2/9 Test: CombatCastServiceTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/CombatCastServiceTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"CombatCastServiceTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"CombatCastServiceTest" end time: Jun 10 09:21 中国标准时间
+"CombatCastServiceTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/9 Testing: QuestSystemFlowTest
+3/9 Test: QuestSystemFlowTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/QuestSystemFlowTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"QuestSystemFlowTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"QuestSystemFlowTest" end time: Jun 10 09:21 中国标准时间
+"QuestSystemFlowTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/9 Testing: RegionServiceDoorTest
+4/9 Test: RegionServiceDoorTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/RegionServiceDoorTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"RegionServiceDoorTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"RegionServiceDoorTest" end time: Jun 10 09:21 中国标准时间
+"RegionServiceDoorTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/9 Testing: DialogueServiceRewardTest
+5/9 Test: DialogueServiceRewardTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/DialogueServiceRewardTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"DialogueServiceRewardTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+[DialogueTree] Node not found: base_rain_night
+[DialogueTree] Node not found: base_low_heart
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"DialogueServiceRewardTest" end time: Jun 10 09:21 中国标准时间
+"DialogueServiceRewardTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/9 Testing: AudioManifestTest
+6/9 Test: AudioManifestTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/AudioManifestTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"AudioManifestTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"AudioManifestTest" end time: Jun 10 09:21 中国标准时间
+"AudioManifestTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/9 Testing: SaveApplierIntegrationTest
+7/9 Test: SaveApplierIntegrationTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/SaveApplierIntegrationTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"SaveApplierIntegrationTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.25 sec
+----------------------------------------------------------
+Test Passed.
+"SaveApplierIntegrationTest" end time: Jun 10 09:21 中国标准时间
+"SaveApplierIntegrationTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/9 Testing: CombatCollisionServiceTest
+8/9 Test: CombatCollisionServiceTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/CombatCollisionServiceTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"CombatCollisionServiceTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"CombatCollisionServiceTest" end time: Jun 10 09:21 中国标准时间
+"CombatCollisionServiceTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/9 Testing: InputControllerBoundaryTest
+9/9 Test: InputControllerBoundaryTest
+Command: "E:/DouBao2/Project/KatCode/Project02/build/Release/InputControllerBoundaryTest.exe"
+Directory: E:/DouBao2/Project/KatCode/Project02/build
+"InputControllerBoundaryTest" start time: Jun 10 09:21 中国标准时间
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"InputControllerBoundaryTest" end time: Jun 10 09:21 中国标准时间
+"InputControllerBoundaryTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jun 10 09:21 中国标准时间

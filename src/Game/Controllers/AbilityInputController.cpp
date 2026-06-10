@@ -165,6 +165,10 @@ void handleKeyDown(Context& context, SDL_Scancode scancode, const Callbacks& cal
 }
 
 void handleMouseButtonDown(Context& context, Uint8 button, const Callbacks& callbacks) {
+    if (!isGameplayActionAllowed(context)) {
+        return;
+    }
+
     if (button == SDL_BUTTON_LEFT) {
         glm::vec2 playerPos = getPlayerPosition(context);
         glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);

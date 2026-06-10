@@ -2,8 +2,11 @@
 
 #include "Game/Controllers/InputController.h"
 #include "Game/Presentation/WindowTitlePresenter.h"
+#include "Game/Scenes/IScene.h"
 #include "Game/Services/WorldUpdateService.h"
 #include "Game/World/TileMap.h"
+
+#include <memory>
 
 struct GameState;
 struct SDL_Window;
@@ -18,6 +21,7 @@ struct State {
 };
 
 State createState();
+std::unique_ptr<IScene> create();
 
 bool handleEvent(GameState& gs,
                  const SDL_Event& event,
