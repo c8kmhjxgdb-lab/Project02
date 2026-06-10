@@ -10,9 +10,28 @@ struct Context;
 }
 
 class EnemyManager;
+class Lightning;
+class ParticleSystem;
+class ProjectileManager;
 struct GameState;
+namespace Engine { namespace Audio { class AudioSystem; } }
 
 namespace CombatService {
+
+struct CastContext {
+    bool& isDead;
+    b2WorldId worldId;
+    b2BodyId playerBodyId;
+    glm::vec2& facingDir;
+    ProjectileManager& projectileManager;
+    ParticleSystem& particleSystem;
+    float& fireballCooldown;
+    float& fireballCooldownMax;
+    Lightning& lightning;
+    float& playerMana;
+    EnemyManager& enemyManager;
+    Engine::Audio::AudioSystem* audioSystem = nullptr;
+};
 
 struct SpawnContext {
     b2BodyId playerBodyId;
@@ -22,18 +41,21 @@ struct SpawnContext {
     b2WorldId worldId;
 };
 
-bool tryCastProjectile(GameState& gs, ProjectileType type);
+CastContext makeCastContext(GameState& gs);
 
-bool tryCastLightning(GameState& gs);
+bool tryCastProjectile(CastContext& context,
+                       ProjectileType type,
+                       const glm::vec2& playerPos,
+                       const glm::vec2& aimDir);
+
+bool tryCastLightning(CastContext& context,
+                      const glm::vec2& playerPos,
+                      const glm::vec2& aimDir);
 
 SpawnContext makeSpawnContext(GameState& gs);
 
 void spawnEnemy(SpawnContext& context, const glm::vec2& pos);
 
-void spawnEnemy(GameState& gs, const glm::vec2& pos);
-
 void handleCollisions(CombatCollisionService::Context& context);
-
-void handleCollisions(GameState& gs);
 
 }  // namespace CombatService

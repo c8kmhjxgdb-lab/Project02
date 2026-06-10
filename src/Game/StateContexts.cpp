@@ -39,8 +39,7 @@ CombatState makeCombatState(GameState& gs) {
 
 UIState makeUIState(GameState& gs) {
     return {
-        gs.appMode,
-        gs.menuSelection,
+        gs.ui.menuSelection,
         gs.dialogueTree,
         gs.dialogueUI
     };

@@ -2,6 +2,7 @@
 
 #include "Game/GameState.h"
 #include "Game/Services/PlayerInputQuery.h"
+#include "Game/Services/SaveGameService.h"
 #include "Game/Services/WorldQuery.h"
 
 #include <string>
@@ -9,13 +10,13 @@
 namespace PresentationModelBuilder {
 
 MainMenuView::Model buildMainMenuModel(const GameState& gs) {
-    SaveSystem::SaveMeta meta = gs.saveSystem.getSaveMeta("autosave");
+    SaveGameService::SaveMeta meta = SaveGameService::getSaveMeta("autosave");
     MainMenuView::Model model;
-    model.selectedIndex = gs.menuSelection;
-    model.hasSave = gs.saveSystem.hasSave("autosave");
+    model.selectedIndex = gs.ui.menuSelection;
+    model.hasSave = SaveGameService::hasSave("autosave");
     model.animationTime = gs.charTime;
-    model.message = gs.menuMessage;
-    model.messageTimer = gs.menuMessageTimer;
+    model.message = gs.ui.menuMessage;
+    model.messageTimer = gs.ui.menuMessageTimer;
     model.saveTimestamp = meta.timestamp;
     model.saveRegionName = meta.regionName;
     return model;
@@ -156,8 +157,8 @@ HudView::Model buildHudModel(const GameState& gs) {
             "/" + std::to_string(gs.questSystem.getQuestCount());
     }
     model.statusText = status;
-    model.noticeText = gs.stage7Notice;
-    model.noticeTimer = gs.stage7NoticeTimer;
+    model.noticeText = gs.ui.stage7Notice;
+    model.noticeTimer = gs.ui.stage7NoticeTimer;
     return model;
 }
 

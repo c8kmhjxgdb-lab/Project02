@@ -8,14 +8,102 @@
 		<Platform Name="x64"/>
 	</Configurations>
 	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b5daf898-0f23-3a6c-96e8-242e67fef9ff">
+		<BuildDependency Project="AudioManifestTest.vcxproj"/>
+		<BuildDependency Project="CombatCastServiceTest.vcxproj"/>
+		<BuildDependency Project="DialogueServiceRewardTest.vcxproj"/>
+		<BuildDependency Project="QuestSystemFlowTest.vcxproj"/>
+		<BuildDependency Project="RegionServiceDoorTest.vcxproj"/>
+		<BuildDependency Project="SaveDataRoundTripTest.vcxproj"/>
 		<BuildDependency Project="Starchild2D.vcxproj"/>
+		<BuildDependency Project="StarchildApp.vcxproj"/>
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
 		<Build Solution="Release|*" Project="false"/>
 		<Build Solution="MinSizeRel|*" Project="false"/>
 		<Build Solution="RelWithDebInfo|*" Project="false"/>
 	</Project>
+	<Project Path="AudioManifestTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f168d7f8-266f-38a4-a9f7-39b27212c143">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="CombatCastServiceTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="76488e4c-2f7f-31d7-98eb-db7d15a80cf9">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="Continuous.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="23b34785-987a-33f8-a026-4ded8e1d362a">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="DialogueServiceRewardTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2a4c7b50-e9d1-371c-aabd-7ad1bf1ba44d">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="Experimental.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="da887f42-9858-3efd-8aef-6200cc2661d9">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="Nightly.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b188f8c9-6f58-383c-9687-9e523e4912c2">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="NightlyMemoryCheck.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="00dc6294-d804-354d-bf8c-0ed91d74b7f1">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="QuestSystemFlowTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d56968ae-2fe5-3391-9b47-89c3f302555c">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="RUN_TESTS.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a455512e-fe89-3bb0-8936-e10ccc5e0cb4">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="RegionServiceDoorTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f128b4f0-92cd-3430-88f2-fc8ecacef7c7">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="SaveDataRoundTripTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0a4260ba-4cd2-3312-84c9-5d31e0dfa8fa">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
 	<Project Path="Starchild2D.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7269e34c-dade-31a2-9705-b81896ffd529" DefaultStartup="true">
+		<BuildDependency Project="StarchildApp.vcxproj"/>
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="StarchildApp.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="74d7fa0f-6e74-3a01-baea-ab47a57129c5">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="StarchildEngine.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="08a9f350-e4fe-3479-b936-42821a93bfbb">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="StarchildGame.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="454a407d-a5b7-3454-9332-84942c4d83e3">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
 	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ec1087a0-55b5-3350-801a-9ad186c086ab"/>

@@ -1,3 +1,17 @@
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/Experimental.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/Nightly.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/Continuous.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/NightlyMemoryCheck.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/StarchildEngine.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/StarchildGame.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/StarchildApp.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/Starchild2D.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/SaveDataRoundTripTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/CombatCastServiceTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/QuestSystemFlowTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/RegionServiceDoorTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/DialogueServiceRewardTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/AudioManifestTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/RUN_TESTS.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/ALL_BUILD.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/ZERO_CHECK.dir

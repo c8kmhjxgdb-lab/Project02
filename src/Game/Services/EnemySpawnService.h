@@ -23,6 +23,4 @@ Context makeContext(GameState& gs);
 
 void update(Context& context, float dt);
 
-void update(GameState& gs, float dt);
-
 }  // namespace EnemySpawnService

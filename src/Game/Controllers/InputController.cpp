@@ -3,12 +3,11 @@
 #include "Game/Controllers/AbilityInputController.h"
 #include "Game/Controllers/BuildingInputController.h"
 #include "Game/Controllers/InteractionInputController.h"
-#include "Game/Controllers/MainMenuInputController.h"
 #include "Game/GameState.h"
 #include "Game/Services/CombatService.h"
+#include "Game/Services/NoticeService.h"
 #include "Game/Services/PlayerInputQuery.h"
 #include "Game/Services/SaveGameService.h"
-#include "Game/Services/SessionService.h"
 
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
@@ -45,7 +44,8 @@ void handleDebugKey(GameState& gs, SDL_Scancode scancode) {
         b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
         glm::vec2 playerPos(pPos.x, pPos.y);
         glm::vec2 spawnPos(playerPos + PlayerInputQuery::getAimDirection(gs, playerPos) * 3.0f);
-        CombatService::spawnEnemy(gs, spawnPos);
+        CombatService::SpawnContext spawnContext = CombatService::makeSpawnContext(gs);
+        CombatService::spawnEnemy(spawnContext, spawnPos);
     }
 
     if (scancode == SDL_SCANCODE_H) {
@@ -72,13 +72,8 @@ void handleDebugKey(GameState& gs, SDL_Scancode scancode) {
 #endif
 
 bool handleKeyDown(GameState& gs,
-                   SDL_Scancode scancode,
-                   const InputController::Callbacks& callbacks) {
+                   SDL_Scancode scancode) {
     gs.input.setKey(scancode, true);
-
-    if (gs.appMode == AppMode::MainMenu) {
-        return MainMenuInputController::handleKeyDown(gs, scancode, callbacks);
-    }
 
     if (scancode == SDL_SCANCODE_ESCAPE) {
         if (gs.buildingSystem.isActive()) {
@@ -95,25 +90,35 @@ bool handleKeyDown(GameState& gs,
     if (scancode == SDL_SCANCODE_MINUS || scancode == SDL_SCANCODE_KP_MINUS)
         gs.camera.setZoom(gs.camera.zoom * 1.15f);
 
-    BuildingInputController::handleToggleKey(gs, scancode);
-    BuildingInputController::handleKeyDown(gs, scancode);
-    AbilityInputController::handleKeyDown(gs, scancode);
+    BuildingInputController::Context buildingContext = BuildingInputController::makeContext(gs);
+    BuildingInputController::Callbacks buildingCallbacks = BuildingInputController::makeCallbacks(gs);
+    BuildingInputController::handleToggleKey(buildingContext, scancode);
+    BuildingInputController::handleKeyDown(buildingContext, scancode, buildingCallbacks);
+    AbilityInputController::Context abilityContext = AbilityInputController::makeContext(gs);
+    AbilityInputController::Callbacks abilityCallbacks = AbilityInputController::makeCallbacks(gs);
+    AbilityInputController::handleKeyDown(abilityContext, scancode, abilityCallbacks);
+
+    InteractionInputController::Context interactionContext =
+        InteractionInputController::makeContext(gs);
 
     if (scancode == SDL_SCANCODE_E) {
-        InteractionInputController::handleInteract(gs);
+        InteractionInputController::Callbacks interactionCallbacks =
+            InteractionInputController::makeCallbacks(gs);
+        InteractionInputController::handleInteract(interactionContext, interactionCallbacks);
     }
 
-    InteractionInputController::handleDialogueNavigation(gs, scancode);
+    InteractionInputController::handleDialogueNavigation(interactionContext, scancode);
 
 #ifdef DEBUG
     handleDebugKey(gs, scancode);
 #endif
 
     if (scancode == SDL_SCANCODE_F5) {
+        NoticeService::Context noticeContext = NoticeService::makeContext(gs);
         if (SaveGameService::saveCurrentGame(gs, "autosave")) {
-            SessionService::showNotice(gs, "已保存 Saved");
+            NoticeService::showNotice(noticeContext, "已保存 Saved");
         } else {
-            SessionService::showNotice(gs, "保存失败 Save failed");
+            NoticeService::showNotice(noticeContext, "保存失败 Save failed");
         }
     }
 
@@ -125,20 +130,26 @@ bool handleKeyDown(GameState& gs,
 }
 
 bool handleMouseButtonDown(GameState& gs,
-                           const SDL_MouseButtonEvent& buttonEvent,
-                           const InputController::Callbacks& callbacks) {
+                           const SDL_MouseButtonEvent& buttonEvent) {
     gs.input.mousePos = glm::vec2(static_cast<float>(buttonEvent.x),
                                   static_cast<float>(buttonEvent.y));
 
-    if (gs.appMode == AppMode::MainMenu) {
-        return MainMenuInputController::handleMouseButtonDown(gs, buttonEvent, callbacks);
-    }
-
     if (!gs.isDead && !gs.dialogueUI.isVisible() && !gs.toySystem.isMiniCarActive()) {
         if (gs.buildingSystem.isActive()) {
-            BuildingInputController::handleMouseButtonDown(gs, buttonEvent.button);
+            BuildingInputController::Context buildingContext = BuildingInputController::makeContext(gs);
+            BuildingInputController::Callbacks buildingCallbacks =
+                BuildingInputController::makeCallbacks(gs);
+            BuildingInputController::handleMouseButtonDown(
+                buildingContext,
+                buttonEvent.button,
+                buildingCallbacks);
         } else {
-            AbilityInputController::handleMouseButtonDown(gs, buttonEvent.button);
+            AbilityInputController::Context abilityContext = AbilityInputController::makeContext(gs);
+            AbilityInputController::Callbacks abilityCallbacks = AbilityInputController::makeCallbacks(gs);
+            AbilityInputController::handleMouseButtonDown(
+                abilityContext,
+                buttonEvent.button,
+                abilityCallbacks);
         }
     }
 
@@ -150,15 +161,18 @@ bool handleMouseButtonDown(GameState& gs,
 namespace InputController {
 
 bool handleEvent(GameState& gs, const SDL_Event& e, const Callbacks& callbacks) {
+    (void)callbacks;
+
     if (e.type == SDL_KEYDOWN) {
-        return handleKeyDown(gs, e.key.keysym.scancode, callbacks);
+        return handleKeyDown(gs, e.key.keysym.scancode);
     }
 
     if (e.type == SDL_KEYUP) {
         SDL_Scancode scancode = e.key.keysym.scancode;
         gs.input.setKey(scancode, false);
     } else if (e.type == SDL_MOUSEWHEEL) {
-        if (BuildingInputController::handleMouseWheel(gs, e.wheel.y)) {
+        BuildingInputController::Context buildingContext = BuildingInputController::makeContext(gs);
+        if (BuildingInputController::handleMouseWheel(buildingContext, e.wheel.y)) {
             // Building controller consumed the wheel.
         } else if (e.wheel.y > 0) {
             gs.camera.setZoom(gs.camera.zoom * 1.15f);
@@ -169,7 +183,7 @@ bool handleEvent(GameState& gs, const SDL_Event& e, const Callbacks& callbacks) 
         gs.input.mousePos = glm::vec2(static_cast<float>(e.motion.x),
                                       static_cast<float>(e.motion.y));
     } else if (e.type == SDL_MOUSEBUTTONDOWN) {
-        return handleMouseButtonDown(gs, e.button, callbacks);
+        return handleMouseButtonDown(gs, e.button);
     }
 
     return false;

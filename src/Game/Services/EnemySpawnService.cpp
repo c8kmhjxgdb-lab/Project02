@@ -52,9 +52,4 @@ void update(Context& context, float dt) {
     CombatService::spawnEnemy(context.combatSpawn, spawnPos);
 }
 
-void update(GameState& gs, float dt) {
-    Context context = makeContext(gs);
-    update(context, dt);
-}
-
 }  // namespace EnemySpawnService

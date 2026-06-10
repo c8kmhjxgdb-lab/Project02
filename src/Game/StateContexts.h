@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Game/Scenes/AppMode.h"
-
 #include <glm/vec2.hpp>
 
 class BuildingSystem;
@@ -58,7 +56,6 @@ struct CombatState {
 };
 
 struct UIState {
-    AppMode& appMode;
     int& menuSelection;
     DialogueTree& dialogueTree;
     DialogueUI& dialogueUI;

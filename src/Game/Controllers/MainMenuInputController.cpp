@@ -20,10 +20,10 @@ bool handleKeyDown(GameState& gs,
         return true;
     }
     if (scancode == SDL_SCANCODE_W || scancode == SDL_SCANCODE_UP) {
-        gs.menuSelection = (gs.menuSelection + MainMenuView::kMenuItemCount - 1) %
+        gs.ui.menuSelection = (gs.ui.menuSelection + MainMenuView::kMenuItemCount - 1) %
             MainMenuView::kMenuItemCount;
     } else if (scancode == SDL_SCANCODE_S || scancode == SDL_SCANCODE_DOWN) {
-        gs.menuSelection = (gs.menuSelection + 1) % MainMenuView::kMenuItemCount;
+        gs.ui.menuSelection = (gs.ui.menuSelection + 1) % MainMenuView::kMenuItemCount;
     } else if (scancode == SDL_SCANCODE_RETURN ||
                scancode == SDL_SCANCODE_KP_ENTER ||
                scancode == SDL_SCANCODE_SPACE) {
@@ -48,7 +48,7 @@ bool handleMouseButtonDown(GameState& gs,
         return false;
     }
 
-    gs.menuSelection = hit;
+    gs.ui.menuSelection = hit;
     return activateMenuSelection(gs, callbacks);
 }
 

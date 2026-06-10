@@ -1,116 +1,132 @@
 #include "Game/Controllers/InteractionInputController.h"
 
+#include "Game/Building/BuildingSystem.h"
+#include "Game/Emotion/EmotionSystem.h"
+#include "Game/Emotion/VentAnimation.h"
 #include "Game/GameState.h"
-#include "Game/Services/SessionService.h"
+#include "Game/Services/DialogueService.h"
+#include "Game/Services/NoticeService.h"
+#include "Game/Services/RegionService.h"
 #include "Game/Services/WorldQuery.h"
+#include "Game/Social/DialogueTree.h"
+#include "Game/Social/Princess.h"
+#include "Game/World/RegionManager.h"
+#include "Game/World/TimeSystem.h"
+#include "Game/World/WeatherSystem.h"
 
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
 
 namespace {
 
-bool isGameplayActionAllowed(const GameState& gs) {
-    return !gs.isDead && !gs.buildingSystem.isActive() && !gs.toySystem.isMiniCarActive();
+bool isGameplayActionAllowed(const InteractionInputController::Context& context) {
+    return !context.isDead &&
+           !context.buildingSystem.isActive() &&
+           !context.toySystem.isMiniCarActive();
+}
+
+glm::vec2 getPlayerPosition(const InteractionInputController::Context& context) {
+    b2Vec2 pos = b2Body_GetPosition(context.playerBodyId);
+    return glm::vec2(pos.x, pos.y);
+}
+
+void showNotice(InteractionInputController::Context& context,
+                const InteractionInputController::Callbacks& callbacks,
+                const std::string& notice) {
+    if (callbacks.showNotice) {
+        callbacks.showNotice(context, notice);
+    }
+}
+
+DialogueService::NoticeSink makeNoticeSink(InteractionInputController::Context& context,
+                                           const InteractionInputController::Callbacks& callbacks) {
+    return {
+        [&context, &callbacks](const std::string& notice) {
+            showNotice(context, callbacks, notice);
+        }
+    };
 }
 
 }  // namespace
 
 namespace InteractionInputController {
 
-void handleDialogueNavigation(GameState& gs, SDL_Scancode scancode) {
-    if (!gs.dialogueUI.isVisible()) return;
-
-    if (scancode == SDL_SCANCODE_W || scancode == SDL_SCANCODE_UP) {
-        gs.dialogueUI.navigateUp();
-    } else if (scancode == SDL_SCANCODE_S || scancode == SDL_SCANCODE_DOWN) {
-        gs.dialogueUI.navigateDown();
-    } else if (scancode == SDL_SCANCODE_J || scancode == SDL_SCANCODE_SPACE) {
-        gs.dialogueUI.confirm();
-        if (gs.dialogueTree.getCurrentNode() && !gs.dialogueTree.getCurrentNode()->choices.empty()) {
-            gs.dialogueTree.choose(gs.dialogueUI.getSelectedChoice());
-        } else {
-            gs.dialogueTree.next();
+Context makeContext(GameState& gs) {
+    return {
+        gs.isDead,
+        gs.buildingSystem,
+        gs.toySystem,
+        gs.dialogueTree,
+        gs.dialogueUI,
+        gs.regionManager,
+        gs.timeSystem,
+        gs.emotionSystem,
+        gs.weatherSystem,
+        gs.ventAnimation,
+        gs.princess,
+        gs.playerBodyId,
+        gs.homePosition,
+        gs.homeRadius,
+        gs.isVenting,
+        gs.ui.talkedWithPrincessAtBaseThisFrame,
+        {
+            gs.buildingSystem,
+            gs.dialogueTree,
+            gs.dialogueUI,
+            gs.regionManager,
+            gs.timeSystem,
+            gs.emotionSystem,
+            gs.weatherSystem,
+            gs.ventAnimation,
+            gs.princess,
+            gs.homePosition,
+            gs.homeRadius,
+            gs.isVenting,
+            gs.ui.talkedWithPrincessAtBaseThisFrame
         }
-    }
+    };
 }
 
-void handleInteract(GameState& gs) {
-    if (!isGameplayActionAllowed(gs)) return;
-
-    b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
-    glm::vec2 playerPos(pPos.x, pPos.y);
-
-    if (gs.dialogueTree.isActive()) {
-        if (gs.dialogueUI.isVisible()) {
-            gs.dialogueUI.confirm();
-            const DialogueNode* currentNode = gs.dialogueTree.getCurrentNode();
-            if (currentNode && currentNode->choices.empty()) {
-                gs.dialogueTree.next();
-            } else if (currentNode) {
-                gs.dialogueTree.choose(gs.dialogueUI.getSelectedChoice());
-            }
-        } else {
-            gs.dialogueTree.next();
+Callbacks makeCallbacks(GameState& gs) {
+    return {
+        [&gs](Context&, const glm::vec2& playerPos) {
+            RegionService::DoorContext doorContext = RegionService::makeDoorContext(gs);
+            return RegionService::tryUseHomeBaseDoor(doorContext, playerPos);
+        },
+        [&gs](Context&, const std::string& notice) {
+            NoticeService::Context noticeContext = NoticeService::makeContext(gs);
+            NoticeService::showNotice(noticeContext, notice);
         }
-    } else if (SessionService::tryUseHomeBaseDoor(gs, playerPos)) {
+    };
+}
+
+void handleDialogueNavigation(Context& context, SDL_Scancode scancode) {
+    DialogueService::handleNavigation(context.dialogue, scancode);
+}
+
+void handleInteract(Context& context, const Callbacks& callbacks) {
+    if (!isGameplayActionAllowed(context)) return;
+
+    glm::vec2 playerPos = getPlayerPosition(context);
+
+    DialogueService::NoticeSink noticeSink = makeNoticeSink(context, callbacks);
+
+    if (DialogueService::advanceActiveDialogue(context.dialogue)) {
+    } else if (callbacks.tryUseHomeBaseDoor &&
+               callbacks.tryUseHomeBaseDoor(context, playerPos)) {
         // Enter/leave the secret base via home POIs.
-    } else if (WorldQuery::isCurrentRegion(gs.regionManager, "home_base")) {
-        MapRegion* buildRegion = gs.regionManager.getCurrentRegion();
-        bool nearBed = buildRegion && WorldQuery::isNearFurniture(
-            gs.buildingSystem,
-            buildRegion->getTileMap(),
-            "simple_bed",
-            playerPos,
-            2.2f);
-        if (nearBed) {
-            gs.timeSystem.restUntil(gs.timeSystem.getRestUntilHour());
-            gs.emotionSystem.reduceGrievance(
-                25.0f + static_cast<float>(gs.buildingSystem.getComfort()) * 0.2f);
-            gs.emotionSystem.addChildlikeHeart(
-                gs.timeSystem.getRestChildlikeHeartReward() +
-                static_cast<float>(gs.buildingSystem.getChildlikeRestoreBonus()));
-            if (gs.princess) {
-                gs.princess->addAffection(2.0f);
-            }
-            SessionService::showNotice(gs, "床铺休息 Rest: 童心恢复，委屈下降");
-        } else if (gs.princess && gs.princess->canInteract(playerPos, 2.0f)) {
-            gs.talkedWithPrincessAtBaseThisFrame = true;
-            WeatherType currentWeather = gs.weatherSystem.getCurrentWeather();
-            bool rainy = currentWeather == WeatherType::Rain ||
-                         currentWeather == WeatherType::HeavyRain;
-            if (rainy && gs.timeSystem.isNighttime()) {
-                gs.dialogueTree.start("base_rain_night");
-                gs.emotionSystem.reduceGrievance(12.0f);
-                gs.emotionSystem.addChildlikeHeart(10.0f);
-                gs.princess->addAffection(3.0f);
-                SessionService::showNotice(gs, "雨夜谈心 Rain talk: 童心 +10");
-            } else if (gs.emotionSystem.isLowChildlikeHeart()) {
-                gs.dialogueTree.start("base_low_heart");
-                gs.emotionSystem.reduceGrievance(8.0f);
-                gs.emotionSystem.addChildlikeHeart(16.0f);
-                gs.princess->addAffection(2.0f);
-                SessionService::showNotice(gs, "低童心安抚 Comfort: 童心 +16");
-            } else {
-                gs.dialogueTree.start("start");
-            }
-        } else if (gs.emotionSystem.getState().grievance > 30.0f) {
-            gs.isVenting = true;
-            gs.ventAnimation.start(playerPos);
-            gs.emotionSystem.vent();
-            SessionService::showNotice(gs, "宣泄 Vent: 委屈清空");
+    } else if (WorldQuery::isCurrentRegion(context.regionManager, "home_base")) {
+        if (DialogueService::tryRestAtBaseBed(context.dialogue, playerPos, noticeSink)) {
+            return;
         }
-    } else if (gs.princess && gs.princess->canInteract(playerPos, 2.0f)) {
-        gs.dialogueTree.start("start");
-    } else if (WorldQuery::isPlayerAtHome(
-                   gs.regionManager,
-                   gs.homePosition,
-                   gs.homeRadius,
-                   playerPos) &&
-               gs.emotionSystem.getState().grievance > 30.0f) {
-        gs.isVenting = true;
-        gs.ventAnimation.start(playerPos);
-        gs.emotionSystem.vent();
-        SessionService::showNotice(gs, "宣泄 Vent: 委屈清空");
+        if (DialogueService::tryStartPrincessDialogue(context.dialogue, playerPos, noticeSink)) {
+            return;
+        }
+        DialogueService::tryVent(context.dialogue, playerPos, noticeSink);
+    } else if (DialogueService::tryStartPrincessDialogue(context.dialogue, playerPos, noticeSink)) {
+        return;
+    } else {
+        DialogueService::tryVent(context.dialogue, playerPos, noticeSink);
     }
 }
 

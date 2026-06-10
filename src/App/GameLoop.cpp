@@ -16,7 +16,14 @@ void run(SDL_Window* window, GameState& gs) {
     const float dt = 1.0f / 60.0f;
 
     InputController::Callbacks inputCallbacks;
-    inputCallbacks.activateMainMenuSelection = GameSessionService::activateMainMenuSelection;
+    inputCallbacks.activateMainMenuSelection = [&sceneState](GameState& state) {
+        GameSessionService::MenuActivationResult result =
+            GameSessionService::activateMainMenuSelection(state);
+        if (result.enterPlaying) {
+            SceneManager::requestMode(sceneState, AppMode::Playing);
+        }
+        return result.quit;
+    };
 
     while (running) {
         SDL_Event e;

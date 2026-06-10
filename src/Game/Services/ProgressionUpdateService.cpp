@@ -2,7 +2,7 @@
 
 #include "Game/GameState.h"
 #include "Game/Quest/QuestSystem.h"
-#include "Game/Services/SessionService.h"
+#include "Game/Services/NoticeService.h"
 #include "Game/Services/WorldQuery.h"
 #include "Game/Toy/ToySystem.h"
 #include "Game/World/WeatherSystem.h"
@@ -129,9 +129,10 @@ Context makeContext(GameState& gs) {
         gs.princess.get(),
         gs.weatherSystem,
         gs.questSystem,
-        gs.talkedWithPrincessAtBaseThisFrame,
+        gs.ui.talkedWithPrincessAtBaseThisFrame,
         [&gs](const std::string& notice) {
-            SessionService::showNotice(gs, notice);
+            NoticeService::Context noticeContext = NoticeService::makeContext(gs);
+            NoticeService::showNotice(noticeContext, notice);
         }
     };
 }

@@ -5,6 +5,24 @@
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\x64\Release\ZERO_CHECK</FullPath>
     </ProjectOutput>
     <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\AudioManifestTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\CombatCastServiceTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\DialogueServiceRewardTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\QuestSystemFlowTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\RegionServiceDoorTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\SaveDataRoundTripTest.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
       <FullPath>E:\DouBao2\Project\KatCode\Project02\build\Release\Starchild2D.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>

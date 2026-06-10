@@ -87,9 +87,4 @@ void emitTrails(Context& context) {
     }
 }
 
-void emitTrails(GameState& gs) {
-    Context context = makeContext(gs);
-    emitTrails(context);
-}
-
 }  // namespace ProjectileTrailService

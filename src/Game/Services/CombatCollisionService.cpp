@@ -217,9 +217,4 @@ void handleCollisions(Context& context) {
     }
 }
 
-void handleCollisions(GameState& gs) {
-    Context context = makeContext(gs);
-    handleCollisions(context);
-}
-
 }  // namespace CombatCollisionService

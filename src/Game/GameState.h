@@ -6,6 +6,7 @@
 #include <glm/vec2.hpp>
 
 #include "Engine/Camera/Camera2D.h"
+#include "Engine/Audio/AudioSystem.h"
 #include "Engine/Physics/PhysicsWorld.h"
 #include "Engine/Renderer/DecorRenderer.h"
 #include "Engine/Renderer/DialogueUI.h"
@@ -28,10 +29,9 @@
 #include "Game/Health.h"
 #include "Game/Inventory/Inventory.h"
 #include "Game/Quest/QuestSystem.h"
-#include "Game/SaveSystem.h"
-#include "Game/Scenes/AppMode.h"
 #include "Game/Social/DialogueTree.h"
 #include "Game/Social/Princess.h"
+#include "Game/State/GameUiState.h"
 #include "Game/Toy/ToySystem.h"
 #include "Game/World/Decoration.h"
 #include "Game/World/MapTileManager.h"
@@ -98,6 +98,9 @@ struct GameState {
 
     // Physics
     PhysicsWorld physicsWorld;
+
+    // Audio
+    Engine::Audio::AudioSystem audioSystem;
 
     // Health
     HealthComponent playerHealth;
@@ -231,9 +234,6 @@ struct GameState {
     // Pathfinding system (A* pathfinding)
     PathfindingSystem pathfinding;
 
-    // Save/Load system
-    SaveSystem saveSystem;
-
     // Time system (day/night cycle)
     TimeSystem timeSystem;
 
@@ -251,15 +251,9 @@ struct GameState {
 
     // Stage 7: base quest loop
     QuestSystem questSystem;
-    std::string stage7Notice;
-    float stage7NoticeTimer = 0.0f;
-    bool talkedWithPrincessAtBaseThisFrame = false;
 
     // Main menu / persistent runtime state
-    AppMode appMode = AppMode::MainMenu;
-    int menuSelection = 0;
-    std::string menuMessage;
-    float menuMessageTimer = 0.0f;
+    GameUiState ui;
     float totalPlayTimeSeconds = 0.0f;
     bool miniMapInitialized = false;
     bool decorRendererInitialized = false;

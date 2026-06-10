@@ -19,7 +19,7 @@ Context makeContext(GameState& gs) {
         gs.gameTime,
         gs.worldId,
         gs.playerBodyId,
-        SessionService::makeRegionGameplayContext(gs)
+        RegionService::makeGameplayContext(gs)
     };
 }
 
@@ -79,7 +79,7 @@ void update(Context& context,
                                          cur->getTileMap().tileSize);
         context.miniMap.forceUpdate(playerPosNow);
         state.lastRegionId = curId;
-        SessionService::refreshRegionGameplayContext(context.regionGameplay);
+        RegionService::refreshGameplayContext(context.regionGameplay);
     }
 }
 

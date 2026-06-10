@@ -1,8 +1,10 @@
 #include "Game/Services/CombatService.h"
 
+#include "Engine/Renderer/ParticleSystem.h"
+#include "Game/Ability/Lightning.h"
 #include "Game/GameState.h"
+#include "Game/Services/AudioService.h"
 #include "Game/Services/CombatCollisionService.h"
-#include "Game/Services/PlayerInputQuery.h"
 #include "Utils/Math.h"
 
 #include <box2d/box2d.h>
@@ -54,12 +56,30 @@ const Enemy* findLightningTarget(const std::vector<const Enemy*>& enemies,
 
 namespace CombatService {
 
-bool tryCastProjectile(GameState& gs, ProjectileType type) {
-    if (gs.isDead || gs.fireballCooldown > 0.0f) return false;
+CastContext makeCastContext(GameState& gs) {
+    return {
+        gs.isDead,
+        gs.worldId,
+        gs.playerBodyId,
+        gs.facingDir,
+        gs.projectileManager,
+        gs.particleSystem,
+        gs.fireballCooldown,
+        gs.fireballCooldownMax,
+        gs.lightning,
+        gs.playerMana,
+        gs.enemyManager,
+        &gs.audioSystem
+    };
+}
 
-    glm::vec2 playerPos = PlayerInputQuery::getPlayerPosition(gs);
-    glm::vec2 aimDir = PlayerInputQuery::getAimDirection(gs, playerPos);
-    gs.facingDir = aimDir;
+bool tryCastProjectile(CastContext& context,
+                       ProjectileType type,
+                       const glm::vec2& playerPos,
+                       const glm::vec2& aimDir) {
+    if (context.isDead || context.fireballCooldown > 0.0f) return false;
+
+    context.facingDir = aimDir;
 
     float damage = 25.0f;
     float speed = 18.0f;
@@ -72,40 +92,69 @@ bool tryCastProjectile(GameState& gs, ProjectileType type) {
     }
 
     glm::vec2 muzzlePos = playerPos + aimDir * 0.48f;
-    gs.projectileManager.fire(gs.worldId, muzzlePos, aimDir, type, damage, speed, gs.playerBodyId);
-    gs.fireballCooldown = gs.fireballCooldownMax;
+    context.projectileManager.fire(
+        context.worldId,
+        muzzlePos,
+        aimDir,
+        type,
+        damage,
+        speed,
+        context.playerBodyId);
+    context.fireballCooldown = context.fireballCooldownMax;
     if (type == ProjectileType::Fireball) {
-        gs.particleSystem.emitBurst(muzzlePos, 8, particleColor, 2.5f, 0.18f, 0.075f);
-        gs.particleSystem.emitRing(muzzlePos, 8, glm::vec3(1.0f, 0.25f, 0.05f), 0.18f, 0.16f, 0.030f);
+        context.particleSystem.emitBurst(muzzlePos, 8, particleColor, 2.5f, 0.18f, 0.075f);
+        context.particleSystem.emitRing(
+            muzzlePos,
+            8,
+            glm::vec3(1.0f, 0.25f, 0.05f),
+            0.18f,
+            0.16f,
+            0.030f);
     } else {
-        gs.particleSystem.emitBurst(muzzlePos, 7, particleColor, 1.8f, 0.22f, 0.060f);
-        gs.particleSystem.emitRing(muzzlePos, 10, glm::vec3(0.72f, 0.92f, 1.0f), 0.22f, 0.20f, 0.026f);
+        context.particleSystem.emitBurst(muzzlePos, 7, particleColor, 1.8f, 0.22f, 0.060f);
+        context.particleSystem.emitRing(
+            muzzlePos,
+            10,
+            glm::vec3(0.72f, 0.92f, 1.0f),
+            0.22f,
+            0.20f,
+            0.026f);
+    }
+    if (context.audioSystem) {
+        AudioService::playSkillSfx(
+            *context.audioSystem,
+            type == ProjectileType::IceSpike ? "ice_spike" : "fireball");
     }
     return true;
 }
 
-bool tryCastLightning(GameState& gs) {
-    if (gs.isDead || !gs.lightning.canCast() || gs.playerMana < gs.lightning.getManaCost()) {
+bool tryCastLightning(CastContext& context,
+                      const glm::vec2& playerPos,
+                      const glm::vec2& aimDir) {
+    if (context.isDead ||
+        !context.lightning.canCast() ||
+        context.playerMana < context.lightning.getManaCost()) {
         return false;
     }
 
-    glm::vec2 playerPos = PlayerInputQuery::getPlayerPosition(gs);
-    glm::vec2 aimDir = PlayerInputQuery::getAimDirection(gs, playerPos);
-    gs.facingDir = aimDir;
+    context.facingDir = aimDir;
 
-    gs.lightning.begin(playerPos);
-    gs.playerMana -= gs.lightning.getManaCost();
-    gs.lightning.setCooldown(3.0f);
+    context.lightning.begin(playerPos);
+    context.playerMana -= context.lightning.getManaCost();
+    context.lightning.setCooldown(3.0f);
+    if (context.audioSystem) {
+        AudioService::playSkillSfx(*context.audioSystem, "lightning");
+    }
 
-    float currentDamage = gs.lightning.getBaseDamage();
+    float currentDamage = context.lightning.getBaseDamage();
     glm::vec2 currentPos = playerPos;
-    float range = gs.lightning.getChainRange();
-    auto aliveEnemies = gs.enemyManager.getAlive();
+    float range = context.lightning.getChainRange();
+    auto aliveEnemies = context.enemyManager.getAlive();
 
-    for (int chainIndex = 0; chainIndex < gs.lightning.getMaxChains(); ++chainIndex) {
+    for (int chainIndex = 0; chainIndex < context.lightning.getMaxChains(); ++chainIndex) {
         const Enemy* target = findLightningTarget(
             aliveEnemies,
-            gs.lightning.getCurrentChain(),
+            context.lightning.getCurrentChain(),
             currentPos,
             aimDir,
             range,
@@ -116,7 +165,7 @@ bool tryCastLightning(GameState& gs) {
         if (!target && chainIndex == 0) {
             target = findLightningTarget(
                 aliveEnemies,
-                gs.lightning.getCurrentChain(),
+                context.lightning.getCurrentChain(),
                 currentPos,
                 aimDir,
                 range,
@@ -126,12 +175,12 @@ bool tryCastLightning(GameState& gs) {
 
         b2Vec2 ePos = b2Body_GetPosition(target->bodyId);
         glm::vec2 enemyPos(ePos.x, ePos.y);
-        gs.lightning.addHit(enemyPos, currentDamage, target->bodyId);
-        gs.enemyManager.damage(target->id, currentDamage);
-        gs.particleSystem.emitBurst(enemyPos, 6,
+        context.lightning.addHit(enemyPos, currentDamage, target->bodyId);
+        context.enemyManager.damage(target->id, currentDamage);
+        context.particleSystem.emitBurst(enemyPos, 6,
             glm::vec3(0.5f, 0.8f, 1.0f), 4.0f, 0.3f, 0.08f);
 
-        currentDamage *= gs.lightning.getCurrentChain().damageDecay;
+        currentDamage *= context.lightning.getCurrentChain().damageDecay;
         currentPos = enemyPos;
     }
 
@@ -167,17 +216,8 @@ void spawnEnemy(SpawnContext& context, const glm::vec2& pos) {
     context.enemyManager.spawn(context.worldId, pos, type);
 }
 
-void spawnEnemy(GameState& gs, const glm::vec2& pos) {
-    SpawnContext context = makeSpawnContext(gs);
-    spawnEnemy(context, pos);
-}
-
 void handleCollisions(CombatCollisionService::Context& context) {
     CombatCollisionService::handleCollisions(context);
-}
-
-void handleCollisions(GameState& gs) {
-    CombatCollisionService::handleCollisions(gs);
 }
 
 }  // namespace CombatService

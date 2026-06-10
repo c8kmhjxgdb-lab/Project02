@@ -1,102 +1,190 @@
 #include "Game/Controllers/AbilityInputController.h"
 
 #include "Game/GameState.h"
-#include "Game/Services/CombatService.h"
 #include "Game/Services/PlayerInputQuery.h"
 
 #include <box2d/box2d.h>
+#include <glm/geometric.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#include <cmath>
+
 namespace {
 
-bool isGameplayActionAllowed(const GameState& gs) {
-    return !gs.isDead && !gs.buildingSystem.isActive() && !gs.toySystem.isMiniCarActive();
+bool isGameplayActionAllowed(const AbilityInputController::Context& context) {
+    return !context.isDead &&
+           !context.buildingSystem.isActive() &&
+           !context.toySystem.isMiniCarActive();
+}
+
+glm::vec2 getPlayerPosition(const AbilityInputController::Context& context) {
+    b2Vec2 pos = b2Body_GetPosition(context.playerBodyId);
+    return glm::vec2(pos.x, pos.y);
+}
+
+glm::vec2 getAimDirection(const AbilityInputController::Context& context,
+                          const AbilityInputController::Callbacks& callbacks,
+                          const glm::vec2& origin) {
+    glm::vec2 target = callbacks.getMouseWorldPoint
+        ? callbacks.getMouseWorldPoint(context)
+        : origin + context.facingDir;
+    glm::vec2 dir = target - origin;
+    float lenSq = glm::dot(dir, dir);
+    if (lenSq <= 0.0001f) {
+        dir = context.facingDir;
+        lenSq = glm::dot(dir, dir);
+    }
+    if (lenSq <= 0.0001f) {
+        return glm::vec2(1.0f, 0.0f);
+    }
+    return dir / std::sqrt(lenSq);
 }
 
 }  // namespace
 
 namespace AbilityInputController {
 
-void handleKeyDown(GameState& gs, SDL_Scancode scancode) {
-    if (scancode == SDL_SCANCODE_J && isGameplayActionAllowed(gs)) {
-        CombatService::tryCastProjectile(gs, ProjectileType::Fireball);
+Context makeContext(GameState& gs) {
+    return {
+        gs.isDead,
+        gs.buildingSystem,
+        gs.toySystem,
+        gs.superStrength,
+        gs.shield,
+        gs.bondTechnique,
+        gs.particleSystem,
+        gs.princess,
+        gs.worldId,
+        gs.playerBodyId,
+        gs.facingDir,
+        gs.playerMana,
+        gs.isFlying,
+        gs.flightHeight,
+        gs.flightHeightTarget,
+        gs.flightMaxHeight,
+        gs.flightCooldown,
+        gs.shieldCooldown,
+        gs.shieldCooldownMax,
+        CombatService::makeCastContext(gs)
+    };
+}
+
+Callbacks makeCallbacks(GameState& gs) {
+    return {
+        [&gs](const Context&) {
+            return PlayerInputQuery::getMouseWorldPoint(gs);
+        }
+    };
+}
+
+void handleKeyDown(Context& context, SDL_Scancode scancode, const Callbacks& callbacks) {
+    if (scancode == SDL_SCANCODE_J && isGameplayActionAllowed(context)) {
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        CombatService::tryCastProjectile(
+            context.castContext,
+            ProjectileType::Fireball,
+            playerPos,
+            aimDir);
     }
 
-    if (scancode == SDL_SCANCODE_L && isGameplayActionAllowed(gs)) {
-        CombatService::tryCastProjectile(gs, ProjectileType::IceSpike);
+    if (scancode == SDL_SCANCODE_L && isGameplayActionAllowed(context)) {
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        CombatService::tryCastProjectile(
+            context.castContext,
+            ProjectileType::IceSpike,
+            playerPos,
+            aimDir);
     }
 
-    if (scancode == SDL_SCANCODE_K && isGameplayActionAllowed(gs)) {
-        glm::vec2 playerPos = PlayerInputQuery::getPlayerPosition(gs);
-        glm::vec2 aimDir = PlayerInputQuery::getAimDirection(gs, playerPos);
-        gs.facingDir = aimDir;
-        if (gs.superStrength.isGrabbing()) {
-            gs.superStrength.throwObject(aimDir, 20.0f);
+    if (scancode == SDL_SCANCODE_K && isGameplayActionAllowed(context)) {
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        context.facingDir = aimDir;
+        if (context.superStrength.isGrabbing()) {
+            context.superStrength.throwObject(aimDir, 20.0f);
         } else {
-            gs.superStrength.tryGrab(gs.worldId, gs.playerBodyId, aimDir);
+            context.superStrength.tryGrab(context.worldId, context.playerBodyId, aimDir);
         }
     }
 
-    if (scancode == SDL_SCANCODE_SPACE && !gs.isDead
-        && !gs.buildingSystem.isActive()
-        && !gs.toySystem.isMiniCarActive()
-        && gs.flightCooldown <= 0.0f
-        && gs.playerMana >= 5.0f
-        && gs.flightHeight <= 0.1f) {
-        if (!gs.isFlying) {
-            gs.isFlying = true;
-            gs.flightHeightTarget = gs.flightMaxHeight;
+    if (scancode == SDL_SCANCODE_SPACE && !context.isDead
+        && !context.buildingSystem.isActive()
+        && !context.toySystem.isMiniCarActive()
+        && context.flightCooldown <= 0.0f
+        && context.playerMana >= 5.0f
+        && context.flightHeight <= 0.1f) {
+        if (!context.isFlying) {
+            context.isFlying = true;
+            context.flightHeightTarget = context.flightMaxHeight;
         }
     }
 
-    if (scancode == SDL_SCANCODE_F && !gs.isDead && !gs.shield.isActive()
-        && !gs.buildingSystem.isActive()
-        && !gs.toySystem.isMiniCarActive()
-        && gs.shieldCooldown <= 0.0f
-        && gs.playerMana >= 15.0f) {
-        gs.shield.activate(15.0f);
-        gs.playerMana -= 15.0f;
-        gs.shieldCooldown = gs.shieldCooldownMax;
+    if (scancode == SDL_SCANCODE_F && !context.isDead && !context.shield.isActive()
+        && !context.buildingSystem.isActive()
+        && !context.toySystem.isMiniCarActive()
+        && context.shieldCooldown <= 0.0f
+        && context.playerMana >= 15.0f) {
+        context.shield.activate(15.0f);
+        context.playerMana -= 15.0f;
+        context.shieldCooldown = context.shieldCooldownMax;
 
-        b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
-        gs.particleSystem.emitRing(glm::vec2(pPos.x, pPos.y),
+        b2Vec2 pPos = b2Body_GetPosition(context.playerBodyId);
+        context.particleSystem.emitRing(glm::vec2(pPos.x, pPos.y),
             16, glm::vec3(0.3f, 0.7f, 1.0f),
-            gs.shield.getRadius(), 0.5f, 0.1f);
+            context.shield.getRadius(), 0.5f, 0.1f);
     }
 
-    if (scancode == SDL_SCANCODE_Q && isGameplayActionAllowed(gs)) {
-        CombatService::tryCastLightning(gs);
+    if (scancode == SDL_SCANCODE_Q && isGameplayActionAllowed(context)) {
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        CombatService::tryCastLightning(context.castContext, playerPos, aimDir);
     }
 
-    if (scancode == SDL_SCANCODE_G && !gs.isDead
-        && !gs.buildingSystem.isActive()
-        && !gs.toySystem.isMiniCarActive()
-        && gs.princess && gs.princess->isFollowing()
-        && gs.princess->isUltimateReady()
-        && gs.bondTechnique.canActivate()) {
-        b2Vec2 pPos = b2Body_GetPosition(gs.playerBodyId);
+    if (scancode == SDL_SCANCODE_G && !context.isDead
+        && !context.buildingSystem.isActive()
+        && !context.toySystem.isMiniCarActive()
+        && context.princess && context.princess->isFollowing()
+        && context.princess->isUltimateReady()
+        && context.bondTechnique.canActivate()) {
+        b2Vec2 pPos = b2Body_GetPosition(context.playerBodyId);
         glm::vec2 centerPos(pPos.x, pPos.y);
 
-        gs.bondTechnique.activate(centerPos);
-        gs.princess->ultimateCharge = 0.0f;
-        gs.bondTechnique.setCooldown(30.0f);
+        context.bondTechnique.activate(centerPos);
+        context.princess->ultimateCharge = 0.0f;
+        context.bondTechnique.setCooldown(30.0f);
 
-        gs.particleSystem.emitBurst(centerPos, 40,
+        context.particleSystem.emitBurst(centerPos, 40,
             glm::vec3(1.0f, 0.9f, 0.5f), 8.0f, 0.8f, 0.15f);
-        gs.particleSystem.emitRing(centerPos, 24,
+        context.particleSystem.emitRing(centerPos, 24,
             glm::vec3(1.0f, 0.7f, 0.3f),
-            gs.bondTechnique.getMaxRadius(), 1.0f, 0.2f);
+            context.bondTechnique.getMaxRadius(), 1.0f, 0.2f);
     }
 }
 
-void handleMouseButtonDown(GameState& gs, Uint8 button) {
+void handleMouseButtonDown(Context& context, Uint8 button, const Callbacks& callbacks) {
     if (button == SDL_BUTTON_LEFT) {
-        CombatService::tryCastProjectile(gs, ProjectileType::Fireball);
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        CombatService::tryCastProjectile(
+            context.castContext,
+            ProjectileType::Fireball,
+            playerPos,
+            aimDir);
     } else if (button == SDL_BUTTON_RIGHT) {
-        CombatService::tryCastProjectile(gs, ProjectileType::IceSpike);
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        CombatService::tryCastProjectile(
+            context.castContext,
+            ProjectileType::IceSpike,
+            playerPos,
+            aimDir);
     } else if (button == SDL_BUTTON_MIDDLE) {
-        CombatService::tryCastLightning(gs);
+        glm::vec2 playerPos = getPlayerPosition(context);
+        glm::vec2 aimDir = getAimDirection(context, callbacks, playerPos);
+        CombatService::tryCastLightning(context.castContext, playerPos, aimDir);
     }
 }
 

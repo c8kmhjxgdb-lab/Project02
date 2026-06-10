@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Game/Services/SessionService.h"
+#include "Game/Services/RegionService.h"
 
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
@@ -30,7 +30,7 @@ struct Context {
     float& gameTime;
     b2WorldId worldId;
     b2BodyId playerBodyId;
-    SessionService::RegionGameplayContext regionGameplay;
+    RegionService::GameplayContext regionGameplay;
 };
 
 Context makeContext(GameState& gs);

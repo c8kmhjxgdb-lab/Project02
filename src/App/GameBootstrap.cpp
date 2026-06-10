@@ -2,9 +2,11 @@
 
 #include "Engine/Renderer/Draw2D.h"
 #include "Engine/Renderer/TextRenderer.h"
+#include "Game/Data/LuaConfigRepository.h"
 #include "Game/GameState.h"
+#include "Game/Services/AudioService.h"
 #include "Game/Services/GameSessionService.h"
-#include "Game/Services/SessionService.h"
+#include "Game/Services/RegionService.h"
 #include "Utils/ShaderUtils.h"
 
 #include <GL/glew.h>
@@ -162,6 +164,16 @@ void initCombatSystems(GameState& gs) {
     gs.particleSystem.init();
 }
 
+void initAudio(GameState& gs) {
+    if (gs.audioSystem.init()) {
+        gs.audioSystem.loadManifest("assets/audio/manifest.json");
+        gs.audioSystem.setMasterVolume(0.85f);
+        gs.audioSystem.setBgmVolume(0.85f);
+        gs.audioSystem.setSfxVolume(0.90f);
+        gs.audioSystem.setBgmFadeSeconds(0.35f);
+    }
+}
+
 void initRuntimeRenderState(GameState& gs, SDL_Window* window) {
     int actualW = 0;
     int actualH = 0;
@@ -220,29 +232,30 @@ void initCamera(GameState& gs) {
 
 void initProgressionSystems(GameState& gs) {
     gs.timeSystem.init(10.0f);
-    gs.timeSystem.loadConfig(gs.luaVM, "assets/scripts/time_events.lua");
+    gs.timeSystem.loadConfig(gs.luaVM, LuaConfigRepository::timeEventsPath());
     gs.timeSystem.setDaySpeed(2.0f);
 
     gs.weatherSystem.init(&gs.particleSystem, &gs.camera);
-    gs.weatherSystem.loadConfig(gs.luaVM, "assets/scripts/weather_config.lua");
+    gs.weatherSystem.loadConfig(gs.luaVM, LuaConfigRepository::weatherConfigPath());
     gs.weatherSystem.setRandomWeather(gs.weatherSystem.getDefaultChangeInterval());
-    SessionService::refreshWeatherRegionContext(gs);
+    RegionService::refreshWeatherContext(gs.regionManager, gs.weatherSystem);
 
-    gs.emotionSystem.loadConfig(gs.luaVM, "assets/scripts/childhood_config.lua");
+    gs.emotionSystem.loadConfig(gs.luaVM, LuaConfigRepository::childhoodConfigPath());
     gs.buildingSystem.init(gs.worldId);
-    gs.buildingSystem.loadDefinitions(gs.luaVM, "assets/scripts/furniture.lua");
+    gs.buildingSystem.loadDefinitions(gs.luaVM, LuaConfigRepository::furniturePath());
     gs.buildingSystem.setBuildableRegion("home_base");
     gs.toySystem.init();
-    gs.toySystem.loadDefinitions(gs.luaVM, "assets/scripts/toys.lua");
+    gs.toySystem.loadDefinitions(gs.luaVM, LuaConfigRepository::toysPath());
     gs.questSystem.init();
-    gs.questSystem.loadDefinitions(gs.luaVM, "assets/scripts/quests.lua");
+    gs.questSystem.loadDefinitions(gs.luaVM, LuaConfigRepository::questsPath());
     gs.inventory.setCoins(60);
     gs.inventory.unlockFurnitureDefaults();
     gs.inventory.addFurniture("simple_bed", 1);
     gs.inventory.addFurniture("writing_desk", 1);
     gs.inventory.addFurniture("star_lamp", 1);
     gs.inventory.addFurniture("soft_rug", 1);
-    SessionService::refreshRegionGameplayContext(gs);
+    RegionService::GameplayContext regionGameplay = RegionService::makeGameplayContext(gs);
+    RegionService::refreshGameplayContext(regionGameplay);
 }
 
 bool initRendererServices() {
@@ -313,10 +326,10 @@ bool initialize(GameState& gs, SDL_Window* window) {
     }
 
     initCombatSystems(gs);
+    initAudio(gs);
 
     gs.luaVM.init();
-    gs.luaVM.loadFile("assets/scripts/abilities.lua");
-    gs.luaVM.loadFile("assets/scripts/emotion_config.lua");
+    LuaConfigRepository::loadSharedRuntimeScripts(gs.luaVM);
 
     initRuntimeRenderState(gs, window);
     initStoryAndPlayerSystems(gs);
@@ -337,6 +350,7 @@ void shutdown(GameState& gs) {
     gs.enemyManager.clear();
     gs.dropManager.clear();
     gs.buildingSystem.shutdown();
+    gs.audioSystem.shutdown();
     gs.physicsWorld.destroy();
     deleteGlResources(gs);
 }

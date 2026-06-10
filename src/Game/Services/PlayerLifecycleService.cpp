@@ -22,7 +22,7 @@ Context makeContext(GameState& gs) {
     return {
         gs.flightCooldown,
         gs.shieldCooldown,
-        gs.stage7NoticeTimer,
+        gs.ui.stage7NoticeTimer,
         gs.playerMana,
         gs.playerMaxMana,
         gs.manaRegen,

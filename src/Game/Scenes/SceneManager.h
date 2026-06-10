@@ -19,6 +19,7 @@ struct State {
     std::unique_ptr<IScene> worldScene;
     IScene* currentScene = nullptr;
     AppMode currentMode = AppMode::MainMenu;
+    AppMode requestedMode = AppMode::MainMenu;
 };
 
 State createState(GameState& gs);
@@ -28,6 +29,6 @@ bool handleEventCurrent(GameState& gs,
                         const InputController::Callbacks& callbacks,
                         State& state);
 void updateAndRenderCurrent(SDL_Window* window, GameState& gs, float dt, State& state);
-void requestMode(GameState& gs, AppMode mode);
+void requestMode(State& state, AppMode mode);
 
 }  // namespace SceneManager

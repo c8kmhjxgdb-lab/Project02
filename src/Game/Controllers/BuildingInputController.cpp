@@ -1,9 +1,14 @@
 #include "Game/Controllers/BuildingInputController.h"
 
+#include "Game/Building/BuildingSystem.h"
 #include "Game/GameState.h"
+#include "Game/Inventory/Inventory.h"
+#include "Game/Services/NoticeService.h"
 #include "Game/Services/PlayerInputQuery.h"
-#include "Game/Services/SessionService.h"
 #include "Game/Services/WorldQuery.h"
+#include "Game/Toy/ToySystem.h"
+#include "Game/World/RegionManager.h"
+#include "Game/World/TimeSystem.h"
 
 #include <glm/vec2.hpp>
 
@@ -11,119 +16,151 @@
 
 namespace BuildingInputController {
 
-bool canBuildHere(GameState& gs) {
-    MapRegion* region = gs.regionManager.getCurrentRegion();
-    return region && gs.buildingSystem.isBuildableHere(region->getId());
+Context makeContext(GameState& gs) {
+    return {
+        gs.isDead,
+        gs.buildingSystem,
+        gs.regionManager,
+        gs.toySystem,
+        gs.timeSystem,
+        gs.inventory
+    };
 }
 
-void handleToggleKey(GameState& gs, SDL_Scancode scancode) {
-    if ((scancode != SDL_SCANCODE_TAB && scancode != SDL_SCANCODE_B) || gs.isDead) {
+Callbacks makeCallbacks(GameState& gs) {
+    return {
+        [&gs](const Context&) {
+            return PlayerInputQuery::getMouseWorldPoint(gs);
+        },
+        [&gs](Context&, const std::string& notice) {
+            NoticeService::Context noticeContext = NoticeService::makeContext(gs);
+            NoticeService::showNotice(noticeContext, notice);
+        }
+    };
+}
+
+bool canBuildHere(Context& context) {
+    MapRegion* region = context.regionManager.getCurrentRegion();
+    return region && context.buildingSystem.isBuildableHere(region->getId());
+}
+
+void handleToggleKey(Context& context, SDL_Scancode scancode) {
+    if ((scancode != SDL_SCANCODE_TAB && scancode != SDL_SCANCODE_B) || context.isDead) {
         return;
     }
 
-    if (canBuildHere(gs) && !gs.toySystem.isMiniCarActive()) {
-        gs.buildingSystem.toggleBuildMode();
+    if (canBuildHere(context) && !context.toySystem.isMiniCarActive()) {
+        context.buildingSystem.toggleBuildMode();
     } else {
-        gs.buildingSystem.setBuildMode(false);
+        context.buildingSystem.setBuildMode(false);
     }
 }
 
-void handleKeyDown(GameState& gs, SDL_Scancode scancode) {
-    bool buildable = canBuildHere(gs);
+void handleKeyDown(Context& context, SDL_Scancode scancode, const Callbacks& callbacks) {
+    bool buildable = canBuildHere(context);
 
-    if (scancode == SDL_SCANCODE_T && !gs.isDead && buildable) {
-        if (gs.toySystem.isMiniCarActive()) {
-            gs.toySystem.stopMiniCar();
-        } else if (gs.toySystem.canStartMiniCar(
-                       WorldQuery::hasPlacedFurniture(gs.buildingSystem, "toy_shelf"))) {
-            gs.buildingSystem.setBuildMode(false);
-            gs.toySystem.startMiniCar(gs.timeSystem.getDay());
+    if (scancode == SDL_SCANCODE_T && !context.isDead && buildable) {
+        if (context.toySystem.isMiniCarActive()) {
+            context.toySystem.stopMiniCar();
+        } else if (context.toySystem.canStartMiniCar(
+                       WorldQuery::hasPlacedFurniture(context.buildingSystem, "toy_shelf"))) {
+            context.buildingSystem.setBuildMode(false);
+            context.toySystem.startMiniCar(context.timeSystem.getDay());
         }
     }
 
-    if (!gs.buildingSystem.isActive() || !buildable || gs.toySystem.isMiniCarActive()) {
+    if (!context.buildingSystem.isActive() || !buildable || context.toySystem.isMiniCarActive()) {
         return;
     }
 
     if (scancode == SDL_SCANCODE_Q) {
-        gs.buildingSystem.rotatePreview(-1);
+        context.buildingSystem.rotatePreview(-1);
     } else if (scancode == SDL_SCANCODE_E) {
-        gs.buildingSystem.rotatePreview(1);
+        context.buildingSystem.rotatePreview(1);
     } else if (scancode == SDL_SCANCODE_M) {
-        MapRegion* buildRegion = gs.regionManager.getCurrentRegion();
-        if (buildRegion) {
-            glm::vec2 world = PlayerInputQuery::getMouseWorldPoint(gs);
+        MapRegion* buildRegion = context.regionManager.getCurrentRegion();
+        if (buildRegion && callbacks.getMouseWorldPoint) {
+            glm::vec2 world = callbacks.getMouseWorldPoint(context);
             const TileMap& map = buildRegion->getTileMap();
-            if (gs.buildingSystem.beginMoveAt(map.worldToTile(world.x, world.y))) {
-                SessionService::showNotice(gs, "移动家具 Move: 左键确认，右键取消");
+            if (context.buildingSystem.beginMoveAt(map.worldToTile(world.x, world.y)) &&
+                callbacks.showNotice) {
+                callbacks.showNotice(context, "移动家具 Move: 左键确认，右键取消");
             }
         }
     } else if (scancode == SDL_SCANCODE_DELETE) {
-        MapRegion* buildRegion = gs.regionManager.getCurrentRegion();
-        if (buildRegion) {
-            glm::vec2 world = PlayerInputQuery::getMouseWorldPoint(gs);
+        MapRegion* buildRegion = context.regionManager.getCurrentRegion();
+        if (buildRegion && callbacks.getMouseWorldPoint) {
+            glm::vec2 world = callbacks.getMouseWorldPoint(context);
             const TileMap& map = buildRegion->getTileMap();
             std::string removedDefId;
-            if (gs.buildingSystem.removeAt(map.worldToTile(world.x, world.y), &removedDefId)) {
-                gs.inventory.addFurniture(removedDefId, 1);
+            if (context.buildingSystem.removeAt(map.worldToTile(world.x, world.y), &removedDefId)) {
+                context.inventory.addFurniture(removedDefId, 1);
             }
         }
     }
 }
 
-void handleMouseButtonDown(GameState& gs, Uint8 button) {
-    MapRegion* buildRegion = gs.regionManager.getCurrentRegion();
-    if (!buildRegion || !gs.buildingSystem.isBuildableHere(buildRegion->getId())) {
+void handleMouseButtonDown(Context& context, Uint8 button, const Callbacks& callbacks) {
+    MapRegion* buildRegion = context.regionManager.getCurrentRegion();
+    if (!buildRegion ||
+        !context.buildingSystem.isBuildableHere(buildRegion->getId()) ||
+        !callbacks.getMouseWorldPoint) {
         return;
     }
 
-    glm::vec2 world = PlayerInputQuery::getMouseWorldPoint(gs);
+    glm::vec2 world = callbacks.getMouseWorldPoint(context);
     const TileMap& map = buildRegion->getTileMap();
-    glm::ivec2 tile = gs.buildingSystem.getPreviewTile(map, world);
+    glm::ivec2 tile = context.buildingSystem.getPreviewTile(map, world);
     if (button == SDL_BUTTON_LEFT) {
-        if (gs.buildingSystem.isMovingFurniture()) {
-            if (gs.buildingSystem.confirmMove(map, tile)) {
-                SessionService::showNotice(gs, "家具已移动 Furniture moved");
+        if (context.buildingSystem.isMovingFurniture()) {
+            if (context.buildingSystem.confirmMove(map, tile) && callbacks.showNotice) {
+                callbacks.showNotice(context, "家具已移动 Furniture moved");
             }
         } else {
             glm::ivec2 clickedTile = map.worldToTile(world.x, world.y);
-            if (gs.buildingSystem.beginMoveAt(clickedTile)) {
-                SessionService::showNotice(gs, "移动家具 Move: 左键确认，右键取消");
+            if (context.buildingSystem.beginMoveAt(clickedTile)) {
+                if (callbacks.showNotice) {
+                    callbacks.showNotice(context, "移动家具 Move: 左键确认，右键取消");
+                }
             } else {
-                const FurnitureDef* selected = gs.buildingSystem.getSelectedDef();
+                const FurnitureDef* selected = context.buildingSystem.getSelectedDef();
                 if (selected) {
-                    if (gs.inventory.getFurnitureCount(selected->id) <= 0) {
-                        if (gs.inventory.isFurnitureUnlocked(selected->id) &&
-                            gs.inventory.spendCoins(selected->price)) {
-                            gs.inventory.addFurniture(selected->id, 1);
+                    if (context.inventory.getFurnitureCount(selected->id) <= 0) {
+                        if (context.inventory.isFurnitureUnlocked(selected->id) &&
+                            context.inventory.spendCoins(selected->price)) {
+                            context.inventory.addFurniture(selected->id, 1);
                         }
                     }
-                    if (gs.inventory.getFurnitureCount(selected->id) > 0 &&
-                        gs.buildingSystem.placeSelected(map, tile)) {
-                        gs.inventory.consumeFurniture(selected->id, 1);
+                    if (context.inventory.getFurnitureCount(selected->id) > 0 &&
+                        context.buildingSystem.placeSelected(map, tile)) {
+                        context.inventory.consumeFurniture(selected->id, 1);
                     }
                 }
             }
         }
     } else if (button == SDL_BUTTON_RIGHT) {
-        if (gs.buildingSystem.isMovingFurniture()) {
-            gs.buildingSystem.cancelMove();
-            SessionService::showNotice(gs, "移动已取消 Move canceled");
+        if (context.buildingSystem.isMovingFurniture()) {
+            context.buildingSystem.cancelMove();
+            if (callbacks.showNotice) {
+                callbacks.showNotice(context, "移动已取消 Move canceled");
+            }
         } else {
             std::string removedDefId;
-            if (gs.buildingSystem.removeAt(map.worldToTile(world.x, world.y), &removedDefId)) {
-                gs.inventory.addFurniture(removedDefId, 1);
+            if (context.buildingSystem.removeAt(
+                    map.worldToTile(world.x, world.y),
+                    &removedDefId)) {
+                context.inventory.addFurniture(removedDefId, 1);
             }
         }
     }
 }
 
-bool handleMouseWheel(GameState& gs, int wheelY) {
-    if (!gs.buildingSystem.isActive()) {
+bool handleMouseWheel(Context& context, int wheelY) {
+    if (!context.buildingSystem.isActive()) {
         return false;
     }
 
-    gs.buildingSystem.selectNextDef(wheelY >= 0 ? 1 : -1);
+    context.buildingSystem.selectNextDef(wheelY >= 0 ? 1 : -1);
     return true;
 }
 

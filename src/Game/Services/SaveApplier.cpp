@@ -1,8 +1,8 @@
 #include "Game/Services/SaveApplier.h"
 
 #include "Game/GameState.h"
-#include "Game/Scenes/SceneManager.h"
-#include "Game/Services/SessionService.h"
+#include "Game/Services/NoticeService.h"
+#include "Game/Services/RegionService.h"
 
 #include <algorithm>
 #include <box2d/box2d.h>
@@ -31,16 +31,17 @@ void applySavedRegions(GameState& gs, const SaveData& saveData) {
 namespace SaveApplier {
 
 void resetSessionState(GameState& gs) {
-    SessionService::clearTransientCombat(gs);
+    RegionService::GameplayContext regionGameplay = RegionService::makeGameplayContext(gs);
+    RegionService::clearTransientCombat(regionGameplay);
     gs.input.clear();
     gs.buildingSystem.setBuildMode(false);
     gs.toySystem.stopMiniCar();
     gs.dialogueTree.end();
     gs.dialogueUI.hide();
     gs.isVenting = false;
-    gs.talkedWithPrincessAtBaseThisFrame = false;
-    gs.stage7Notice.clear();
-    gs.stage7NoticeTimer = 0.0f;
+    gs.ui.talkedWithPrincessAtBaseThisFrame = false;
+    gs.ui.stage7Notice.clear();
+    gs.ui.stage7NoticeTimer = 0.0f;
     gs.isDead = false;
     gs.deathTimer = 0.0f;
     gs.isFlying = false;
@@ -128,15 +129,16 @@ bool applySaveData(GameState& gs, const SaveData& saveData) {
     }
 
     gs.totalPlayTimeSeconds = std::max(0.0f, saveData.player.progress.totalPlayTime);
-    SessionService::refreshRegionGameplayContext(gs);
+    RegionService::GameplayContext regionGameplay = RegionService::makeGameplayContext(gs);
+    RegionService::refreshGameplayContext(regionGameplay);
     MapRegion* region = gs.regionManager.getCurrentRegion();
     if (region) {
         gs.miniMap.setMapDimensions(region->getWidth(), region->getHeight(),
             region->getTileMap().tileSize);
         gs.miniMap.forceUpdate(saveData.player.position);
     }
-    SceneManager::requestMode(gs, AppMode::Playing);
-    SessionService::showNotice(gs, "读档完成 Loaded");
+    NoticeService::Context noticeContext = NoticeService::makeContext(gs);
+    NoticeService::showNotice(noticeContext, "读档完成 Loaded");
     return true;
 }
 

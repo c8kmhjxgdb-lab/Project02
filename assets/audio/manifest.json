@@ -1,0 +1,53 @@
+{
+  "bgm": {
+    "bgm/default": {
+      "fallbackFrequency": 220.0,
+      "volume": 0.08,
+      "loop": true
+    },
+    "bgm/starter_village": {
+      "file": "assets/audio/bgm/starter_village.wav",
+      "fallbackFrequency": 246.94,
+      "volume": 0.08,
+      "loop": true
+    },
+    "bgm/home_base": {
+      "file": "assets/audio/bgm/home_base.wav",
+      "fallbackFrequency": 196.0,
+      "volume": 0.07,
+      "loop": true
+    }
+  },
+  "sfx": {
+    "sfx/skill/fireball": {
+      "file": "assets/audio/sfx/skill/fireball.wav",
+      "fallbackFrequency": 523.25,
+      "durationSeconds": 0.18,
+      "volume": 0.18
+    },
+    "sfx/skill/ice_spike": {
+      "file": "assets/audio/sfx/skill/ice_spike.wav",
+      "fallbackFrequency": 880.0,
+      "durationSeconds": 0.14,
+      "volume": 0.14
+    },
+    "sfx/skill/lightning": {
+      "file": "assets/audio/sfx/skill/lightning.wav",
+      "fallbackFrequency": 1320.0,
+      "durationSeconds": 0.22,
+      "volume": 0.16
+    },
+    "sfx/ui/confirm": {
+      "file": "assets/audio/sfx/ui/confirm.wav",
+      "fallbackFrequency": 660.0,
+      "durationSeconds": 0.08,
+      "volume": 0.10
+    },
+    "sfx/ui/cancel": {
+      "file": "assets/audio/sfx/ui/cancel.wav",
+      "fallbackFrequency": 440.0,
+      "durationSeconds": 0.10,
+      "volume": 0.10
+    }
+  }
+}

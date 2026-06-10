@@ -1,10 +1,12 @@
 #include "Game/Services/GameSessionService.h"
 
 #include "Game/GameState.h"
-#include "Game/Scenes/SceneManager.h"
+#include "Game/Data/SaveRepository.h"
+#include "Game/Data/LuaConfigRepository.h"
 #include "Game/Services/CombatService.h"
+#include "Game/Services/NoticeService.h"
+#include "Game/Services/RegionService.h"
 #include "Game/Services/SaveGameService.h"
-#include "Game/Services/SessionService.h"
 
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
@@ -56,7 +58,8 @@ void startNewGame(GameState& gs) {
 
     gs.regionManager.shutdown();
     initializeWorld(gs);
-    SessionService::refreshRegionGameplayContext(gs);
+    RegionService::GameplayContext regionGameplay = RegionService::makeGameplayContext(gs);
+    RegionService::refreshGameplayContext(regionGameplay);
 
     MapRegion* region = gs.regionManager.getCurrentRegion();
     glm::vec2 startWorld(7.0f, 8.0f);
@@ -90,13 +93,13 @@ void startNewGame(GameState& gs) {
     gs.gameTime = 10.0f;
     gs.weatherSystem.setWeatherImmediate(WeatherType::Clear, 0.0f);
     gs.weatherSystem.setRandomWeather(gs.weatherSystem.getDefaultChangeInterval());
-    SessionService::refreshWeatherRegionContext(gs);
+    RegionService::refreshWeatherContext(gs.regionManager, gs.weatherSystem);
 
     gs.buildingSystem.clearInstances();
     gs.toySystem.init();
-    gs.toySystem.loadDefinitions(gs.luaVM, "assets/scripts/toys.lua");
+    gs.toySystem.loadDefinitions(gs.luaVM, LuaConfigRepository::toysPath());
     gs.questSystem.init();
-    gs.questSystem.loadDefinitions(gs.luaVM, "assets/scripts/quests.lua");
+    gs.questSystem.loadDefinitions(gs.luaVM, LuaConfigRepository::questsPath());
 
     if (gs.princess) {
         gs.princess->affection = 0.0f;
@@ -112,27 +115,31 @@ void startNewGame(GameState& gs) {
     for (int i = 0; i < 5; ++i) {
         float angle = (static_cast<float>(i) / 5.0f) * 6.28318f;
         glm::vec2 spawnPos = gs.spawnPoint + glm::vec2(std::cos(angle), std::sin(angle)) * 10.0f;
-        CombatService::spawnEnemy(gs, spawnPos);
+        CombatService::SpawnContext spawnContext = CombatService::makeSpawnContext(gs);
+        CombatService::spawnEnemy(spawnContext, spawnPos);
     }
-    SceneManager::requestMode(gs, AppMode::Playing);
-    SessionService::showNotice(gs, "新游戏开始 New Game");
+    NoticeService::Context noticeContext = NoticeService::makeContext(gs);
+    NoticeService::showNotice(noticeContext, "新游戏开始 New Game");
 }
 
-bool activateMainMenuSelection(GameState& gs) {
-    if (gs.menuSelection == 0) {
+MenuActivationResult activateMainMenuSelection(GameState& gs) {
+    if (gs.ui.menuSelection == 0) {
         startNewGame(gs);
-    } else if (gs.menuSelection == 1) {
-        if (!gs.saveSystem.hasSave("autosave")) {
-            gs.menuMessage = "没有可读取的存档 / No save found";
-            gs.menuMessageTimer = 3.0f;
+        return {false, true};
+    } else if (gs.ui.menuSelection == 1) {
+        if (!SaveRepository::hasSave("autosave")) {
+            gs.ui.menuMessage = "没有可读取的存档 / No save found";
+            gs.ui.menuMessageTimer = 3.0f;
         } else {
-            SaveGameService::loadGameSlot(gs, "autosave");
+            if (SaveGameService::loadGameSlot(gs, "autosave")) {
+                return {false, true};
+            }
         }
-    } else if (gs.menuSelection == 2) {
-        return true;
+    } else if (gs.ui.menuSelection == 2) {
+        return {true, false};
     }
 
-    return false;
+    return {};
 }
 
 }  // namespace GameSessionService

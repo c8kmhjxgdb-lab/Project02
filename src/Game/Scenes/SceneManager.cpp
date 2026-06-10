@@ -53,7 +53,7 @@ IScene* selectScene(SceneManager::State& state, AppMode mode) {
 }
 
 void syncCurrentScene(GameState& gs, SceneManager::State& state) {
-    if (state.currentScene && state.currentMode == gs.appMode) {
+    if (state.currentScene && state.currentMode == state.requestedMode) {
         return;
     }
 
@@ -61,8 +61,8 @@ void syncCurrentScene(GameState& gs, SceneManager::State& state) {
         state.currentScene->exit(gs);
     }
 
-    state.currentMode = gs.appMode;
-    state.currentScene = selectScene(state, gs.appMode);
+    state.currentMode = state.requestedMode;
+    state.currentScene = selectScene(state, state.requestedMode);
 
     if (state.currentScene) {
         state.currentScene->enter(gs);
@@ -78,8 +78,8 @@ State createState(GameState& gs) {
     state.worldSceneState = std::make_unique<WorldScene::State>(WorldScene::createState());
     state.mainMenuScene = std::make_unique<MainMenuSceneAdapter>();
     state.worldScene = std::make_unique<WorldSceneAdapter>(*state.worldSceneState);
-    state.currentMode = gs.appMode;
-    state.currentScene = selectScene(state, gs.appMode);
+    state.currentMode = state.requestedMode;
+    state.currentScene = selectScene(state, state.requestedMode);
     if (state.currentScene) {
         state.currentScene->enter(gs);
     }
@@ -106,8 +106,8 @@ void updateAndRenderCurrent(SDL_Window* window, GameState& gs, float dt, State& 
     state.currentScene->render(window, gs, dt);
 }
 
-void requestMode(GameState& gs, AppMode mode) {
-    gs.appMode = mode;
+void requestMode(State& state, AppMode mode) {
+    state.requestedMode = mode;
 }
 
 }  // namespace SceneManager
