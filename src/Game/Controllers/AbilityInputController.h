@@ -41,6 +41,7 @@ struct Context {
     float& flightCooldown;
     float& shieldCooldown;
     float& shieldCooldownMax;
+    bool gameMenuOpen = false;
     CombatService::CastContext castContext;
 };
 

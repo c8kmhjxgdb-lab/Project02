@@ -22,6 +22,7 @@ public:
     QuestState getQuestState(const std::string& questId) const;
     int getRewardedCount() const;
     int getQuestCount() const { return static_cast<int>(definitions.size()); }
+    std::string getTrackedQuestText() const;
 
 private:
     std::vector<std::string> completedQuests;

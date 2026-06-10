@@ -1,11 +1,35 @@
 #include "Game/Presentation/PresentationModelBuilder.h"
 
+#include "Game/Ability/ChildlikeSkillProfile.h"
 #include "Game/GameState.h"
+#include "Game/Inventory/ItemCatalog.h"
 #include "Game/Services/PlayerInputQuery.h"
 #include "Game/Services/SaveGameService.h"
 #include "Game/Services/WorldQuery.h"
 
+#include <algorithm>
 #include <string>
+
+namespace {
+
+std::string questStateName(QuestState state) {
+    switch (state) {
+        case QuestState::Hidden: return "隐藏";
+        case QuestState::Available: return "可接";
+        case QuestState::Active: return "进行中";
+        case QuestState::Completed: return "完成";
+        case QuestState::Rewarded: return "已领奖";
+    }
+    return "?";
+}
+
+std::string progressText(const QuestObjectiveProgress& objective) {
+    return objective.type + " " + objective.targetId + " " +
+        std::to_string(objective.current) + "/" +
+        std::to_string(objective.required);
+}
+
+}  // namespace
 
 namespace PresentationModelBuilder {
 
@@ -111,6 +135,15 @@ HudView::Model buildHudModel(const GameState& gs) {
     model.canUseFlight = gs.playerMana >= 5.0f;
 
     const EmotionState& emotion = gs.emotionSystem.getState();
+    const SkillTierProfile profile = ChildlikeSkillProfile::forTier(gs.emotionSystem.getChildlikeHeartTier());
+    model.childlikeTierName = gs.emotionSystem.getChildlikeHeartTierName();
+    model.fireSkillName = profile.fireName;
+    model.iceSkillName = profile.iceName;
+    model.lightningSkillName = profile.lightningName;
+    model.shieldSkillName = profile.shieldName;
+    model.movementSkillName = profile.movementName;
+    model.trackedQuestText = gs.questSystem.getTrackedQuestText();
+
     TimeSnapshot timeSnapshot = gs.timeSystem.getSnapshot();
     const MapRegion* region = gs.regionManager.getCurrentRegion();
     std::string status =
@@ -159,6 +192,58 @@ HudView::Model buildHudModel(const GameState& gs) {
     model.statusText = status;
     model.noticeText = gs.ui.stage7Notice;
     model.noticeTimer = gs.ui.stage7NoticeTimer;
+    return model;
+}
+
+GameMenuView::Model buildGameMenuModel(const GameState& gs) {
+    GameMenuView::Model model;
+    model.open = gs.ui.gameMenuOpen;
+    model.page = gs.ui.gameMenuPage;
+
+    for (const QuestSaveEntry& entry : gs.questSystem.getSaveData()) {
+        model.questLines.push_back(entry.id + " [" + questStateName(entry.state) + "]");
+        for (const QuestObjectiveProgress& objective : entry.objectives) {
+            model.questLines.push_back("  - " + progressText(objective));
+        }
+    }
+    if (model.questLines.empty()) {
+        model.questLines.push_back("暂无任务");
+    }
+
+    const EmotionState& emotion = gs.emotionSystem.getState();
+    const SkillTierProfile profile = ChildlikeSkillProfile::forTier(gs.emotionSystem.getChildlikeHeartTier());
+    model.characterLines.push_back("生命: " + std::to_string(static_cast<int>(gs.playerHealth.getCurrentHealth())) +
+        "/" + std::to_string(static_cast<int>(gs.playerHealth.getMaxHealth())));
+    model.characterLines.push_back("魔力: " + std::to_string(static_cast<int>(gs.playerMana)) +
+        "/" + std::to_string(static_cast<int>(gs.playerMaxMana)));
+    model.characterLines.push_back("童心: " + std::to_string(static_cast<int>(emotion.childlikeHeart)) +
+        " / 档位 " + gs.emotionSystem.getChildlikeHeartTierName());
+    model.characterLines.push_back("委屈: " + std::to_string(static_cast<int>(emotion.grievance)));
+    model.characterLines.push_back("移动技能: " + profile.movementName +
+        " 距离 " + std::to_string(static_cast<int>(profile.movementDistance)));
+
+    std::vector<ItemStack> stacks = gs.inventory.getItemStacks();
+    for (const ItemStack& stack : stacks) {
+        const ItemDef* def = ItemCatalog::find(stack.itemId);
+        std::string name = def ? def->name : stack.itemId;
+        model.inventoryLines.push_back(name + " x" + std::to_string(stack.count));
+    }
+    if (model.inventoryLines.empty()) {
+        model.inventoryLines.push_back("背包空空");
+    }
+
+    model.partnerLines.push_back(gs.princess && gs.princess->isFollowing()
+        ? "阿娅: 跟随中 / 羁绊技待命"
+        : "阿娅: 未跟随");
+    model.partnerLines.push_back(gs.storyProgress.isPartnerUnlocked("tieyi")
+        ? "铁翼: 已入队 / 火箭破盾支援"
+        : "铁翼: 未救出");
+
+    model.systemLines.push_back("F5 保存");
+    model.systemLines.push_back("F9 读取");
+    model.systemLines.push_back("Esc / Tab 返回");
+    model.systemLines.push_back("金币: " + std::to_string(gs.inventory.getCoins()));
+
     return model;
 }
 

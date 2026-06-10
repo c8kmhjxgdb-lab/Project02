@@ -37,7 +37,8 @@ GameRenderer::WorldRenderContext buildRenderContext(GameState& gs) {
         PresentationModelBuilder::buildAbilityEffectsModel(gs),
         PresentationModelBuilder::buildVentTearsModel(gs),
         PresentationModelBuilder::buildAimReticleModel(gs),
-        PresentationModelBuilder::buildHudModel(gs)
+        PresentationModelBuilder::buildHudModel(gs),
+        PresentationModelBuilder::buildGameMenuModel(gs)
     };
 }
 

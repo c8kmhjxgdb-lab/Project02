@@ -3,6 +3,7 @@
 #include "Game/Presentation/AbilityView.h"
 #include "Game/Presentation/AimReticleView.h"
 #include "Game/Presentation/EntityView.h"
+#include "Game/Presentation/GameMenuView.h"
 #include "Game/Presentation/HudView.h"
 #include "Game/Presentation/MainMenuView.h"
 #include "Game/Presentation/ParticleView.h"
@@ -22,6 +23,8 @@ EntityView::ProjectileRenderResources buildProjectileRenderResources(const GameS
 EntityView::EnemyRenderResources buildEnemyRenderResources(const GameState& gs);
 
 HudView::Model buildHudModel(const GameState& gs);
+
+GameMenuView::Model buildGameMenuModel(const GameState& gs);
 
 AimReticleView::Model buildAimReticleModel(const GameState& gs);
 

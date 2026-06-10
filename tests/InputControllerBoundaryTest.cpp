@@ -54,6 +54,7 @@ struct Fixture {
     RegionManager regionManager;
     TimeSystem timeSystem;
     Inventory inventory;
+    bool gameMenuOpen = false;
 
     Fixture() {
         b2WorldDef worldDef = b2DefaultWorldDef();
@@ -131,6 +132,7 @@ struct Fixture {
             flightCooldown,
             shieldCooldown,
             shieldCooldownMax,
+            gameMenuOpen,
             makeCastContext()
         };
     }
@@ -249,6 +251,22 @@ void abilityKeyAndMouseBlockProjectileAtActionBoundaries() {
         "left mouse does not cast while mini car is active");
 }
 
+void abilityKeyAndMouseBlockProjectileWhileGameMenuOpen() {
+    Fixture fixture;
+    AbilityInputController::Callbacks callbacks = fixture.makeAbilityCallbacks();
+    fixture.gameMenuOpen = true;
+
+    handleAbilityKey(fixture, SDL_SCANCODE_J, callbacks);
+    TestSupport::require(
+        fixture.projectileManager.getActive().empty(),
+        "J does not cast while game menu is open");
+
+    handleAbilityMouse(fixture, SDL_BUTTON_LEFT, callbacks);
+    TestSupport::require(
+        fixture.projectileManager.getActive().empty(),
+        "left mouse does not cast while game menu is open");
+}
+
 void abilityKeyAndMouseCastProjectileDuringGameplay() {
     Fixture fixture;
     AbilityInputController::Callbacks callbacks = fixture.makeAbilityCallbacks();
@@ -365,6 +383,7 @@ void buildingMouseWheelConsumesOnlyInBuildMode() {
 
 int main() {
     abilityKeyAndMouseBlockProjectileAtActionBoundaries();
+    abilityKeyAndMouseBlockProjectileWhileGameMenuOpen();
     abilityKeyAndMouseCastProjectileDuringGameplay();
     abilitySpaceStartsFlightOnlyWhenAllowed();
     buildingToggleRequiresHomeBaseAndNoMiniCar();

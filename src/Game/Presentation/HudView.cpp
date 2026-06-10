@@ -177,6 +177,42 @@ void render(const Model& model, int screenWidth, int screenHeight) {
         glm::vec3(0.92f, 0.96f, 0.98f),
         0.94f);
 
+    TextRenderer::drawText(uiProj,
+        24.0f,
+        screenH - 154.0f,
+        "童心档位: " + model.childlikeTierName,
+        15,
+        glm::vec3(0.86f, 0.92f, 1.0f),
+        0.95f);
+
+    if (!model.trackedQuestText.empty()) {
+        TextRenderer::drawText(uiProj,
+            screenW - 360.0f,
+            screenH - 82.0f,
+            model.trackedQuestText,
+            15,
+            glm::vec3(1.0f, 0.88f, 0.48f),
+            0.95f);
+    }
+
+    const std::string skillNames[6] = {
+        model.fireSkillName,
+        model.iceSkillName,
+        model.shieldSkillName,
+        model.lightningSkillName,
+        "羁绊",
+        model.movementSkillName
+    };
+    for (int i = 0; i < 6; ++i) {
+        TextRenderer::drawText(uiProj,
+            slotsX + (slotSize + slotGap) * static_cast<float>(i),
+            slotsY - 18.0f,
+            skillNames[i],
+            11,
+            glm::vec3(0.80f, 0.88f, 0.92f),
+            0.92f);
+    }
+
     if (model.noticeTimer > 0.0f && !model.noticeText.empty()) {
         TextRenderer::drawText(uiProj,
             screenW - 330.0f,

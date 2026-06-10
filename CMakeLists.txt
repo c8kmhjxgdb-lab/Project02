@@ -85,13 +85,17 @@ add_library(StarchildGame STATIC
     src/Game/Presentation/AbilityView.cpp
     src/Game/Presentation/AimReticleView.cpp
     src/Game/Presentation/BuildingView.cpp
+    src/Game/Presentation/CharacterPanelView.cpp
     src/Game/Presentation/EntityView.cpp
+    src/Game/Presentation/GameMenuView.cpp
     src/Game/Presentation/GameRenderer.cpp
     src/Game/Presentation/HudView.cpp
+    src/Game/Presentation/InventoryView.cpp
     src/Game/Presentation/MainMenuView.cpp
     src/Game/Presentation/MiniMapPresenter.cpp
     src/Game/Presentation/ParticleView.cpp
     src/Game/Presentation/PresentationModelBuilder.cpp
+    src/Game/Presentation/QuestLogView.cpp
     src/Game/Presentation/WindowTitlePresenter.cpp
     src/Game/Presentation/WorldPresentationBuilder.cpp
     src/Game/Presentation/WorldRenderer.cpp

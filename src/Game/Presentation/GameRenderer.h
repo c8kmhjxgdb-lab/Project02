@@ -3,6 +3,7 @@
 #include "Game/Presentation/AbilityView.h"
 #include "Game/Presentation/AimReticleView.h"
 #include "Game/Presentation/EntityView.h"
+#include "Game/Presentation/GameMenuView.h"
 #include "Game/Presentation/HudView.h"
 #include "Game/Presentation/MainMenuView.h"
 #include "Game/Presentation/ParticleView.h"
@@ -67,6 +68,7 @@ struct WorldRenderContext {
     ParticleView::VentTearsModel ventTearsModel;
     AimReticleView::Model aimReticleModel;
     HudView::Model hudModel;
+    GameMenuView::Model gameMenuModel;
 };
 
 void renderMainMenu(const MainMenuRenderContext& context);

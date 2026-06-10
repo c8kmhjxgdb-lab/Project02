@@ -9,6 +9,7 @@
 #include "Game/Presentation/AimReticleView.h"
 #include "Game/Presentation/BuildingView.h"
 #include "Game/Presentation/EntityView.h"
+#include "Game/Presentation/GameMenuView.h"
 #include "Game/Presentation/HudView.h"
 #include "Game/Presentation/MainMenuView.h"
 #include "Game/Presentation/ParticleView.h"
@@ -207,6 +208,11 @@ void renderScreenEffectsAndUi(GameRenderer::WorldRenderContext& context) {
     if (context.dialogueUI.isVisible()) {
         context.dialogueUI.render(uiProj, static_cast<int>(uiW), static_cast<int>(uiH));
     }
+
+    GameMenuView::render(
+        context.gameMenuModel,
+        static_cast<int>(uiW),
+        static_cast<int>(uiH));
 }
 
 }  // namespace

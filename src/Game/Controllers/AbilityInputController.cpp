@@ -14,6 +14,7 @@ namespace {
 
 bool isGameplayActionAllowed(const AbilityInputController::Context& context) {
     return !context.isDead &&
+           !context.gameMenuOpen &&
            !context.buildingSystem.isActive() &&
            !context.toySystem.isMiniCarActive();
 }
@@ -66,6 +67,7 @@ Context makeContext(GameState& gs) {
         gs.flightCooldown,
         gs.shieldCooldown,
         gs.shieldCooldownMax,
+        gs.ui.gameMenuOpen,
         CombatService::makeCastContext(gs)
     };
 }
@@ -110,9 +112,7 @@ void handleKeyDown(Context& context, SDL_Scancode scancode, const Callbacks& cal
         }
     }
 
-    if (scancode == SDL_SCANCODE_SPACE && !context.isDead
-        && !context.buildingSystem.isActive()
-        && !context.toySystem.isMiniCarActive()
+    if (scancode == SDL_SCANCODE_SPACE && isGameplayActionAllowed(context)
         && context.flightCooldown <= 0.0f
         && context.playerMana >= 5.0f
         && context.flightHeight <= 0.1f) {
@@ -122,9 +122,8 @@ void handleKeyDown(Context& context, SDL_Scancode scancode, const Callbacks& cal
         }
     }
 
-    if (scancode == SDL_SCANCODE_F && !context.isDead && !context.shield.isActive()
-        && !context.buildingSystem.isActive()
-        && !context.toySystem.isMiniCarActive()
+    if (scancode == SDL_SCANCODE_F && isGameplayActionAllowed(context)
+        && !context.shield.isActive()
         && context.shieldCooldown <= 0.0f
         && context.playerMana >= 15.0f) {
         context.shield.activate(15.0f);
@@ -143,9 +142,7 @@ void handleKeyDown(Context& context, SDL_Scancode scancode, const Callbacks& cal
         CombatService::tryCastLightning(context.castContext, playerPos, aimDir);
     }
 
-    if (scancode == SDL_SCANCODE_G && !context.isDead
-        && !context.buildingSystem.isActive()
-        && !context.toySystem.isMiniCarActive()
+    if (scancode == SDL_SCANCODE_G && isGameplayActionAllowed(context)
         && context.princess && context.princess->isFollowing()
         && context.princess->isUltimateReady()
         && context.bondTechnique.canActivate()) {

@@ -28,6 +28,13 @@ struct Model {
 
     std::string statusText;
     std::string noticeText;
+    std::string childlikeTierName;
+    std::string trackedQuestText;
+    std::string fireSkillName;
+    std::string iceSkillName;
+    std::string lightningSkillName;
+    std::string shieldSkillName;
+    std::string movementSkillName;
     float noticeTimer = 0.0f;
 };
 

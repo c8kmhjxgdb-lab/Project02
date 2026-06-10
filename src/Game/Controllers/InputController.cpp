@@ -76,8 +76,18 @@ bool handleKeyDown(GameState& gs,
                    SDL_Scancode scancode) {
     gs.input.setKey(scancode, true);
 
+    if (scancode == SDL_SCANCODE_TAB) {
+        gs.ui.gameMenuOpen = !gs.ui.gameMenuOpen;
+        AudioService::playUiSfx(gs.audioSystem, gs.ui.gameMenuOpen ? "confirm" : "cancel");
+        return true;
+    }
+
     if (scancode == SDL_SCANCODE_ESCAPE) {
-        if (gs.buildingSystem.isActive()) {
+        if (gs.ui.gameMenuOpen) {
+            gs.ui.gameMenuOpen = false;
+            AudioService::playUiSfx(gs.audioSystem, "cancel");
+            return true;
+        } else if (gs.buildingSystem.isActive()) {
             AudioService::playUiSfx(gs.audioSystem, "cancel");
             gs.buildingSystem.setBuildMode(false);
         } else {
@@ -85,6 +95,16 @@ bool handleKeyDown(GameState& gs,
             return true;
         }
     }
+
+    if (gs.ui.gameMenuOpen) {
+        if (scancode == SDL_SCANCODE_1) gs.ui.gameMenuPage = GameMenuPage::Quest;
+        if (scancode == SDL_SCANCODE_2) gs.ui.gameMenuPage = GameMenuPage::Character;
+        if (scancode == SDL_SCANCODE_3) gs.ui.gameMenuPage = GameMenuPage::Inventory;
+        if (scancode == SDL_SCANCODE_4) gs.ui.gameMenuPage = GameMenuPage::Partners;
+        if (scancode == SDL_SCANCODE_5) gs.ui.gameMenuPage = GameMenuPage::System;
+        return true;
+    }
+
     if (scancode == SDL_SCANCODE_1) gs.charExpression = 0;
     if (scancode == SDL_SCANCODE_2) gs.charExpression = 1;
     if (scancode == SDL_SCANCODE_3) gs.charExpression = 2;
@@ -139,6 +159,10 @@ bool handleMouseButtonDown(GameState& gs,
     gs.input.mousePos = glm::vec2(static_cast<float>(buttonEvent.x),
                                   static_cast<float>(buttonEvent.y));
 
+    if (gs.ui.gameMenuOpen) {
+        return true;
+    }
+
     if (!gs.isDead && !gs.dialogueUI.isVisible() && !gs.toySystem.isMiniCarActive()) {
         if (gs.buildingSystem.isActive()) {
             BuildingInputController::Context buildingContext = BuildingInputController::makeContext(gs);
@@ -176,6 +200,9 @@ bool handleEvent(GameState& gs, const SDL_Event& e, const Callbacks& callbacks) 
         SDL_Scancode scancode = e.key.keysym.scancode;
         gs.input.setKey(scancode, false);
     } else if (e.type == SDL_MOUSEWHEEL) {
+        if (gs.ui.gameMenuOpen) {
+            return true;
+        }
         BuildingInputController::Context buildingContext = BuildingInputController::makeContext(gs);
         if (BuildingInputController::handleMouseWheel(buildingContext, e.wheel.y)) {
             // Building controller consumed the wheel.

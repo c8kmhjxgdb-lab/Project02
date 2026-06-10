@@ -127,6 +127,30 @@ int QuestSystem::getRewardedCount() const {
     return count;
 }
 
+std::string QuestSystem::getTrackedQuestText() const {
+    for (const QuestSaveEntry& entry : questEntries) {
+        if (entry.rewardClaimed || entry.state == QuestState::Rewarded ||
+            entry.state == QuestState::Hidden) {
+            continue;
+        }
+
+        auto defIt = std::find_if(definitions.begin(), definitions.end(),
+            [&entry](const QuestDef& quest) { return quest.id == entry.id; });
+        if (defIt == definitions.end()) continue;
+
+        auto objectiveIt = std::find_if(entry.objectives.begin(), entry.objectives.end(),
+            [](const QuestObjectiveProgress& objective) {
+                return objective.current < objective.required;
+            });
+        if (objectiveIt == entry.objectives.end()) continue;
+
+        return defIt->name + ": " + objectiveIt->targetId + " " +
+            std::to_string(objectiveIt->current) + "/" +
+            std::to_string(objectiveIt->required);
+    }
+    return {};
+}
+
 QuestSaveEntry& QuestSystem::ensureEntry(const QuestDef& quest) {
     auto it = std::find_if(questEntries.begin(), questEntries.end(),
         [&quest](const QuestSaveEntry& entry) { return entry.id == quest.id; });

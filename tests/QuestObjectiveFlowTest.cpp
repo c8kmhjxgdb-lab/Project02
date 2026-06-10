@@ -80,9 +80,24 @@ void objectiveQuestTracksProgressAndRewardsOnce() {
     TestSupport::require(quests.isCompleted("arcade_trial_tokens"), "objective quest is completed");
 }
 
+void trackedQuestTextShowsFirstIncompleteObjective() {
+    QuestSystem quests;
+    quests.initWithDefinitions({makeObjectiveQuest()});
+
+    QuestSnapshot snapshot;
+    snapshot.facts.push_back({"collect", "trial_token", 3});
+    snapshot.facts.push_back({"defeat", "popup_bubble", 2});
+    quests.update(snapshot);
+
+    TestSupport::require(
+        quests.getTrackedQuestText() == "找回试玩币: popup_bubble 2/5",
+        "tracked quest shows first incomplete objective");
+}
+
 }  // namespace
 
 int main() {
     objectiveQuestTracksProgressAndRewardsOnce();
+    trackedQuestTextShowsFirstIncompleteObjective();
     return 0;
 }
