@@ -99,12 +99,48 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         return true;
     }
 
+    if (region->getId() == "real_street_prologue" &&
+        WorldQuery::isNearPOI(region, "childhood_crack", playerPos, 1.8f)) {
+        clearTransientCombat(context.gameplay);
+        if (context.gameplay.regionManager.transitionTo(
+                "home_base",
+                glm::ivec2(12, 15),
+                context.worldId)) {
+            refreshGameplayContext(context.gameplay);
+        }
+        return true;
+    }
+
     if (region->getId() == "home_base" &&
         WorldQuery::isNearPOI(region, "base_exit", playerPos, 1.6f)) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
-                "starter_village",
-                glm::ivec2(5, 7),
+                "real_street_prologue",
+                glm::ivec2(18, 25),
+                context.worldId)) {
+            refreshGameplayContext(context.gameplay);
+        }
+        return true;
+    }
+
+    if (region->getId() == "home_base" &&
+        WorldQuery::isNearPOI(region, "arcade_gate", playerPos, 1.6f)) {
+        clearTransientCombat(context.gameplay);
+        if (context.gameplay.regionManager.transitionTo(
+                "popup_arcade",
+                glm::ivec2(30, 56),
+                context.worldId)) {
+            refreshGameplayContext(context.gameplay);
+        }
+        return true;
+    }
+
+    if (region->getId() == "popup_arcade" &&
+        WorldQuery::isNearPOI(region, "base_return_gate", playerPos, 1.8f)) {
+        clearTransientCombat(context.gameplay);
+        if (context.gameplay.regionManager.transitionTo(
+                "home_base",
+                glm::ivec2(19, 9),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }

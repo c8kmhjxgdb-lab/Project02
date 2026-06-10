@@ -125,7 +125,7 @@ void enteringHomeBaseSwitchesRegionAndRefreshesContext() {
         "starter village is cached after entering home base");
 }
 
-void leavingHomeBaseReturnsToStarterVillageAndTeleportsPlayer() {
+void leavingHomeBaseReturnsToPrologueAndTeleportsPlayer() {
     Fixture fixture;
 
     RegionService::DoorContext enterContext = fixture.makeDoorContext();
@@ -140,18 +140,47 @@ void leavingHomeBaseReturnsToStarterVillageAndTeleportsPlayer() {
 
     TestSupport::require(usedExit, "home base exit door is used");
     TestSupport::require(
-        WorldQuery::isCurrentRegion(fixture.regionManager, "starter_village"),
-        "exit switches current region to starter village");
+        WorldQuery::isCurrentRegion(fixture.regionManager, "real_street_prologue"),
+        "exit switches current region to prologue street");
     TestSupport::require(
         fixture.regionManager.hasRegion("home_base"),
         "home base is cached after leaving");
 
     const MapRegion* region = fixture.regionManager.getCurrentRegion();
-    glm::vec2 expected = region->getTileMap().tileToWorld(5, 7);
+    glm::vec2 expected = region->getTileMap().tileToWorld(18, 25);
     b2Vec2 playerPos = b2Body_GetPosition(fixture.playerBodyId);
     TestSupport::require(
         glm::length(glm::vec2(playerPos.x, playerPos.y) - expected) < 0.001f,
-        "exit teleports player to starter village entry tile");
+        "exit teleports player to prologue crack tile");
+}
+
+void homeBaseArcadeGateRoundTripsToPopupArcade() {
+    Fixture fixture;
+
+    RegionService::DoorContext enterContext = fixture.makeDoorContext();
+    RegionService::tryUseHomeBaseDoor(
+        enterContext,
+        poiWorldPosition(fixture.regionManager, "player_home"));
+
+    RegionService::DoorContext arcadeContext = fixture.makeDoorContext();
+    bool usedArcadeGate = RegionService::tryUseHomeBaseDoor(
+        arcadeContext,
+        poiWorldPosition(fixture.regionManager, "arcade_gate"));
+
+    TestSupport::require(usedArcadeGate, "home base arcade gate is used");
+    TestSupport::require(
+        WorldQuery::isCurrentRegion(fixture.regionManager, "popup_arcade"),
+        "arcade gate switches current region to popup arcade");
+
+    RegionService::DoorContext returnContext = fixture.makeDoorContext();
+    bool usedReturnGate = RegionService::tryUseHomeBaseDoor(
+        returnContext,
+        poiWorldPosition(fixture.regionManager, "base_return_gate"));
+
+    TestSupport::require(usedReturnGate, "popup arcade return gate is used");
+    TestSupport::require(
+        WorldQuery::isCurrentRegion(fixture.regionManager, "home_base"),
+        "return gate switches current region to home base");
 }
 
 void enteringHomeBaseClearsTransientCombat() {
@@ -197,7 +226,8 @@ void enteringHomeBaseClearsTransientCombat() {
 
 int main() {
     enteringHomeBaseSwitchesRegionAndRefreshesContext();
-    leavingHomeBaseReturnsToStarterVillageAndTeleportsPlayer();
+    leavingHomeBaseReturnsToPrologueAndTeleportsPlayer();
+    homeBaseArcadeGateRoundTripsToPopupArcade();
     enteringHomeBaseClearsTransientCombat();
     return 0;
 }

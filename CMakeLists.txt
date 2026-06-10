@@ -269,6 +269,13 @@ if(BUILD_TESTING)
     target_link_libraries(RegionServiceDoorTest PRIVATE StarchildGame)
     add_test(NAME RegionServiceDoorTest COMMAND RegionServiceDoorTest)
 
+    add_executable(RegionFactoryNostalgiaTest
+        tests/RegionFactoryNostalgiaTest.cpp
+    )
+    configure_starchild_target(RegionFactoryNostalgiaTest)
+    target_link_libraries(RegionFactoryNostalgiaTest PRIVATE StarchildGame)
+    add_test(NAME RegionFactoryNostalgiaTest COMMAND RegionFactoryNostalgiaTest)
+
     add_executable(DialogueServiceRewardTest
         tests/DialogueServiceRewardTest.cpp
     )
