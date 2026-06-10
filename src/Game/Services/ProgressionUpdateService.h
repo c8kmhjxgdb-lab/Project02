@@ -1,16 +1,19 @@
 #pragma once
 
+#include <box2d/box2d.h>
 #include <glm/vec2.hpp>
 
 #include <functional>
 #include <string>
 
 class BuildingSystem;
+class DropManager;
 class EmotionSystem;
 class Inventory;
 class Princess;
 class QuestSystem;
 class RegionManager;
+class StoryProgress;
 class TimeSystem;
 class ToySystem;
 class WeatherSystem;
@@ -29,6 +32,9 @@ struct Context {
     InputState& input;
     TimeSystem& timeSystem;
     Inventory& inventory;
+    StoryProgress& storyProgress;
+    DropManager& dropManager;
+    b2WorldId worldId;
     Princess* princess;
     WeatherSystem& weatherSystem;
     QuestSystem& questSystem;

@@ -1,4 +1,6 @@
 #include "Drop.h"
+#include "Game/Inventory/ItemCatalog.h"
+
 #include <algorithm>
 #include <cstdio>
 
@@ -35,6 +37,32 @@ b2BodyId DropManager::createBody(b2WorldId world, const glm::vec2& pos) {
     return bodyId;
 }
 
+namespace {
+
+glm::vec3 colorForItem(const std::string& itemId) {
+    const ItemDef* def = ItemCatalog::find(itemId);
+    if (!def) {
+        return glm::vec3(0.5f, 1.0f, 0.3f);
+    }
+
+    switch (def->category) {
+    case ItemCategory::Consumable:
+        return glm::vec3(0.25f, 0.92f, 1.0f);
+    case ItemCategory::Material:
+        return glm::vec3(0.58f, 0.68f, 0.78f);
+    case ItemCategory::Story:
+    case ItemCategory::Relic:
+        return glm::vec3(1.0f, 0.78f, 0.18f);
+    case ItemCategory::HiddenCollectible:
+        return glm::vec3(0.78f, 0.36f, 1.0f);
+    case ItemCategory::ToyFurniture:
+        return glm::vec3(0.45f, 0.95f, 0.62f);
+    }
+    return glm::vec3(0.5f, 1.0f, 0.3f);
+}
+
+}  // namespace
+
 DropId DropManager::spawn(b2WorldId world, const glm::vec2& pos, DropType type, int value) {
     b2BodyId bodyId = createBody(world, pos);
 
@@ -68,6 +96,27 @@ DropId DropManager::spawn(b2WorldId world, const glm::vec2& pos, DropType type, 
 
     drops.push_back(drop);
     return drop.id;
+}
+
+DropId DropManager::spawnItem(b2WorldId world,
+                              const glm::vec2& pos,
+                              const std::string& itemId,
+                              int count,
+                              const std::string& collectionFlag) {
+    if (itemId.empty() || count <= 0) {
+        return DROP_NULL;
+    }
+
+    DropId id = spawn(world, pos, DropType::Item, count);
+    Drop* drop = find(id);
+    if (!drop) {
+        return DROP_NULL;
+    }
+
+    drop->itemId = itemId;
+    drop->collectionFlag = collectionFlag;
+    drop->color = colorForItem(itemId);
+    return id;
 }
 
 Drop* DropManager::find(DropId id) {

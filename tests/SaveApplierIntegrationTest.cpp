@@ -3,6 +3,8 @@
 #include "Game/Ability/Projectile.h"
 #include "Game/Data/SaveData.h"
 #include "Game/GameState.h"
+#include "Game/Services/DropCollectionService.h"
+#include "Game/Services/ProgressionUpdateService.h"
 #include "Game/Services/SaveGameService.h"
 #include "Game/Social/Princess.h"
 #include "Game/World/WeatherTypes.h"
@@ -36,6 +38,25 @@ bool contains(const std::vector<std::string>& values, const std::string& expecte
 
 bool containsText(const std::string& value, const std::string& expected) {
     return value.find(expected) != std::string::npos;
+}
+
+int countItemDrops(const DropManager& dropManager, const std::string& itemId) {
+    int count = 0;
+    for (const Drop& drop : dropManager.getActive()) {
+        if (drop.active && drop.type == DropType::Item && drop.itemId == itemId) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+bool hasCollectionFlag(const DropManager& dropManager, const std::string& collectionFlag) {
+    for (const Drop& drop : dropManager.getActive()) {
+        if (drop.active && drop.collectionFlag == collectionFlag) {
+            return true;
+        }
+    }
+    return false;
 }
 
 struct Fixture {
@@ -179,7 +200,9 @@ SaveData makeSaveData() {
     data.homeFurniture.push_back(bed);
 
     data.furnitureStock.push_back({"simple_bed", 2});
+    data.itemStacks.push_back({"trial_token", 3});
     data.unlockedFurniture.push_back("simple_bed");
+    data.storyProgress.unlockedPartners.push_back("tieyi");
     data.toyData.collectedToys = {"mini_car"};
     data.toyData.miniCarLastRewardDay = 4;
     data.toyData.miniCarBestTime = 9.5f;
@@ -190,6 +213,118 @@ SaveData makeSaveData() {
     data.princess.ultimateCharge = 70.0f;
 
     return data;
+}
+
+QuestDef makeChapterFactQuest() {
+    QuestDef quest;
+    quest.id = "chapter_fact_test";
+    quest.name = "章节事实测试";
+    quest.objectives.push_back({"collect", "trial_token", 3});
+    quest.objectives.push_back({"interact", "tieyi_cage", 1});
+    quest.objectives.push_back({"clear_boss", "popup_crown", 1});
+    quest.reward.questId = quest.id;
+    quest.reward.completed = true;
+    quest.reward.storyFlag = "chapter_fact_rewarded";
+    quest.reward.maxChildlikeHeart = 10.0f;
+    return quest;
+}
+
+void itemDropsCarryItemMetadata() {
+    b2WorldDef worldDef = b2DefaultWorldDef();
+    worldDef.gravity = b2Vec2{0.0f, 0.0f};
+    b2WorldId worldId = b2CreateWorld(&worldDef);
+
+    DropManager dropManager;
+    dropManager.init();
+
+    DropId dropId = dropManager.spawnItem(
+        worldId,
+        glm::vec2(1.0f, 2.0f),
+        "trial_token",
+        3,
+        "collected_trial_token_1");
+
+    const auto& drops = dropManager.getActive();
+    TestSupport::require(dropId != DROP_NULL, "item drop id is valid");
+    TestSupport::require(drops.size() == 1, "one item drop is created");
+    TestSupport::require(drops.front().type == DropType::Item, "item drop uses item type");
+    TestSupport::require(drops.front().itemId == "trial_token", "item drop stores item id");
+    TestSupport::require(drops.front().collectionFlag == "collected_trial_token_1", "item drop stores collection flag");
+    TestSupport::require(drops.front().value == 3, "item drop stores count");
+
+    dropManager.clear();
+    b2DestroyWorld(worldId);
+}
+
+void popupArcadeSpawnsChapterPickupsWithoutDuplicates() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 56), gs.worldId);
+    gs.emotionSystem.setChildlikeHeart(650.0f);
+
+    ProgressionUpdateService::State state;
+    ProgressionUpdateService::Context context = ProgressionUpdateService::makeContext(gs);
+    ProgressionUpdateService::update(context, 0.1f, glm::vec2(30.0f, 56.0f), state);
+
+    TestSupport::require(countItemDrops(gs.dropManager, "trial_token") == 3, "three trial tokens spawn");
+    TestSupport::require(countItemDrops(gs.dropManager, "recovery_candy") == 4, "four recovery candies spawn");
+    TestSupport::require(countItemDrops(gs.dropManager, "color_battery") == 2, "two color batteries spawn");
+    TestSupport::require(countItemDrops(gs.dropManager, "half_melody_arcade") == 1, "hidden melody spawns for vivid heart");
+    TestSupport::require(hasCollectionFlag(gs.dropManager, "collected_trial_token_1"), "trial token 1 has collection flag");
+
+    ProgressionUpdateService::update(context, 0.1f, glm::vec2(30.0f, 56.0f), state);
+    TestSupport::require(countItemDrops(gs.dropManager, "trial_token") == 3, "trial tokens do not duplicate");
+
+    gs.storyProgress.setFlag("collected_trial_token_1", true);
+    gs.dropManager.clear();
+    ProgressionUpdateService::update(context, 0.1f, glm::vec2(30.0f, 56.0f), state);
+
+    TestSupport::require(countItemDrops(gs.dropManager, "trial_token") == 2, "collected token does not respawn");
+    TestSupport::require(!hasCollectionFlag(gs.dropManager, "collected_trial_token_1"), "collected token flag stays absent");
+}
+
+void progressionFactsDriveChapterQuestReward() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 56), gs.worldId);
+    gs.inventory.addItem("trial_token", 3);
+    gs.storyProgress.unlockPartner("tieyi");
+    gs.storyProgress.setFlag("popup_crown_defeated", true);
+    gs.questSystem.initWithDefinitions({makeChapterFactQuest()});
+
+    ProgressionUpdateService::State state;
+    ProgressionUpdateService::Context context = ProgressionUpdateService::makeContext(gs);
+    ProgressionUpdateService::update(context, 0.1f, glm::vec2(30.0f, 56.0f), state);
+
+    TestSupport::require(gs.questSystem.isCompleted("chapter_fact_test"), "chapter quest completes from facts");
+    TestSupport::require(gs.storyProgress.getFlag("chapter_fact_rewarded"), "quest reward story flag applies");
+    TestSupport::require(
+        gs.storyProgress.getFlag("max_childlike_bonus_chapter_fact_test"),
+        "max childlike reward marker applies");
+}
+
+void collectedItemDropUpdatesInventoryAndStoryFlags() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    Drop drop;
+    drop.type = DropType::Item;
+    drop.value = 2;
+    drop.itemId = "color_battery";
+    drop.collectionFlag = "collected_color_battery_1";
+
+    DropCollectionService::Context context = DropCollectionService::makeContext(gs);
+    DropCollectionService::collect(context, drop);
+
+    TestSupport::require(gs.inventory.getItemCount("color_battery") == 2, "item drop adds inventory item");
+    TestSupport::require(
+        gs.storyProgress.getFlag("collected_color_battery"),
+        "item drop sets generic collected item flag");
+    TestSupport::require(
+        gs.storyProgress.getFlag("collected_color_battery_1"),
+        "item drop sets per-pickup collection flag");
 }
 
 void applySaveDataRestoresPersistentStateAndClearsTransientState() {
@@ -224,7 +359,9 @@ void applySaveDataRestoresPersistentStateAndClearsTransientState() {
     TestSupport::require(near(gs.playerMaxMana, data.player.maxMana), "max mana restores");
     TestSupport::require(gs.inventory.getCoins() == data.player.coins, "coins restore");
     TestSupport::require(gs.inventory.getFurnitureCount("simple_bed") == 2, "furniture stock restores");
+    TestSupport::require(gs.inventory.getItemCount("trial_token") == 3, "trial tokens restore");
     TestSupport::require(gs.inventory.isFurnitureUnlocked("simple_bed"), "unlocked furniture restores");
+    TestSupport::require(gs.storyProgress.isPartnerUnlocked("tieyi"), "Tieyi restore");
 
     TestSupport::require(gs.timeSystem.getDay() == data.environment.day, "day restores");
     TestSupport::require(near(gs.timeSystem.getHour(), data.environment.hour), "hour restores");
@@ -294,6 +431,10 @@ void applySaveDataRestoresPersistentStateAndClearsTransientState() {
 }  // namespace
 
 int main() {
+    itemDropsCarryItemMetadata();
+    popupArcadeSpawnsChapterPickupsWithoutDuplicates();
+    progressionFactsDriveChapterQuestReward();
+    collectedItemDropUpdatesInventoryAndStoryFlags();
     applySaveDataRestoresPersistentStateAndClearsTransientState();
     return 0;
 }

@@ -11,6 +11,10 @@ namespace WorldQuery {
 
 const PointOfInterest* findPOI(const MapRegion* region, const std::string& poiId);
 
+bool tryGetPOIWorldPosition(const MapRegion* region,
+                            const std::string& poiId,
+                            glm::vec2& outPosition);
+
 bool isNearPOI(const MapRegion* region,
                const std::string& poiId,
                const glm::vec2& worldPos,

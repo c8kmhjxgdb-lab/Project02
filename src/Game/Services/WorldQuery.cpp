@@ -12,6 +12,15 @@ const PointOfInterest* findPOI(const MapRegion* region, const std::string& poiId
     return nullptr;
 }
 
+bool tryGetPOIWorldPosition(const MapRegion* region,
+                            const std::string& poiId,
+                            glm::vec2& outPosition) {
+    const PointOfInterest* poi = findPOI(region, poiId);
+    if (!region || !poi) return false;
+    outPosition = region->getTileMap().tileToWorld(poi->tilePos.x, poi->tilePos.y);
+    return true;
+}
+
 bool isNearPOI(const MapRegion* region,
                const std::string& poiId,
                const glm::vec2& worldPos,

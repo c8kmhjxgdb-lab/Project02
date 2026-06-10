@@ -110,6 +110,7 @@ add_library(StarchildGame STATIC
     src/Game/Services/CombatCollisionService.cpp
     src/Game/Services/CombatService.cpp
     src/Game/Services/DialogueService.cpp
+    src/Game/Services/DropCollectionService.cpp
     src/Game/Services/EnemySpawnService.cpp
     src/Game/Services/GameSessionService.cpp
     src/Game/Services/NoticeService.cpp

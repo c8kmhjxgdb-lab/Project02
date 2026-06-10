@@ -5,6 +5,7 @@
 #include "Game/Data/LuaConfigRepository.h"
 #include "Game/GameState.h"
 #include "Game/Services/AudioService.h"
+#include "Game/Services/DropCollectionService.h"
 #include "Game/Services/GameSessionService.h"
 #include "Game/Services/RegionService.h"
 #include "Utils/ShaderUtils.h"
@@ -157,9 +158,8 @@ void initCombatSystems(GameState& gs) {
 
     gs.dropManager.init();
     gs.dropManager.setCollectCallback([&gs](const Drop& drop) {
-        if (drop.type == DropType::Coin) {
-            gs.inventory.addCoins(std::max(0, drop.value));
-        }
+        DropCollectionService::Context context = DropCollectionService::makeContext(gs);
+        DropCollectionService::collect(context, drop);
     });
     gs.particleSystem.init();
 }

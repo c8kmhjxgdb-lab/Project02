@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdint>
 #include <functional>
+#include <string>
 
 /**
  * 掉落物类型
@@ -37,6 +38,8 @@ struct Drop {
     DropId id;
     DropType type;
     int value;           // 数量/值
+    std::string itemId;
+    std::string collectionFlag;
     glm::vec3 color;
     float lifetime;      // 存在时间（自动消失）
     float maxLifetime;
@@ -52,7 +55,7 @@ struct Drop {
 
     Drop()
         : bodyId(b2_nullBodyId), id(DROP_NULL), type(DropType::Coin)
-        , value(1), color(1, 1, 0), lifetime(0), maxLifetime(15.0f)
+        , value(1), itemId(), collectionFlag(), color(1, 1, 0), lifetime(0), maxLifetime(15.0f)
         , collected(false), bobTimer(0), collectTimer(0), collecting(false)
         , active(true) {}
 };
@@ -69,6 +72,11 @@ public:
 
     // 生成掉落物
     DropId spawn(b2WorldId world, const glm::vec2& pos, DropType type, int value);
+    DropId spawnItem(b2WorldId world,
+                     const glm::vec2& pos,
+                     const std::string& itemId,
+                     int count,
+                     const std::string& collectionFlag = "");
 
     // 更新（自动拾取检测、生命周期）
     void update(float dt, const glm::vec2& playerPos);
