@@ -55,6 +55,8 @@ add_library(StarchildGame STATIC
     src/Game/AI/Enemy.cpp
     src/Game/AI/EnemyDefinition.cpp
     src/Game/AI/PathfindingSystem.cpp
+    src/Game/Boss/BossController.cpp
+    src/Game/Boss/PopupCrownBoss.cpp
     src/Game/Building/BuildingPhysicsSync.cpp
     src/Game/Building/BuildingPlacementRules.cpp
     src/Game/Building/BuildingStats.cpp
@@ -340,4 +342,11 @@ if(BUILD_TESTING)
     configure_starchild_target(EnemyDefinitionTest)
     target_link_libraries(EnemyDefinitionTest PRIVATE StarchildGame)
     add_test(NAME EnemyDefinitionTest COMMAND EnemyDefinitionTest)
+
+    add_executable(PopupCrownBossTest
+        tests/PopupCrownBossTest.cpp
+    )
+    configure_starchild_target(PopupCrownBossTest)
+    target_link_libraries(PopupCrownBossTest PRIVATE StarchildGame)
+    add_test(NAME PopupCrownBossTest COMMAND PopupCrownBossTest)
 endif()

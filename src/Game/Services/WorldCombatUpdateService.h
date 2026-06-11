@@ -10,6 +10,7 @@ class DropManager;
 class EnemyManager;
 class HealthComponent;
 class ParticleSystem;
+class PopupCrownBoss;
 class ProjectileManager;
 struct GameState;
 
@@ -22,6 +23,7 @@ struct Context {
     DropManager& dropManager;
     HealthComponent& playerHealth;
     float& fireballCooldown;
+    PopupCrownBoss& popupCrownBoss;
     b2WorldId worldId;
     ProjectileTrailService::Context projectileTrail;
     CombatCollisionService::Context collision;

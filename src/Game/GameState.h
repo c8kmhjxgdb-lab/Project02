@@ -21,6 +21,7 @@
 #include "Game/Ability/Projectile.h"
 #include "Game/Ability/Shield.h"
 #include "Game/Ability/SuperStrength.h"
+#include "Game/Boss/PopupCrownBoss.h"
 #include "Game/Building/BuildingSystem.h"
 #include "Game/Controllers/InputState.h"
 #include "Game/Drop.h"
@@ -255,6 +256,7 @@ struct GameState {
 
     // Story progression
     StoryProgress storyProgress;
+    PopupCrownBoss popupCrownBoss;
 
     // Main menu / persistent runtime state
     GameUiState ui;

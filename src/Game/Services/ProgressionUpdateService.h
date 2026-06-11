@@ -10,6 +10,7 @@ class BuildingSystem;
 class DropManager;
 class EmotionSystem;
 class Inventory;
+class PopupCrownBoss;
 class Princess;
 class QuestSystem;
 class RegionManager;
@@ -33,6 +34,7 @@ struct Context {
     TimeSystem& timeSystem;
     Inventory& inventory;
     StoryProgress& storyProgress;
+    PopupCrownBoss& popupCrownBoss;
     DropManager& dropManager;
     b2WorldId worldId;
     Princess* princess;

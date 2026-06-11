@@ -53,6 +53,7 @@ void resetSessionState(GameState& gs) {
     gs.enemySpawnTimer = 0.0f;
     gs.score = 0;
     gs.enemiesKilled = 0;
+    gs.popupCrownBoss = PopupCrownBoss{};
 }
 
 bool applySaveData(GameState& gs, const SaveData& saveData) {

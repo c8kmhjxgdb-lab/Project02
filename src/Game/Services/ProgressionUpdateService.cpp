@@ -1,5 +1,6 @@
 #include "Game/Services/ProgressionUpdateService.h"
 
+#include "Game/Boss/PopupCrownBoss.h"
 #include "Game/Drop.h"
 #include "Game/GameState.h"
 #include "Game/Progress/StoryProgress.h"
@@ -196,6 +197,35 @@ void applyQuestReward(Context& context, const QuestReward& reward) {
         " 童心 +" + std::to_string(static_cast<int>(reward.childlikeHeart)));
 }
 
+void applyBossReward(Context& context, const BossReward& reward) {
+    if (!reward.defeated) return;
+
+    context.inventory.addCoins(reward.coins);
+    if (reward.childlikeHeart > 0.0f) {
+        context.emotionSystem.addChildlikeHeart(reward.childlikeHeart);
+    }
+    for (const QuestItemReward& itemReward : reward.itemRewards) {
+        context.inventory.addItem(itemReward.itemId, itemReward.count);
+    }
+    if (!reward.storyFlag.empty()) {
+        context.storyProgress.setFlag(reward.storyFlag, true);
+    }
+    context.storyProgress.setFlag("popup_crown_rewarded", true);
+    context.storyProgress.completeChapter("chapter_1_popup_arcade");
+    context.storyProgress.unlockPartner("tieyi");
+
+    context.showNotice("六元冠冕已击破 Popup Crown down");
+}
+
+void updateBossProgress(Context& context) {
+    if (!context.popupCrownBoss.isDefeated()) return;
+    if (context.storyProgress.getFlag("popup_crown_rewarded")) return;
+
+    BossReward reward =
+        context.popupCrownBoss.buildReward(context.emotionSystem.getState().childlikeHeart);
+    applyBossReward(context, reward);
+}
+
 void updateQuestProgress(Context& context) {
     QuestSnapshot questSnapshot = buildQuestSnapshot(context);
     for (const QuestReward& reward : context.questSystem.update(questSnapshot)) {
@@ -218,6 +248,7 @@ Context makeContext(GameState& gs) {
         gs.timeSystem,
         gs.inventory,
         gs.storyProgress,
+        gs.popupCrownBoss,
         gs.dropManager,
         gs.worldId,
         gs.princess.get(),
@@ -235,6 +266,7 @@ void update(Context& context, float dt, const glm::vec2& playerPos, State& state
     updateEmotionProgress(context, dt, playerPos, state);
     updateToyProgress(context, dt);
     updateChapterPickups(context);
+    updateBossProgress(context);
     updateQuestProgress(context);
     context.talkedWithPrincessAtBaseThisFrame = false;
 }

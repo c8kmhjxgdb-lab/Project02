@@ -14,6 +14,7 @@ Context makeContext(GameState& gs) {
         gs.dropManager,
         gs.playerHealth,
         gs.fireballCooldown,
+        gs.popupCrownBoss,
         gs.worldId,
         ProjectileTrailService::makeContext(gs),
         CombatCollisionService::makeContext(gs)
@@ -29,6 +30,7 @@ void updateAlive(Context& context, float dt, const glm::vec2& playerPos) {
 
     context.enemyManager.update(dt, context.worldId, playerPos);
     context.dropManager.update(dt, playerPos);
+    context.popupCrownBoss.update(dt);
 
     if (context.fireballCooldown > 0.0f) {
         context.fireballCooldown -= dt;

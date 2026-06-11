@@ -305,6 +305,42 @@ void progressionFactsDriveChapterQuestReward() {
         "max childlike reward marker applies");
 }
 
+void popupCrownBossDefeatAppliesRewardsOnce() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 50), gs.worldId);
+    gs.inventory.setCoins(10);
+    gs.emotionSystem.setChildlikeHeart(650.0f);
+    gs.storyProgress.startChapter("chapter_1_popup_arcade");
+    gs.popupCrownBoss.start();
+    gs.popupCrownBoss.applyDamage(1000.0f);
+
+    ProgressionUpdateService::State state;
+    ProgressionUpdateService::Context context = ProgressionUpdateService::makeContext(gs);
+    ProgressionUpdateService::update(context, 0.1f, glm::vec2(30.0f, 50.0f), state);
+
+    TestSupport::require(gs.inventory.getCoins() == 70, "boss reward adds coins once");
+    TestSupport::require(near(gs.emotionSystem.getState().childlikeHeart, 770.0f), "boss reward adds childlike heart");
+    TestSupport::require(gs.inventory.getItemCount("pixel_controller") == 1, "boss reward grants pixel controller");
+    TestSupport::require(gs.inventory.getItemCount("pixel_screw") == 4, "boss reward grants pixel screws");
+    TestSupport::require(gs.inventory.getItemCount("old_button") == 2, "boss reward grants old buttons");
+    TestSupport::require(gs.inventory.getItemCount("no_pay_victory_sticker") == 1, "boss reward grants hidden sticker");
+    TestSupport::require(gs.storyProgress.getFlag("popup_crown_defeated"), "boss defeat story flag applies");
+    TestSupport::require(gs.storyProgress.getFlag("popup_crown_rewarded"), "boss reward flag applies");
+    TestSupport::require(gs.storyProgress.isPartnerUnlocked("tieyi"), "boss reward unlocks Tieyi");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("chapter_1_popup_arcade") == ChapterState::Completed,
+        "boss reward completes chapter");
+
+    ProgressionUpdateService::update(context, 0.1f, glm::vec2(30.0f, 50.0f), state);
+
+    TestSupport::require(gs.inventory.getCoins() == 70, "boss reward does not duplicate coins");
+    TestSupport::require(gs.inventory.getItemCount("pixel_controller") == 1, "boss reward does not duplicate relic");
+    TestSupport::require(gs.inventory.getItemCount("no_pay_victory_sticker") == 1, "boss reward does not duplicate sticker");
+    TestSupport::require(near(gs.emotionSystem.getState().childlikeHeart, 770.0f), "boss reward does not duplicate childlike heart");
+}
+
 void collectedItemDropUpdatesInventoryAndStoryFlags() {
     Fixture fixture;
     GameState& gs = fixture.gs;
@@ -434,6 +470,7 @@ int main() {
     itemDropsCarryItemMetadata();
     popupArcadeSpawnsChapterPickupsWithoutDuplicates();
     progressionFactsDriveChapterQuestReward();
+    popupCrownBossDefeatAppliesRewardsOnce();
     collectedItemDropUpdatesInventoryAndStoryFlags();
     applySaveDataRestoresPersistentStateAndClearsTransientState();
     return 0;
