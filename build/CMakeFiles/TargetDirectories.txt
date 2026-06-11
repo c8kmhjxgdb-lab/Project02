@@ -7,6 +7,7 @@ E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/StarchildGame.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/StarchildApp.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/Starchild2D.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/SaveDataRoundTripTest.dir
+E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/StoryProgressTest.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/CombatCastServiceTest.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/QuestSystemFlowTest.dir
 E:/DouBao2/Project/KatCode/Project02/build/CMakeFiles/RegionServiceDoorTest.dir

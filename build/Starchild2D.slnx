@@ -21,6 +21,7 @@
 		<BuildDependency Project="StarchildApp.vcxproj"/>
 		<BuildDependency Project="StarchildEngine.vcxproj"/>
 		<BuildDependency Project="StarchildGame.vcxproj"/>
+		<BuildDependency Project="StoryProgressTest.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
 		<Build Solution="Release|*" Project="false"/>
@@ -122,6 +123,11 @@
 	</Project>
 	<Project Path="StarchildGame.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="454a407d-a5b7-3454-9332-84942c4d83e3">
 		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="StoryProgressTest.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d1d1afb4-3d29-31d6-ad31-141b20ce23ef">
+		<BuildDependency Project="StarchildEngine.vcxproj"/>
+		<BuildDependency Project="StarchildGame.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
 	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ec1087a0-55b5-3350-801a-9ad186c086ab"/>

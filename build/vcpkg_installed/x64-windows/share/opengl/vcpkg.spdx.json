@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/opengl-x64-windows-2022-12-04#3-45e7901d-9c55-4259-a6a2-9a2d0987d339",
-  "name": "opengl:x64-windows@2022-12-04#3 711036d5de2884f03417d60e3969a05c9008655bd408f90ae7f4205923f7a37e",
+  "documentNamespace": "https://spdx.org/spdxdocs/opengl-x64-windows-2022-12-04#3-6b5bf08e-1ff7-4d3a-8d71-982801812a3f",
+  "name": "opengl:x64-windows@2022-12-04#3 2599f79a5d47aa95e3ad733a57b10ecb5a79e488b1c0099e63a50318d19f112b",
   "creationInfo": {
     "creators": [
       "Tool: vcpkg-2026-05-27-d5b6777d666efc1a7f491babfcdab37794c1ae3e"
     ],
-    "created": "2026-06-03T13:15:28Z"
+    "created": "2026-06-10T07:32:34Z"
   },
   "relationships": [
     {
@@ -128,7 +128,7 @@
     {
       "name": "opengl:x64-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "711036d5de2884f03417d60e3969a05c9008655bd408f90ae7f4205923f7a37e",
+      "versionInfo": "2599f79a5d47aa95e3ad733a57b10ecb5a79e488b1c0099e63a50318d19f112b",
       "downloadLocation": "NONE",
       "licenseConcluded": "LicenseRef-vcpkg-null",
       "licenseDeclared": "NOASSERTION",

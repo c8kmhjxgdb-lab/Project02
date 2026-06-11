@@ -226,6 +226,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{454A407D-A5B7-3454-9332-84942C4D83E3}</Project>
       <Name>StarchildGame</Name>
     </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\StoryProgressTest.vcxproj">
+      <Project>{D1D1AFB4-3D29-31D6-AD31-141B20CE23EF}</Project>
+      <Name>StoryProgressTest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
