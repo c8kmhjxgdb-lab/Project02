@@ -19,7 +19,7 @@ RegionSpec getRegionSpec(const std::string& regionId) {
         return {"秘密基地", RegionType::Indoor, 24, 18};
     }
     if (regionId == "popup_arcade") {
-        return {"弹窗游乐厅", RegionType::Dungeon, 60, 60};
+        return {"弹窗游乐厅", RegionType::Dungeon, 24, 20};
     }
     return {regionId, RegionType::Overworld, 60, 60};
 }
@@ -178,8 +178,9 @@ void configureHomeBase(MapRegion& region) {
         if (map.isInBounds(x, 2)) map.setTile(x, 2, TileType::Stone);
     }
 
-    if (map.isInBounds(20, 9)) map.setTile(20, 9, TileType::Portal);
-    if (map.isInBounds(19, 9)) map.setTile(19, 9, TileType::Path);
+    // arcade_gate 传送门(东墙,x=map.width-1=23)
+    if (map.isInBounds(doorX + 5, doorY - 1)) map.setTile(doorX + 5, doorY - 1, TileType::Portal);
+    if (map.isInBounds(doorX + 5, doorY - 2)) map.setTile(doorX + 5, doorY - 2, TileType::Path);
 
     addPoi(region, PointOfInterest::Type::Home,
         "base_exit", "返回小卖部门口 / Back to Street", {doorX, doorY - 1});
@@ -189,95 +190,103 @@ void configureHomeBase(MapRegion& region) {
         "save_bed", "存档床 / Save Bed", {4, 4});
     addPoi(region, PointOfInterest::Type::Quest,
         "pixel_controller_spot", "像素手柄摆放处 / Controller Spot", {12, 8});
+    // arcade_gate POI 放在传送门瓦片上,和 Connection sourceTile 一致
     addPoi(region, PointOfInterest::Type::Teleport,
-        "arcade_gate", "弹窗游乐厅入口 / Popup Arcade Gate", {19, 9});
+        "arcade_gate", "弹窗游乐厅入口 / Popup Arcade Gate", {doorX + 5, doorY - 1});
 
+    // popup_arcade: 入口传送门在 popup_arcade 顶部中央 {12,1},玩家落在 {12,2}(传送门下方1格)
     addConnection(region, MapConnection::Direction::East,
-        "popup_arcade", {20, 9}, {30, 54}); // targetTile 从 {30, 53} 改为 {30, 54} 远离 base_return_gate {30, 57}
+        "popup_arcade", {doorX + 5, doorY - 1}, {12, 2});
 }
 
 void configurePopupArcade(MapRegion& region) {
     TileMap& map = region.getTileMap();
 
-    // 内部使用 Dirt 作为可行走地板（不创建物理刚体），避免大量 Stone
-    // 瓦片产生数千个 Box2D 静态刚体导致 FPS 骤降。
+    // 内部使用 Dirt 作为可行走地板(不创建物理刚体),整体尺寸 24×20。
+    // 地图布局(从上到下):
+    //   y=0    : 顶部墙壁(北边界)
+    //   y=1    : 入口平台,中央放入口传送门(来自 home_base 的 arcade_gate)
+    //   y=2-6  : 上部探索区,含试玩币/公告
+    //   y=7-13 : 中部开阔区,含商贩/影子/Boss 门
+    //   y=14-17: 下部区,含返回传送门
+    //   y=18   : 底部墙壁(南边界)
+    //   y=19   : 底部墙壁
+
+    // 填满 Dirt(可行走,无物理刚体)
     for (int y = 1; y < map.height - 1; ++y) {
         for (int x = 1; x < map.width - 1; ++x) {
             map.setTile(x, y, TileType::Dirt);
         }
     }
 
-    // 先设置主路径区域
-    for (int y = 48; y <= 57; ++y) {
-        for (int x = 24; x <= 36; ++x) {
-            if (map.isInBounds(x, y)) map.setTile(x, y, TileType::Path);
-        }
+    // 顶部入口平台 Path(y=1, x=10-14)
+    for (int x = 10; x <= 14; ++x) {
+        if (map.isInBounds(x, 1)) map.setTile(x, 1, TileType::Path);
     }
-    for (int y = 26; y <= 47; ++y) {
-        for (int x = 22; x <= 38; ++x) {
-            if (map.isInBounds(x, y)) map.setTile(x, y, TileType::Path);
-        }
+    // 入口传送门(中央 x=12, y=1),来自 home_base 的 arcade_gate {20,9}
+    if (map.isInBounds(12, 1)) map.setTile(12, 1, TileType::Portal);
+
+    // 中部主路径(y=9, x=5-19)
+    for (int x = 5; x <= 19; ++x) {
+        if (map.isInBounds(x, 9)) map.setTile(x, 9, TileType::Path);
     }
-    for (int y = 20; y <= 34; ++y) {
-        for (int x = 40; x <= 55; ++x) {
-            if (map.isInBounds(x, y)) map.setTile(x, y, TileType::Dirt);
-        }
+    // 底部返回平台 Path(y=17, x=10-14)
+    for (int x = 10; x <= 14; ++x) {
+        if (map.isInBounds(x, 17)) map.setTile(x, 17, TileType::Path);
     }
-    for (int y = 4; y <= 18; ++y) {
-        for (int x = 18; x <= 42; ++x) {
-            if (map.isInBounds(x, y)) map.setTile(x, y, TileType::Path);
-        }
+    // 返回传送门(中央 x=12, y=17),通往 home_base
+    if (map.isInBounds(12, 17)) map.setTile(12, 17, TileType::Portal);
+
+    // Boss 门路径(y=7, x=10-14)
+    for (int x = 10; x <= 14; ++x) {
+        if (map.isInBounds(x, 7)) map.setTile(x, 7, TileType::Path);
     }
 
-    // 在各区域的交界处放置少量 Stone 掩体（在路径区域覆盖之后放置）
-    auto placeStone = [&map](int x, int y) {
-        if (map.isInBounds(x, y) && map.getTile(x, y) != TileType::Wall) {
+    // 少量边界石柱作为掩体(不放在传送门和路径上)
+    auto tryStone = [&map](int x, int y) {
+        if (map.isInBounds(x, y) &&
+            map.getTile(x, y) == TileType::Dirt) {
             map.setTile(x, y, TileType::Stone);
         }
     };
-    for (int y = 4; y <= 18; ++y) {
-        placeStone(18, y);   // 北区左边界石柱
-        placeStone(43, y);   // 北区右边界石柱
-    }
-    for (int y = 20; y <= 34; ++y) {
-        placeStone(39, y);   // 东区左边界石柱
-        placeStone(56, y);   // 东区右边界石柱
-    }
-    for (int y = 26; y <= 47; ++y) {
-        placeStone(21, y);   // 中区左边界石柱
-        placeStone(39, y);   // 中区右边界石柱
-    }
-    for (int y = 48; y <= 57; ++y) {
-        placeStone(23, y);   // 南区左边界石柱
-        placeStone(37, y);   // 南区右边界石柱
-    }
+    // 左边界石柱列(x=3)
+    for (int y = 3; y <= 15; ++y) { tryStone(3, y); }
+    // 右边界石柱列(x=20)
+    for (int y = 3; y <= 15; ++y) { tryStone(20, y); }
+    // 少量散点石柱
+    tryStone(6, 4); tryStone(18, 4);
+    tryStone(6, 12); tryStone(18, 12);
 
-    if (map.isInBounds(30, 58)) map.setTile(30, 58, TileType::Portal);
-    if (map.isInBounds(30, 4)) map.setTile(30, 4, TileType::Portal);
-
+    // POI:严格放在 Path/Dirt 格子上,远离传送门
     addPoi(region, PointOfInterest::Type::NPC_Spawn,
-        "trapped_player_shadow", "被困玩家影子 / Trapped Shadow", {28, 48});
+        "trapped_player_shadow", "被困玩家影子 / Trapped Shadow", {8, 11});
     addPoi(region, PointOfInterest::Type::Shop,
-        "popup_vendor", "弹窗商贩 / Popup Vendor", {34, 45});
+        "popup_vendor", "弹窗商贩 / Popup Vendor", {12, 10});
     addPoi(region, PointOfInterest::Type::Treasure,
-        "trial_token_1", "试玩币 1 / Trial Token 1", {24, 34});
+        "trial_token_1", "试玩币 1 / Trial Token 1", {7, 5});
     addPoi(region, PointOfInterest::Type::Treasure,
-        "trial_token_2", "试玩币 2 / Trial Token 2", {36, 32});
+        "trial_token_2", "试玩币 2 / Trial Token 2", {17, 5});
     addPoi(region, PointOfInterest::Type::Treasure,
-        "trial_token_3", "试玩币 3 / Trial Token 3", {49, 25});
+        "trial_token_3", "试玩币 3 / Trial Token 3", {12, 13});
     addPoi(region, PointOfInterest::Type::Quest,
-        "tieyi_cage", "铁翼牢笼 / Tieyi Cage", {52, 30});
+        "tieyi_cage", "铁翼牢笼 / Tieyi Cage", {17, 11});
     addPoi(region, PointOfInterest::Type::Waypoint,
-        "gray_bureau_notice", "灰色管理局公告 / Gray Bureau Notice", {43, 21});
+        "gray_bureau_notice", "灰色管理局公告 / Gray Bureau Notice", {5, 9});
     addPoi(region, PointOfInterest::Type::Dungeon,
-        "arcade_boss_door", "六元冠冕门 / Crown Door", {30, 20});
+        "arcade_boss_door", "六元冠冕门 / Crown Door", {12, 7});
     addPoi(region, PointOfInterest::Type::Dungeon,
-        "popup_crown_arena", "六元冠冕竞技场 / Popup Crown Arena", {30, 9});
+        "popup_crown_arena", "六元冠冕竞技场 / Popup Crown Arena", {12, 5});
     addPoi(region, PointOfInterest::Type::Teleport,
-        "base_return_gate", "返回秘密基地 / Return to Base", {30, 57});
+        "base_return_gate", "返回秘密基地 / Return to Base", {12, 16});
 
+    // 从 home_base {20,9} 进入,落在 popup_arcade 入口传送门 {12,1}
+    // Direction::North 表示入口在 popup_arcade 的北端
+    addConnection(region, MapConnection::Direction::North,
+        "home_base", {12, 1}, {12, 2});
+    // 返回:popup_arcade {12,17} → home_base {20,9}
+    // Direction::South 表示返回口在 popup_arcade 的南端
     addConnection(region, MapConnection::Direction::South,
-        "home_base", {30, 58}, {17, 9}); // 避开 arcade_gate {19, 9} 的手动交互范围和自动连接范围
+        "home_base", {12, 17}, {20, 9});
 }
 
 void configureRegionSpecials(MapRegion& region) {
@@ -295,6 +304,10 @@ void configureRegionSpecials(MapRegion& region) {
 }  // namespace
 
 namespace RegionFactory {
+
+void configureRegion(MapRegion& region) {
+    ::configureRegionSpecials(region);
+}
 
 std::unique_ptr<MapRegion> createRegion(const std::string& regionId) {
     RegionSpec spec = getRegionSpec(regionId);

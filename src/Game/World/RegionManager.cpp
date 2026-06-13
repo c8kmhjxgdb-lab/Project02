@@ -41,6 +41,13 @@ bool RegionManager::loadRegion(const std::string& regionId) {
 
     auto region = RegionFactory::createRegion(regionId);
 
+    // 如果当前区域存在,它的 connections 可能引用了刚要加载的区域ID
+    // (例如 home_base 的 arcade_gate 连接指向 popup_arcade)。
+    // 为了保持连接一致性,重新配置当前区域的 specials。
+    if (currentRegion && !currentRegionId.empty()) {
+        RegionFactory::configureRegion(*currentRegion);
+    }
+
     loadedRegions[regionId] = std::move(region);
     if (std::find(discoveredRegions.begin(), discoveredRegions.end(), regionId) == discoveredRegions.end()) {
         discoveredRegions.push_back(regionId);

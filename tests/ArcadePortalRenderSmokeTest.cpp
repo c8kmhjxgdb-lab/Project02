@@ -90,8 +90,9 @@ void automaticArcadePortalRendersThroughTransition() {
     enterHomeBaseWithoutFade(gs);
     MapRegion* homeBase = gs.regionManager.getCurrentRegion();
     TestSupport::require(homeBase != nullptr, "home base is current before portal render smoke");
-    movePlayerTo(gs, homeBase->getTileMap().tileToWorld(20, 9));
-    gs.camera.position = homeBase->getTileMap().tileToWorld(20, 9);
+    // arcade_gate portal: home_base {doorX+5, doorY-1} = {17, 16} (doorX=12, doorY=17)
+    movePlayerTo(gs, homeBase->getTileMap().tileToWorld(17, 16));
+    gs.camera.position = homeBase->getTileMap().tileToWorld(17, 16);
 
     WorldScene::State state = WorldScene::createState();
     constexpr float dt = 1.0f / 60.0f;
@@ -149,8 +150,9 @@ void cachedAutomaticArcadePortalRendersImmediateTransition() {
 
     MapRegion* homeBase = gs.regionManager.getCurrentRegion();
     TestSupport::require(homeBase != nullptr, "home base is current before cached portal smoke");
-    movePlayerTo(gs, homeBase->getTileMap().tileToWorld(20, 9));
-    gs.camera.position = homeBase->getTileMap().tileToWorld(20, 9);
+    // arcade_gate portal at {17, 16} (home_base 24×18)
+    movePlayerTo(gs, homeBase->getTileMap().tileToWorld(17, 16));
+    gs.camera.position = homeBase->getTileMap().tileToWorld(17, 16);
 
     WorldScene::State state = WorldScene::createState();
     constexpr float dt = 1.0f / 60.0f;
@@ -190,7 +192,7 @@ void popupArcadePhysicsBodyBudgetIsBounded() {
     //
     // 实际数:
     // - 修复前 (60×60 全 Stone):~3364 个刚体
-    // - 修复后 (60×60 Dirt + 4 条边界石柱 + 墙):~120 个刚体
+    // - 修复后 (24×20 Dirt + 边界石柱 + 墙):实测 114 个刚体
     // 阈值取 500 留出安全余量,任何把内部改回 Stone 的修改都会立即炸出来。
 
     b2WorldDef worldDef = b2DefaultWorldDef();
@@ -220,9 +222,9 @@ void walkingOntoArcadePortalRendersThroughTransition() {
     enterHomeBaseWithoutFade(gs);
     MapRegion* homeBase = gs.regionManager.getCurrentRegion();
     TestSupport::require(homeBase != nullptr, "home base is current before walking portal");
-    movePlayerTo(gs, homeBase->getTileMap().tileToWorld(18, 9));
-    gs.camera.position = homeBase->getTileMap().tileToWorld(18, 9);
-    gs.input.setKey(SDL_SCANCODE_D, true);
+    // 直接瞬移到 arcade_gate portal 瓦片上,测试 auto-transition 路径
+    movePlayerTo(gs, homeBase->getTileMap().tileToWorld(17, 16));
+    gs.camera.position = homeBase->getTileMap().tileToWorld(17, 16);
 
     WorldScene::State state = WorldScene::createState();
     constexpr float dt = 1.0f / 60.0f;

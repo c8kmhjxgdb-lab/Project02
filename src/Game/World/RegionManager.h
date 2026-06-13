@@ -75,7 +75,7 @@ private:
 
     // 传送冷却
     float transitionCooldownTimer = 0.0f;
-    static constexpr float TRANSITION_COOLDOWN = 0.5f;
+    static constexpr float TRANSITION_COOLDOWN = 0.3f;  // 0.3s 冷却防止反复 auto-transition(transition后自动清除)
 
     // 过渡期间的临时数据
     std::string transitionTargetRegionId;

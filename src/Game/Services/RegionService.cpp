@@ -128,7 +128,7 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
                 "popup_arcade",
-                glm::ivec2(30, 54),
+                glm::ivec2(12, 2),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }
@@ -140,7 +140,7 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
                 "home_base",
-                glm::ivec2(17, 9),
+                glm::ivec2(20, 9),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }
