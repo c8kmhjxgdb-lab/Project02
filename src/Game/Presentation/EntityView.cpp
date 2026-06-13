@@ -194,4 +194,25 @@ void renderEnemyHealthBars(const std::vector<const Enemy*>& aliveEnemies,
     Draw2D::endFrame();
 }
 
+bool tryGetPixelActorKind(const Enemy& enemy, PixelActorView::ActorKind& outKind) {
+    if (enemy.definitionId == "popup_bubble") {
+        outKind = PixelActorView::ActorKind::PopupBubble;
+        return true;
+    }
+    if (enemy.definitionId == "payment_button") {
+        outKind = PixelActorView::ActorKind::PaymentButton;
+        return true;
+    }
+    if (enemy.definitionId == "close_x_bug") {
+        outKind = PixelActorView::ActorKind::CloseXBug;
+        return true;
+    }
+    if (enemy.definitionId == "scrap_soldier" ||
+        enemy.definitionId == "scrap_soldier_elite") {
+        outKind = PixelActorView::ActorKind::ScrapSoldier;
+        return true;
+    }
+    return false;
+}
+
 }  // namespace EntityView

@@ -3,6 +3,7 @@
 #include "Game/AI/Enemy.h"
 #include "Game/Ability/Projectile.h"
 #include "Game/Drop.h"
+#include "Game/Presentation/PixelActorView.h"
 
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
@@ -77,5 +78,7 @@ void renderDrop(const Drop& drop, const glm::mat4& viewProj);
 
 void renderEnemyHealthBars(const std::vector<const Enemy*>& aliveEnemies,
                            const glm::mat4& viewProj);
+
+bool tryGetPixelActorKind(const Enemy& enemy, PixelActorView::ActorKind& outKind);
 
 }  // namespace EntityView

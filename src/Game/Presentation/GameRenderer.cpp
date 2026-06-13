@@ -4,6 +4,7 @@
 #include "Engine/Renderer/DialogueUI.h"
 #include "Engine/Renderer/MiniMap.h"
 #include "Engine/Renderer/PostProcess.h"
+#include "Game/Boss/PopupCrownBoss.h"
 #include "Game/Emotion/EmotionSystem.h"
 #include "Game/Presentation/AbilityView.h"
 #include "Game/Presentation/AimReticleView.h"
@@ -13,6 +14,7 @@
 #include "Game/Presentation/HudView.h"
 #include "Game/Presentation/MainMenuView.h"
 #include "Game/Presentation/ParticleView.h"
+#include "Game/Presentation/PixelActorView.h"
 #include "Game/Presentation/WorldRenderer.h"
 #include "Game/Presentation/WorldSignView.h"
 #include "Game/Services/WorldQuery.h"
@@ -30,7 +32,7 @@
 namespace {
 
 struct RenderEntry {
-    int type = 0;  // 0=drop, 1=enemy, 2=princess, 3=player
+    int type = 0;  // 0=drop, 1=enemy, 2=princess, 3=player, 4=boss
     float y = 0.0f;
     size_t index = 0;
 
@@ -38,6 +40,71 @@ struct RenderEntry {
         return y < other.y;
     }
 };
+
+float pixelGlowForTier(ChildlikeHeartTier tier) {
+    switch (tier) {
+        case ChildlikeHeartTier::Faded: return 0.08f;
+        case ChildlikeHeartTier::Normal: return 0.22f;
+        case ChildlikeHeartTier::Vivid: return 0.40f;
+        case ChildlikeHeartTier::Radiant: return 0.58f;
+    }
+    return 0.22f;
+}
+
+bool isFaded(const EmotionSystem& emotionSystem) {
+    return emotionSystem.getChildlikeHeartTier() == ChildlikeHeartTier::Faded;
+}
+
+void renderPixelPlayer(const GameRenderer::WorldRenderContext& context, const glm::mat4& viewProj) {
+    PixelActorView::render({
+        PixelActorView::ActorKind::Xingyuan,
+        context.characterModel.position,
+        context.charTime,
+        pixelGlowForTier(context.emotionSystem.getChildlikeHeartTier()),
+        isFaded(context.emotionSystem)
+    }, viewProj);
+}
+
+void renderPixelPrincess(const GameRenderer::WorldRenderContext& context, const glm::mat4& viewProj) {
+    if (!context.princess) return;
+    PixelActorView::render({
+        PixelActorView::ActorKind::Alya,
+        context.princess->getPosition(),
+        context.charTime,
+        std::max(0.16f, pixelGlowForTier(context.emotionSystem.getChildlikeHeartTier()) * 0.85f),
+        isFaded(context.emotionSystem)
+    }, viewProj);
+}
+
+bool renderPixelEnemy(const GameRenderer::WorldRenderContext& context,
+                      const Enemy& enemy,
+                      const glm::mat4& viewProj) {
+    PixelActorView::ActorKind kind = PixelActorView::ActorKind::PopupBubble;
+    if (!EntityView::tryGetPixelActorKind(enemy, kind)) {
+        return false;
+    }
+
+    b2Vec2 pos = b2Body_GetPosition(enemy.bodyId);
+    float glow = enemy.definitionId == "scrap_soldier_elite" ? 0.34f : 0.18f;
+    PixelActorView::render({
+        kind,
+        glm::vec2(pos.x, pos.y),
+        context.charTime,
+        glow,
+        isFaded(context.emotionSystem)
+    }, viewProj);
+    return true;
+}
+
+void renderPopupCrown(const GameRenderer::WorldRenderContext& context, const glm::mat4& viewProj) {
+    PixelActorView::render({
+        PixelActorView::ActorKind::PopupCrown,
+        glm::vec2(30.0f, 50.0f),
+        context.charTime,
+        0.75f,
+        isFaded(context.emotionSystem)
+    }, viewProj);
+}
 
 void renderSortedEntities(GameRenderer::WorldRenderContext& context, const glm::mat4& viewProj) {
     std::vector<RenderEntry> renderQueue;
@@ -61,6 +128,10 @@ void renderSortedEntities(GameRenderer::WorldRenderContext& context, const glm::
         renderQueue.push_back({2, pPos.y, 0});
     }
 
+    if (context.popupCrownBoss.isActive()) {
+        renderQueue.push_back({4, 50.0f, 0});
+    }
+
     if (!context.isDead) {
         b2Vec2 pPos = b2Body_GetPosition(context.playerBodyId);
         renderQueue.push_back({3, pPos.y, 0});
@@ -74,6 +145,10 @@ void renderSortedEntities(GameRenderer::WorldRenderContext& context, const glm::
                 EntityView::renderDrop(drops[entry.index], viewProj);
                 break;
             case 1:
+                if (context.usePixelActors &&
+                    renderPixelEnemy(context, enemies[entry.index], viewProj)) {
+                    break;
+                }
                 EntityView::renderEnemy(
                     context.enemyResources,
                     enemies[entry.index],
@@ -81,13 +156,24 @@ void renderSortedEntities(GameRenderer::WorldRenderContext& context, const glm::
                     context.charTime);
                 break;
             case 2:
-                if (context.princess) context.princess->render(viewProj);
+                if (context.usePixelActors) {
+                    renderPixelPrincess(context, viewProj);
+                } else if (context.princess) {
+                    context.princess->render(viewProj);
+                }
                 break;
             case 3:
-                EntityView::renderCharacter(
-                    context.characterResources,
-                    context.characterModel,
-                    viewProj);
+                if (context.usePixelActors) {
+                    renderPixelPlayer(context, viewProj);
+                } else {
+                    EntityView::renderCharacter(
+                        context.characterResources,
+                        context.characterModel,
+                        viewProj);
+                }
+                break;
+            case 4:
+                renderPopupCrown(context, viewProj);
                 break;
         }
     }

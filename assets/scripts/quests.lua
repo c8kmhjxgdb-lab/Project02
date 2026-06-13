@@ -37,11 +37,7 @@ return {
             { type = "interact", target = "star_candy", required = 1 },
             { type = "enter_region", target = "real_street_prologue", required = 1 }
         },
-        reward = {
-            itemRewards = {
-                { item = "old_game_coin", count = 1 }
-            }
-        }
+        reward = {}
     },
     arcade_trial_tokens = {
         name = "找回试玩币",

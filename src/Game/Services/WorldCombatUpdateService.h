@@ -12,6 +12,7 @@ class HealthComponent;
 class ParticleSystem;
 class PopupCrownBoss;
 class ProjectileManager;
+class StoryProgress;
 struct GameState;
 
 namespace WorldCombatUpdateService {
@@ -23,6 +24,7 @@ struct Context {
     DropManager& dropManager;
     HealthComponent& playerHealth;
     float& fireballCooldown;
+    StoryProgress& storyProgress;
     PopupCrownBoss& popupCrownBoss;
     b2WorldId worldId;
     ProjectileTrailService::Context projectileTrail;

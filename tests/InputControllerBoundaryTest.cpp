@@ -8,11 +8,20 @@
 #include "Game/Building/BuildingSystem.h"
 #include "Game/Controllers/AbilityInputController.h"
 #include "Game/Controllers/BuildingInputController.h"
+#include "Game/Controllers/InputState.h"
+#include "Engine/Camera/Camera2D.h"
+#include "Engine/Physics/PhysicsWorld.h"
+#include "Engine/Renderer/DialogueUI.h"
+#include "Game/Emotion/EmotionSystem.h"
+#include "Game/Health.h"
 #include "Game/Inventory/Inventory.h"
+#include "Game/Services/PlayerMotionService.h"
 #include "Game/Social/Princess.h"
 #include "Game/Toy/ToySystem.h"
 #include "Game/World/RegionManager.h"
+#include "Game/World/TileMap.h"
 #include "Game/World/TimeSystem.h"
+#include "Game/World/WeatherSystem.h"
 #include "TestSupport.h"
 
 #include <SDL2/SDL.h>
@@ -36,11 +45,26 @@ struct Fixture {
     float flightHeightTarget = 0.0f;
     float flightMaxHeight = 5.0f;
     float flightCooldown = 0.0f;
+    float flightCooldownMax = 2.0f;
     float shieldCooldown = 0.0f;
     float shieldCooldownMax = 5.0f;
     float fireballCooldown = 0.0f;
     float fireballCooldownMax = 0.3f;
+    float playerForce = 50.0f;
+    float flightSpeed = 4.0f;
+    float flightDescentSpeedMult = 2.0f;
+    float flightManaDrain = 10.0f;
+    float shadowScale = 1.0f;
+    float charTime = 0.0f;
+    float armAngle = 0.0f;
 
+    InputState input;
+    Camera2D camera;
+    PhysicsWorld physicsWorld;
+    TileMap tileMap{20, 20, 1.0f};
+    WeatherSystem weatherSystem;
+    EmotionSystem emotionSystem;
+    HealthComponent playerHealth;
     BuildingSystem buildingSystem;
     ToySystem toySystem;
     SuperStrength superStrength;
@@ -52,14 +76,14 @@ struct Fixture {
     Lightning lightning;
     EnemyManager enemyManager;
     RegionManager regionManager;
+    DialogueUI dialogueUI;
     TimeSystem timeSystem;
     Inventory inventory;
     bool gameMenuOpen = false;
 
     Fixture() {
-        b2WorldDef worldDef = b2DefaultWorldDef();
-        worldDef.gravity = b2Vec2{0.0f, 0.0f};
-        worldId = b2CreateWorld(&worldDef);
+        physicsWorld.create();
+        worldId = physicsWorld.getWorldId();
 
         b2BodyDef bodyDef = b2DefaultBodyDef();
         bodyDef.type = b2_dynamicBody;
@@ -72,6 +96,8 @@ struct Fixture {
         projectileManager.init();
         enemyManager.init();
         timeSystem.init(9.0f);
+        weatherSystem.init(&particleSystem, &camera);
+        playerHealth.restore(100.0f, 100.0f);
 
         regionManager.setWorldId(worldId);
         regionManager.setPlayerBody(playerBodyId);
@@ -89,9 +115,7 @@ struct Fixture {
         projectileManager.clear();
         enemyManager.clear();
         particleSystem.clear();
-        if (b2World_IsValid(worldId)) {
-            b2DestroyWorld(worldId);
-        }
+        physicsWorld.destroy();
     }
 
     CombatService::CastContext makeCastContext() {
@@ -154,6 +178,41 @@ struct Fixture {
             toySystem,
             timeSystem,
             inventory
+        };
+    }
+
+    PlayerMotionService::Context makeMotionContext() {
+        return {
+            input,
+            camera,
+            regionManager,
+            tileMap,
+            weatherSystem,
+            emotionSystem,
+            projectileManager,
+            particleSystem,
+            physicsWorld,
+            playerHealth,
+            playerBodyId,
+            playerForce,
+            facingDir,
+            playerMana,
+            isDead,
+            isFlying,
+            flightHeight,
+            flightHeightTarget,
+            flightMaxHeight,
+            flightSpeed,
+            flightDescentSpeedMult,
+            flightManaDrain,
+            flightCooldown,
+            flightCooldownMax,
+            shadowScale,
+            charTime,
+            armAngle,
+            1280,
+            720,
+            !dialogueUI.isVisible() && !gameMenuOpen && !toySystem.isMiniCarActive()
         };
     }
 
@@ -379,6 +438,27 @@ void buildingMouseWheelConsumesOnlyInBuildMode() {
         "mouse wheel changes selection in build mode");
 }
 
+void movementInputIsIgnoredWhileDialogueIsVisible() {
+    Fixture fixture;
+
+    DialogueNode node;
+    node.speaker = "艾莉娅";
+    node.text = "选项出现时，星愿应该停在原地。";
+    node.choices.push_back({"向上", "", "up", 0, {}});
+    node.choices.push_back({"向下", "", "down", 0, {}});
+    fixture.dialogueUI.begin(node);
+
+    fixture.input.setKey(SDL_SCANCODE_UP, true);
+
+    PlayerMotionService::Context context = fixture.makeMotionContext();
+    PlayerMotionService::update(context, 1.0f / 60.0f);
+
+    b2Vec2 velocity = b2Body_GetLinearVelocity(fixture.playerBodyId);
+    b2Vec2 position = b2Body_GetPosition(fixture.playerBodyId);
+    TestSupport::require(velocity.y == 0.0f, "dialogue selection key does not apply movement velocity");
+    TestSupport::require(position.y == 0.0f, "player remains in place while dialogue is visible");
+}
+
 }  // namespace
 
 int main() {
@@ -388,5 +468,6 @@ int main() {
     abilitySpaceStartsFlightOnlyWhenAllowed();
     buildingToggleRequiresHomeBaseAndNoMiniCar();
     buildingMouseWheelConsumesOnlyInBuildMode();
+    movementInputIsIgnoredWhileDialogueIsVisible();
     return 0;
 }

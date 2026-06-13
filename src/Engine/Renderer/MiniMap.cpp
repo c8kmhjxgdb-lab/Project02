@@ -118,6 +118,12 @@ void MiniMap::forceUpdate(const glm::vec2& playerPos) {
     (void)playerPos; // Player position is now handled via entity markers
     if (!tileGetter) return;
     if (mapWidth <= 0 || mapHeight <= 0) return;
+    if (mapSize <= 0) return;
+
+    const size_t expectedDataSize = static_cast<size_t>(mapSize) * static_cast<size_t>(mapSize);
+    if (minimapData.size() != expectedDataSize) {
+        minimapData.assign(expectedDataSize, 0);
+    }
 
     // Fill every minimap texture pixel by sampling the source map. The old
     // code wrote one texture pixel per map tile, leaving most of the texture
@@ -133,10 +139,13 @@ void MiniMap::forceUpdate(const glm::vec2& playerPos) {
         }
     }
 
-    // Upload to GPU
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mapSize, mapSize, GL_RED, GL_UNSIGNED_BYTE, minimapData.data());
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // Upload to GPU only when init() created a texture. Headless tests and
+    // non-rendering sessions still need this method to be safe.
+    if (texture) {
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mapSize, mapSize, GL_RED, GL_UNSIGNED_BYTE, minimapData.data());
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 void MiniMap::render(const glm::mat4& orthoProj, int screenWidth, int screenHeight) {

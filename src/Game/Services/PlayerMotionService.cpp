@@ -1,6 +1,9 @@
 #include "Game/Services/PlayerMotionService.h"
 
+#include "Engine/Renderer/DialogueUI.h"
+#include "Game/Building/BuildingSystem.h"
 #include "Game/GameState.h"
+#include "Game/Toy/ToySystem.h"
 
 #include <SDL2/SDL.h>
 #include <box2d/box2d.h>
@@ -77,7 +80,8 @@ void updateFlight(Context& context, float dt) {
         context.shadowScale = 0.4f;
     }
 
-    if (!context.input.isDown(SDL_SCANCODE_SPACE) && context.isFlying) {
+    if ((!context.movementInputEnabled || !context.input.isDown(SDL_SCANCODE_SPACE)) &&
+        context.isFlying) {
         context.isFlying = false;
         context.flightHeightTarget = 0.0f;
         context.flightCooldown = context.flightCooldownMax;
@@ -88,6 +92,10 @@ b2Vec2 buildMovementForce(const Context& context) {
     b2Vec2 force;
     force.x = 0.0f;
     force.y = 0.0f;
+    if (!context.movementInputEnabled) {
+        return force;
+    }
+
     if (context.input.isDown(SDL_SCANCODE_W) || context.input.isDown(SDL_SCANCODE_UP)) {
         force.y += context.playerForce;
     }
@@ -197,7 +205,11 @@ Context makeContext(GameState& gs) {
         gs.charTime,
         gs.armAngle,
         gs.screenWidth,
-        gs.screenHeight
+        gs.screenHeight,
+        !gs.dialogueUI.isVisible() &&
+            !gs.ui.gameMenuOpen &&
+            !gs.buildingSystem.isActive() &&
+            !gs.toySystem.isMiniCarActive()
     };
 }
 

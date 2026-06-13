@@ -104,7 +104,7 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
                 "home_base",
-                glm::ivec2(12, 15),
+                glm::ivec2(12, 14),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }
@@ -116,7 +116,7 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
                 "real_street_prologue",
-                glm::ivec2(18, 25),
+                glm::ivec2(18, 23),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }
@@ -128,7 +128,7 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
                 "popup_arcade",
-                glm::ivec2(30, 56),
+                glm::ivec2(30, 54),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }
@@ -140,7 +140,7 @@ bool tryUseHomeBaseDoor(DoorContext& context, const glm::vec2& playerPos) {
         clearTransientCombat(context.gameplay);
         if (context.gameplay.regionManager.transitionTo(
                 "home_base",
-                glm::ivec2(19, 9),
+                glm::ivec2(17, 9),
                 context.worldId)) {
             refreshGameplayContext(context.gameplay);
         }

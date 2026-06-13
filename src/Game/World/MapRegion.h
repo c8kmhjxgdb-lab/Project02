@@ -69,7 +69,7 @@ public:
     MapRegion();
     ~MapRegion();
 
-    // 初始化（程序生成）
+    // 初始化（程序生成）— 仅生成地图数据，不创建物理
     void generate(const std::string& id, const std::string& name,
                   RegionType type, int seed,
                   int width = 60, int height = 60,
@@ -79,7 +79,7 @@ public:
     bool loadFromSave(const std::string& saveData);
 
     // 物理世界管理
-    void buildPhysics(b2WorldId world);  // 为当前瓦片地图创建物理刚体
+    void buildPhysics(b2WorldId world);  // 为当前瓦片地图创建物理刚体（必须在所有瓦片修改完成后调用）
     void clearPhysics();                  // 销毁所有物理刚体
 
     // 区域属性

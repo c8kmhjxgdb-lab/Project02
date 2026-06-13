@@ -8,12 +8,23 @@
 #include "Game/Services/RegionService.h"
 #include "Game/Services/SaveGameService.h"
 
+#include <SDL2/SDL.h>
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
 
 #include <cmath>
 
 namespace GameSessionService {
+
+namespace {
+
+const glm::ivec2 kPrologueStartTile(8, 12);
+
+bool hasGraphicsContext() {
+    return SDL_GL_GetCurrentContext() != nullptr;
+}
+
+}
 
 bool initializeWorld(GameState& gs) {
     // Stage 6: Use RegionManager for multi-region support.
@@ -31,7 +42,7 @@ bool initializeWorld(GameState& gs) {
         b2Body_SetTransform(gs.playerBodyId, b2Vec2{startWorld.x, startWorld.y}, b2Rot{0});
         b2Body_SetLinearVelocity(gs.playerBodyId, b2Vec2_zero);
 
-        if (!gs.miniMapInitialized) {
+        if (hasGraphicsContext() && !gs.miniMapInitialized) {
             gs.miniMap.init(150);
             gs.miniMapInitialized = true;
         }
@@ -42,10 +53,12 @@ bool initializeWorld(GameState& gs) {
             if (!region) return 0;
             return static_cast<uint8_t>(region->getTileMap().getTile(x, y));
         });
-        gs.miniMap.forceUpdate(startWorld);
+        if (gs.miniMapInitialized) {
+            gs.miniMap.forceUpdate(startWorld);
+        }
     }
 
-    if (!gs.decorRendererInitialized) {
+    if (hasGraphicsContext() && !gs.decorRendererInitialized) {
         gs.decorRenderer.init();
         gs.decorRendererInitialized = true;
     }
@@ -58,13 +71,20 @@ void startNewGame(GameState& gs) {
 
     gs.regionManager.shutdown();
     initializeWorld(gs);
+
+    bool previousTransitionEffect = gs.regionManager.isTransitionEffectEnabled();
+    gs.regionManager.setTransitionEffectEnabled(false);
+    gs.regionManager.transitionTo("real_street_prologue", kPrologueStartTile, gs.worldId);
+    gs.regionManager.setTransitionEffectEnabled(previousTransitionEffect);
+
     RegionService::GameplayContext regionGameplay = RegionService::makeGameplayContext(gs);
     RegionService::refreshGameplayContext(regionGameplay);
 
     MapRegion* region = gs.regionManager.getCurrentRegion();
-    glm::vec2 startWorld(7.0f, 8.0f);
+    glm::vec2 startWorld(static_cast<float>(kPrologueStartTile.x),
+                         static_cast<float>(kPrologueStartTile.y));
     if (region) {
-        startWorld = region->getTileMap().tileToWorld(7, 8);
+        startWorld = region->getTileMap().tileToWorld(kPrologueStartTile.x, kPrologueStartTile.y);
     }
     b2Body_SetTransform(gs.playerBodyId, b2Vec2{startWorld.x, startWorld.y}, b2Rot{0});
     b2Body_SetLinearVelocity(gs.playerBodyId, b2Vec2_zero);
@@ -76,11 +96,15 @@ void startNewGame(GameState& gs) {
     gs.playerMaxMana = 100.0f;
     gs.inventory.setCoins(60);
     gs.inventory.loadFurnitureStock({});
+    gs.inventory.loadItemStacks({});
     gs.inventory.loadUnlockedFurniture({});
     gs.inventory.addFurniture("simple_bed", 1);
     gs.inventory.addFurniture("writing_desk", 1);
     gs.inventory.addFurniture("star_lamp", 1);
     gs.inventory.addFurniture("soft_rug", 1);
+    gs.storyProgress = StoryProgress{};
+    gs.storyProgress.unlockChapter("prologue_star_candy");
+    gs.storyProgress.unlockChapter("chapter_1_popup_arcade");
 
     gs.emotionSystem.setChildlikeHeart(950.0f);
     gs.emotionSystem.setGrievance(0.0f);

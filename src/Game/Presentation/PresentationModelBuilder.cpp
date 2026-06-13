@@ -43,6 +43,8 @@ MainMenuView::Model buildMainMenuModel(const GameState& gs) {
     model.messageTimer = gs.ui.menuMessageTimer;
     model.saveTimestamp = meta.timestamp;
     model.saveRegionName = meta.regionName;
+    model.childlikeHeart = meta.childlikeHeart;
+    model.rescuedPartners = meta.rescuedPartners;
     return model;
 }
 
@@ -143,6 +145,19 @@ HudView::Model buildHudModel(const GameState& gs) {
     model.shieldSkillName = profile.shieldName;
     model.movementSkillName = profile.movementName;
     model.trackedQuestText = gs.questSystem.getTrackedQuestText();
+    if (model.trackedQuestText.empty()) {
+        if (!gs.storyProgress.getFlag("star_candy_collected")) {
+            model.trackedQuestText = "主线: 调查小卖部门口的星星糖";
+        } else if (!gs.storyProgress.getFlag("alya_following")) {
+            model.trackedQuestText = "主线: 和艾莉娅对话";
+        } else if (!WorldQuery::isCurrentRegion(gs.regionManager, "home_base") &&
+                   gs.storyProgress.getChapterState("chapter_1_popup_arcade") == ChapterState::Unlocked) {
+            model.trackedQuestText = "主线: 从南侧裂缝回秘密基地";
+        } else if (WorldQuery::isCurrentRegion(gs.regionManager, "home_base") &&
+                   gs.storyProgress.getChapterState("chapter_1_popup_arcade") == ChapterState::Unlocked) {
+            model.trackedQuestText = "主线: 从右侧入口进入弹窗游乐厅";
+        }
+    }
 
     TimeSnapshot timeSnapshot = gs.timeSystem.getSnapshot();
     const MapRegion* region = gs.regionManager.getCurrentRegion();
@@ -233,8 +248,8 @@ GameMenuView::Model buildGameMenuModel(const GameState& gs) {
     }
 
     model.partnerLines.push_back(gs.princess && gs.princess->isFollowing()
-        ? "阿娅: 跟随中 / 羁绊技待命"
-        : "阿娅: 未跟随");
+        ? "艾莉娅: 跟随中 / 星形水晶已点亮"
+        : "艾莉娅: 等待序章对话");
     model.partnerLines.push_back(gs.storyProgress.isPartnerUnlocked("tieyi")
         ? "铁翼: 已入队 / 火箭破盾支援"
         : "铁翼: 未救出");
@@ -243,6 +258,10 @@ GameMenuView::Model buildGameMenuModel(const GameState& gs) {
     model.systemLines.push_back("F9 读取");
     model.systemLines.push_back("Esc / Tab 返回");
     model.systemLines.push_back("金币: " + std::to_string(gs.inventory.getCoins()));
+    if (gs.storyProgress.getFlag("alya_following") &&
+        gs.storyProgress.getChapterState("chapter_1_popup_arcade") != ChapterState::Completed) {
+        model.systemLines.push_back("下一步: 回基地地图桌，进入弹窗游乐厅");
+    }
 
     return model;
 }

@@ -23,4 +23,5 @@ struct GameUiState {
     GameMenuPage gameMenuPage = GameMenuPage::Quest;
     int inventorySelection = 0;
     int questSelection = 0;
+    bool usePixelActors = true;
 };

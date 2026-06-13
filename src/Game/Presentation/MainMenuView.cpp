@@ -154,8 +154,8 @@ void render(const Model& model, const glm::mat4& uiProj, int screenW, int screen
     TextRenderer::drawText(uiProj,
         60.0f,
         sh - 148.0f,
-        "STARCHILD 2D",
-        24,
+        "我会长大，但不交出童心",
+        22,
         glm::vec3(0.78f, 0.92f, 1.0f),
         0.92f);
 
@@ -207,8 +207,13 @@ void render(const Model& model, const glm::mat4& uiProj, int screenW, int screen
 
     std::string hint = "W/S 或 方向键选择，Enter 确认";
     if (!model.saveTimestamp.empty()) {
-        hint += "\nAutosave: " + model.saveTimestamp +
-            (model.saveRegionName.empty() ? std::string{} : "  " + model.saveRegionName);
+        hint += "\n继续旅程 Continue";
+        hint += "\n时间: " + model.saveTimestamp;
+        if (!model.saveRegionName.empty()) {
+            hint += "\n区域: " + model.saveRegionName;
+        }
+        hint += "\n童心: " + std::to_string(static_cast<int>(model.childlikeHeart));
+        hint += "\n伙伴: " + std::to_string(model.rescuedPartners);
     }
     TextRenderer::drawText(uiProj,
         layout.menuX - 8.0f,

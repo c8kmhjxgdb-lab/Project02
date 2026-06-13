@@ -25,6 +25,9 @@ struct TileModification {
  */
 class MapTileManager {
 public:
+    // 仅绑定地图数据，不创建物理刚体。用于缓存/读档中的非当前区域。
+    void bind(TileMap& map);
+
     // 初始化：从 TileMap 创建所有必要的物理刚体
     void init(TileMap& map, b2WorldId world);
 
@@ -50,7 +53,7 @@ public:
 
 private:
     TileMap* tileMap = nullptr;
-    b2WorldId worldId;
+    b2WorldId worldId = b2_nullWorldId;
 
     // 瓦片坐标 → Box2D 刚体ID 映射
     std::unordered_map<uint64_t, b2BodyId> tileBodies;

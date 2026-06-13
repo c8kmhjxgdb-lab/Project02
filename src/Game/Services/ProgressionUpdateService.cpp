@@ -159,6 +159,9 @@ QuestSnapshot buildQuestSnapshot(const Context& context) {
     for (const ItemStack& stack : context.inventory.getItemStacks()) {
         questSnapshot.facts.push_back({"collect", stack.itemId, stack.count});
     }
+    if (context.storyProgress.getFlag("star_candy_collected")) {
+        questSnapshot.facts.push_back({"interact", "star_candy", 1});
+    }
     if (context.storyProgress.isPartnerUnlocked("tieyi")) {
         questSnapshot.facts.push_back({"interact", "tieyi_cage", 1});
     }

@@ -23,6 +23,7 @@ void RegionManager::shutdown() {
     transitionFadeOut = true;
     transitionTargetRegionId.clear();
     transitionEntryTile = glm::ivec2(0, 0);
+    transitionCooldownTimer = 0.0f;
 }
 
 void RegionManager::resetLoadedRegions() {
@@ -39,10 +40,6 @@ bool RegionManager::loadRegion(const std::string& regionId) {
     }
 
     auto region = RegionFactory::createRegion(regionId);
-
-    if (worldId.index1 != 0) {
-        region->buildPhysics(worldId);
-    }
 
     loadedRegions[regionId] = std::move(region);
     if (std::find(discoveredRegions.begin(), discoveredRegions.end(), regionId) == discoveredRegions.end()) {
@@ -71,8 +68,8 @@ void RegionManager::unloadCurrentRegion() {
     }
 }
 
-bool RegionManager::transitionTo(const std::string& targetRegionId,
-                                  const glm::ivec2& entryTile,
+bool RegionManager::transitionTo(std::string targetRegionId,
+                                  glm::ivec2 entryTile,
                                   b2WorldId world) {
     if (targetRegionId == currentRegionId) return false;
 
@@ -86,10 +83,14 @@ bool RegionManager::transitionTo(const std::string& targetRegionId,
         currentRegion = std::move(it->second);
         loadedRegions.erase(it);
         currentRegionId = targetRegionId;
+        if (b2World_IsValid(worldId)) {
+            currentRegion->buildPhysics(worldId);
+        }
 
         enforceLoadedCap();
         // Teleport the player to the entry tile in the now-current region.
         teleportPlayerToEntry(targetRegionId, entryTile);
+        transitionCooldownTimer = TRANSITION_COOLDOWN;
         return true;
     }
 
@@ -110,12 +111,15 @@ bool RegionManager::transitionTo(const std::string& targetRegionId,
         // 直接切换（无过渡效果）：直接 swap 并传送玩家
         performImmediateSwap(targetRegionId);
         teleportPlayerToEntry(targetRegionId, entryTile);
+        transitionCooldownTimer = TRANSITION_COOLDOWN; // 立即切换也要有冷却
         return true;
     }
 }
 
 bool RegionManager::transitionTo(const MapConnection& connection, b2WorldId world) {
-    return transitionTo(connection.targetRegionId, connection.targetTile, world);
+    std::string targetRegionId = connection.targetRegionId;
+    glm::ivec2 entryTile = connection.targetTile;
+    return transitionTo(std::move(targetRegionId), entryTile, world);
 }
 
 void RegionManager::beginTransition() {
@@ -137,9 +141,10 @@ void RegionManager::performImmediateSwap(const std::string& targetRegionId) {
         loadedRegions.erase(it);
     } else {
         currentRegion = RegionFactory::createRegion(targetRegionId);
-        if (b2World_IsValid(worldId)) {
-            currentRegion->buildPhysics(worldId);
-        }
+    }
+
+    if (currentRegion && b2World_IsValid(worldId)) {
+        currentRegion->buildPhysics(worldId);
     }
 
     if (std::find(discoveredRegions.begin(), discoveredRegions.end(),
@@ -152,6 +157,7 @@ void RegionManager::performImmediateSwap(const std::string& targetRegionId) {
 
 void RegionManager::archiveCurrentRegion() {
     if (!currentRegion || currentRegionId.empty()) return;
+    currentRegion->clearPhysics();
     loadedRegions[currentRegionId] = std::move(currentRegion);
 }
 
@@ -198,6 +204,7 @@ void RegionManager::updateTransition(float dt) {
         isTransitioningFlag = false;
         transitionProgress = 0.0f;
         transitionAlpha = 0.0f;
+        transitionCooldownTimer = TRANSITION_COOLDOWN; // 过渡结束时设置冷却
     }
 }
 
@@ -212,6 +219,11 @@ void RegionManager::completeTransition() {
 }
 
 void RegionManager::update(float dt) {
+    if (transitionCooldownTimer > 0.0f) {
+        transitionCooldownTimer -= dt;
+        if (transitionCooldownTimer < 0.0f) transitionCooldownTimer = 0.0f;
+    }
+
     if (isTransitioningFlag) {
         updateTransition(dt);
     }

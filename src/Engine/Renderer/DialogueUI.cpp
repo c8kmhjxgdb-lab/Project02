@@ -103,10 +103,12 @@ void DialogueUI::render(const glm::mat4& orthoProj, int sw, int sh) {
     float boxX = (static_cast<float>(sw) - boxWidth) * 0.5f;
     float boxY = 28.0f;
 
-    // 对话框背景（半透明深色矩形）
-    Draw2D::drawRectFilled(boxX, boxY, boxWidth, boxHeight, glm::vec3(0.055f, 0.060f, 0.080f), 0.88f);
-    Draw2D::drawRectFilled(boxX, boxY + boxHeight - 4.0f, boxWidth, 4.0f, glm::vec3(0.82f, 0.54f, 0.88f), 0.72f);
-    Draw2D::drawRect(boxX, boxY, boxWidth, boxHeight, glm::vec3(0.48f, 0.36f, 0.58f), 2.0f, 0.86f);
+    Draw2D::drawRectFilled(boxX - 6.0f, boxY - 6.0f, boxWidth + 12.0f, boxHeight + 12.0f,
+                           glm::vec3(0.01f, 0.015f, 0.028f), 0.48f);
+    Draw2D::drawRectFilled(boxX, boxY, boxWidth, boxHeight, glm::vec3(0.035f, 0.045f, 0.065f), 0.92f);
+    Draw2D::drawRectFilled(boxX, boxY + boxHeight - 5.0f, boxWidth, 5.0f, glm::vec3(0.88f, 0.68f, 0.30f), 0.86f);
+    Draw2D::drawRectFilled(boxX, boxY, 5.0f, boxHeight, glm::vec3(0.34f, 0.68f, 0.95f), 0.52f);
+    Draw2D::drawRect(boxX, boxY, boxWidth, boxHeight, glm::vec3(0.56f, 0.70f, 0.92f), 2.0f, 0.82f);
 
     // 说话者名字标签
     std::string speaker = combineName(state.speakerName, state.speakerNameEn);
@@ -117,7 +119,8 @@ void DialogueUI::render(const glm::mat4& orthoProj, int sw, int sh) {
         float nameX = boxX + 18.0f;
         float nameY = boxY + boxHeight - nameH - 12.0f;
 
-        Draw2D::drawRectFilled(nameX, nameY, nameW, nameH, glm::vec3(0.4f, 0.3f, 0.5f));
+        Draw2D::drawRectFilled(nameX, nameY, nameW, nameH, glm::vec3(0.18f, 0.26f, 0.42f), 0.96f);
+        Draw2D::drawRect(nameX, nameY, nameW, nameH, glm::vec3(0.92f, 0.72f, 0.36f), 1.5f, 0.82f);
     }
 
     // 选项列表
@@ -126,16 +129,17 @@ void DialogueUI::render(const glm::mat4& orthoProj, int sw, int sh) {
         for (size_t i = 0; i < state.choiceTexts.size(); ++i) {
             float optY = choiceBoxY + (state.choiceTexts.size() - 1 - i) * 50.0f;
             bool selected = (i == static_cast<size_t>(state.selectedChoice));
-            glm::vec3 optColor = selected ? glm::vec3(0.9f, 0.7f, 0.4f) : glm::vec3(0.7f);
+            glm::vec3 optColor = selected ? glm::vec3(1.0f, 0.78f, 0.34f) : glm::vec3(0.62f, 0.70f, 0.78f);
 
             // 选项背景
             Draw2D::drawRectFilled(boxX + padding, optY, boxWidth - padding * 2, 42.0f,
-                selected ? glm::vec3(0.22f, 0.16f, 0.26f) : glm::vec3(0.095f, 0.10f, 0.13f), 0.92f);
+                selected ? glm::vec3(0.18f, 0.23f, 0.36f) : glm::vec3(0.075f, 0.090f, 0.120f), 0.94f);
             Draw2D::drawRect(boxX + padding, optY, boxWidth - padding * 2, 42.0f,
                 optColor, 1.5f, selected ? 0.88f : 0.45f);
 
             if (selected) {
                 Draw2D::drawRectFilled(boxX + padding + 8.0f, optY + 9.0f, 5.0f, 24.0f, optColor, 0.92f);
+                Draw2D::drawCircleFilled(boxX + padding + 20.0f, optY + 21.0f, 5.0f, optColor, 0.82f);
             }
         }
     }

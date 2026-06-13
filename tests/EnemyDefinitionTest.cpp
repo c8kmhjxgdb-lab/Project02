@@ -82,7 +82,7 @@ void popupArcadeCreatesFixedSpawnsOnce() {
     gs.regionManager.setPlayerBody(gs.playerBodyId);
     gs.regionManager.setTransitionEffectEnabled(false);
     gs.regionManager.init();
-    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 56), gs.worldId);
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 53), gs.worldId);
 
     gs.enemyManager.init();
     gs.enemySpawnTimer = 99.0f;

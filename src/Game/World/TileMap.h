@@ -65,12 +65,12 @@ inline const TileDef& getTileDef(TileType type) {
         {TileType::Wall,      Passability::Blocked,  "墙",     {0.45f, 0.42f, 0.45f}, 0.0f, 0.0f, true},
         {TileType::Path,      Passability::Walkable, "路径",   {0.7f,  0.58f, 0.4f},  0.8f, 0.0f, false},
         {TileType::Sand,      Passability::Walkable, "沙地",   {0.76f, 0.7f,  0.5f},  1.2f, 0.0f, false},
+        {TileType::Snow,      Passability::Walkable, "雪地",   {0.9f,  0.9f,  0.95f}, 1.1f, 0.0f, false},
         {TileType::Lava,      Passability::Lava,     "熔岩",   {0.8f,  0.2f,  0.0f},  2.0f, 10.0f, false},
         {TileType::DeepWater, Passability::Water,    "深水",   {0.1f,  0.3f,  0.6f},  2.5f, 0.0f, false},
         {TileType::Bridge,    Passability::Walkable, "桥",     {0.55f, 0.4f,  0.3f},  1.0f, 0.0f, false},
         {TileType::Door,      Passability::Door,     "门",     {0.5f,  0.35f, 0.2f},  0.0f, 0.0f, true},
         {TileType::Portal,    Passability::Portal,   "传送门", {0.6f,  0.2f,  0.9f},  0.0f, 0.0f, false},
-        {TileType::Snow,      Passability::Walkable, "雪地",   {0.9f,  0.9f,  0.95f}, 1.1f, 0.0f, false},
     };
     // Bounds check — assert in debug, return Grass in release
     size_t idx = static_cast<size_t>(type);

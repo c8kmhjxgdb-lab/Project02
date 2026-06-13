@@ -22,6 +22,8 @@ struct SaveMeta {
     std::string timestamp;
     std::string regionName;
     float playTime = 0.0f;
+    float childlikeHeart = 0.0f;
+    int rescuedPartners = 0;
 };
 
 SaveMeta getSaveMeta(const std::string& slot);

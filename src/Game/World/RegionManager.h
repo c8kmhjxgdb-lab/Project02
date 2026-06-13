@@ -17,8 +17,8 @@ public:
     void unloadCurrentRegion();
 
     // 区域切换（所有权交换）
-    bool transitionTo(const std::string& targetRegionId,
-                      const glm::ivec2& entryTile,
+    bool transitionTo(std::string targetRegionId,
+                      glm::ivec2 entryTile,
                       b2WorldId world);
     bool transitionTo(const MapConnection& connection, b2WorldId world);
 
@@ -54,6 +54,9 @@ public:
     bool isTransitioning() const { return isTransitioningFlag; }
     float getTransitionProgress() const { return transitionProgress; }
 
+    // 传送冷却机制
+    bool isOnCooldown() const { return transitionCooldownTimer > 0.0f; }
+
 private:
     std::string currentRegionId;
     std::unique_ptr<MapRegion> currentRegion;
@@ -69,6 +72,10 @@ private:
     float transitionProgress = 0.0f;
     float transitionAlpha = 0.0f;  // 过渡透明度（0=完全可见，1=全黑）
     bool transitionFadeOut = true;
+
+    // 传送冷却
+    float transitionCooldownTimer = 0.0f;
+    static constexpr float TRANSITION_COOLDOWN = 0.5f;
 
     // 过渡期间的临时数据
     std::string transitionTargetRegionId;

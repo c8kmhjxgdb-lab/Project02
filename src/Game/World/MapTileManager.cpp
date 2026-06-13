@@ -8,8 +8,12 @@ static double getTime() {
     return std::chrono::duration_cast<std::chrono::duration<double>>(dur).count();
 }
 
-void MapTileManager::init(TileMap& map, b2WorldId world) {
+void MapTileManager::bind(TileMap& map) {
     tileMap = &map;
+}
+
+void MapTileManager::init(TileMap& map, b2WorldId world) {
+    bind(map);
     worldId = world;
 
     // Create physics bodies for all tiles that need them
@@ -70,10 +74,12 @@ b2BodyId MapTileManager::getBodyAt(int x, int y) const {
 
 void MapTileManager::shutdown() {
     for (const auto& pair : tileBodies) {
-        b2DestroyBody(pair.second);
+        if (b2Body_IsValid(pair.second)) {
+            b2DestroyBody(pair.second);
+        }
     }
     tileBodies.clear();
-    tileMap = nullptr;
+    worldId = b2_nullWorldId;
 }
 
 bool MapTileManager::replayModifications(const std::vector<TileModification>& savedModifications) {

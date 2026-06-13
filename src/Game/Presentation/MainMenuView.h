@@ -15,6 +15,8 @@ struct Model {
     float messageTimer = 0.0f;
     std::string saveTimestamp;
     std::string saveRegionName;
+    float childlikeHeart = 0.0f;
+    int rescuedPartners = 0;
 };
 
 void render(const Model& model, const glm::mat4& uiProj, int screenW, int screenH);

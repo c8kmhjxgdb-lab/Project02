@@ -37,10 +37,11 @@ void update(Context& context,
     context.weatherSystem.update(dt, context.camera);
 
     // Stage 6: Check for region transitions
-    if (!context.regionManager.isTransitioning() && currentRegion) {
+    if (!context.regionManager.isTransitioning() && !context.regionManager.isOnCooldown() && currentRegion) {
         MapConnection* conn = currentRegion->getConnectionAt(
             glm::vec2(playerPos.x, playerPos.y), 1.5f);
         if (conn) {
+            glm::ivec2 targetTile = conn->targetTile;
             // Ask the manager to transition. It returns:
             //   true  -> swap happened immediately (cached or no-fade path).
             //           RegionManager has already teleported the player.
@@ -53,7 +54,6 @@ void update(Context& context,
                 // actually complete; fade path does this later).
                 MapRegion* newRegion = context.regionManager.getCurrentRegion();
                 if (newRegion) {
-                    glm::ivec2 targetTile = conn->targetTile;
                     glm::vec2 targetWorld = newRegion->getTileMap().tileToWorld(
                         targetTile.x, targetTile.y);
                     context.miniMap.setMapDimensions(newRegion->getWidth(),

@@ -3,9 +3,14 @@
 #include "Game/Ability/Projectile.h"
 #include "Game/Data/SaveData.h"
 #include "Game/GameState.h"
+#include "Game/Controllers/InteractionInputController.h"
 #include "Game/Services/DropCollectionService.h"
+#include "Game/Services/GameSessionService.h"
 #include "Game/Services/ProgressionUpdateService.h"
 #include "Game/Services/SaveGameService.h"
+#include "Game/Services/WorldCombatUpdateService.h"
+#include "Game/Services/WorldUpdateService.h"
+#include "Game/Services/WorldQuery.h"
 #include "Game/Social/Princess.h"
 #include "Game/World/WeatherTypes.h"
 #include "TestSupport.h"
@@ -38,6 +43,30 @@ bool contains(const std::vector<std::string>& values, const std::string& expecte
 
 bool containsText(const std::string& value, const std::string& expected) {
     return value.find(expected) != std::string::npos;
+}
+
+glm::vec2 poiWorldPosition(const RegionManager& regionManager, const char* poiId) {
+    const MapRegion* region = regionManager.getCurrentRegion();
+    TestSupport::require(region != nullptr, "current region exists");
+    const PointOfInterest* poi = WorldQuery::findPOI(region, poiId);
+    TestSupport::require(poi != nullptr, "poi exists");
+    return region->getTileMap().tileToWorld(poi->tilePos.x, poi->tilePos.y);
+}
+
+glm::vec2 playerWorldPosition(b2BodyId playerBodyId) {
+    b2Vec2 pos = b2Body_GetPosition(playerBodyId);
+    return glm::vec2(pos.x, pos.y);
+}
+
+void movePlayerTo(GameState& gs, const glm::vec2& position) {
+    b2Body_SetTransform(gs.playerBodyId, b2Vec2{position.x, position.y}, b2Rot{0});
+    b2Body_SetLinearVelocity(gs.playerBodyId, b2Vec2_zero);
+}
+
+void interact(GameState& gs) {
+    InteractionInputController::Context context = InteractionInputController::makeContext(gs);
+    InteractionInputController::Callbacks callbacks = InteractionInputController::makeCallbacks(gs);
+    InteractionInputController::handleInteract(context, callbacks);
 }
 
 int countItemDrops(const DropManager& dropManager, const std::string& itemId) {
@@ -260,7 +289,7 @@ void popupArcadeSpawnsChapterPickupsWithoutDuplicates() {
     Fixture fixture;
     GameState& gs = fixture.gs;
 
-    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 56), gs.worldId);
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 53), gs.worldId);
     gs.emotionSystem.setChildlikeHeart(650.0f);
 
     ProgressionUpdateService::State state;
@@ -288,7 +317,7 @@ void progressionFactsDriveChapterQuestReward() {
     Fixture fixture;
     GameState& gs = fixture.gs;
 
-    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 56), gs.worldId);
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 53), gs.worldId);
     gs.inventory.addItem("trial_token", 3);
     gs.storyProgress.unlockPartner("tieyi");
     gs.storyProgress.setFlag("popup_crown_defeated", true);
@@ -339,6 +368,256 @@ void popupCrownBossDefeatAppliesRewardsOnce() {
     TestSupport::require(gs.inventory.getItemCount("pixel_controller") == 1, "boss reward does not duplicate relic");
     TestSupport::require(gs.inventory.getItemCount("no_pay_victory_sticker") == 1, "boss reward does not duplicate sticker");
     TestSupport::require(near(gs.emotionSystem.getState().childlikeHeart, 770.0f), "boss reward does not duplicate childlike heart");
+}
+
+void prologueStarCandyInteractionStartsChapterAndAwardsCoin() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("real_street_prologue", glm::ivec2(8, 12), gs.worldId);
+    movePlayerTo(gs, poiWorldPosition(gs.regionManager, "star_candy"));
+
+    interact(gs);
+
+    TestSupport::require(gs.storyProgress.getFlag("star_candy_collected"), "star candy sets collected flag");
+    TestSupport::require(gs.inventory.getItemCount("old_game_coin") == 1, "star candy grants old game coin");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("prologue_star_candy") == ChapterState::InProgress,
+        "star candy starts prologue chapter");
+
+    interact(gs);
+
+    TestSupport::require(gs.inventory.getItemCount("old_game_coin") == 1, "star candy reward does not duplicate");
+}
+
+void prologueStarCandyQuestCompletesWithoutDuplicatingCoinReward() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.luaVM.init();
+    TestSupport::require(
+        gs.questSystem.loadDefinitions(gs.luaVM, "assets/scripts/quests.lua"),
+        "quest definitions load for star candy regression");
+
+    gs.regionManager.transitionTo("real_street_prologue", glm::ivec2(8, 12), gs.worldId);
+    movePlayerTo(gs, poiWorldPosition(gs.regionManager, "star_candy"));
+
+    interact(gs);
+
+    ProgressionUpdateService::State state;
+    ProgressionUpdateService::Context context = ProgressionUpdateService::makeContext(gs);
+    ProgressionUpdateService::update(context, 0.1f, playerWorldPosition(gs.playerBodyId), state);
+
+    TestSupport::require(gs.questSystem.isCompleted("prologue_star_candy"), "star candy quest completes from progression facts");
+    TestSupport::require(gs.inventory.getItemCount("old_game_coin") == 1, "star candy quest does not duplicate old game coin");
+}
+
+void tieyiRescueRequiresEliteDefeatAndRewardsBattery() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 53), gs.worldId);
+    movePlayerTo(gs, poiWorldPosition(gs.regionManager, "tieyi_cage"));
+
+    interact(gs);
+
+    TestSupport::require(!gs.storyProgress.isPartnerUnlocked("tieyi"), "Tieyi stays locked before elite defeat");
+    TestSupport::require(gs.inventory.getItemCount("color_battery") == 0, "rescue does not award battery before elite defeat");
+
+    gs.storyProgress.setFlag("scrap_elite_defeated", true);
+    interact(gs);
+
+    TestSupport::require(gs.storyProgress.isPartnerUnlocked("tieyi"), "Tieyi unlocks after rescue");
+    TestSupport::require(gs.storyProgress.getFlag("tieyi_rescued"), "rescue sets Tieyi flag");
+    TestSupport::require(gs.inventory.getItemCount("color_battery") == 1, "rescue grants color battery");
+    TestSupport::require(containsText(gs.ui.stage7Notice, "铁翼恢复了火箭核心"), "rescue shows Tieyi notice");
+
+    interact(gs);
+
+    TestSupport::require(gs.inventory.getItemCount("color_battery") == 1, "rescue reward does not duplicate");
+}
+
+void scrapEliteDeathMarksTieyiRescuePrerequisite() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    EnemyId eliteId = gs.enemyManager.spawnByDefinition(
+        gs.worldId,
+        glm::vec2(8.0f, 8.0f),
+        "scrap_soldier_elite");
+    gs.enemyManager.damage(eliteId, 1000.0f);
+
+    WorldCombatUpdateService::Context context = WorldCombatUpdateService::makeContext(gs);
+    WorldCombatUpdateService::updateAlive(context, 0.1f, playerWorldPosition(gs.playerBodyId));
+
+    TestSupport::require(gs.storyProgress.getFlag("scrap_elite_defeated"), "scrap elite death sets rescue prerequisite flag");
+}
+
+void arcadeBossDoorRequiresTieyiAndTokensThenStartsBoss() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("popup_arcade", glm::ivec2(30, 53), gs.worldId);
+    movePlayerTo(gs, poiWorldPosition(gs.regionManager, "arcade_boss_door"));
+
+    interact(gs);
+    TestSupport::require(!gs.popupCrownBoss.isActive(), "boss door stays closed without requirements");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("chapter_1_popup_arcade") != ChapterState::InProgress,
+        "boss door does not start chapter without requirements");
+
+    gs.inventory.addItem("trial_token", 3);
+    interact(gs);
+    TestSupport::require(!gs.popupCrownBoss.isActive(), "boss door stays closed before Tieyi rescue");
+
+    gs.storyProgress.setFlag("tieyi_rescued", true);
+    interact(gs);
+
+    TestSupport::require(gs.popupCrownBoss.isActive(), "boss door starts popup crown boss");
+    TestSupport::require(
+        gs.popupCrownBoss.getPhase() == PopupCrownPhase::WelcomePopup,
+        "boss starts in welcome popup phase");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("chapter_1_popup_arcade") == ChapterState::InProgress,
+        "boss door starts chapter progress");
+    TestSupport::require(
+        nearVec(playerWorldPosition(gs.playerBodyId), poiWorldPosition(gs.regionManager, "popup_crown_arena")),
+        "boss door teleports player to arena");
+}
+
+void worldUpdateAutomaticArcadePortalEntersPopupArcade() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("home_base", glm::ivec2(9, 11), gs.worldId);
+    gs.regionManager.update(1.0f);
+    gs.regionManager.setTransitionEffectEnabled(true);
+    gs.regionManager.setTransitionDuration(0.2f);
+
+    MapRegion* baseRegion = gs.regionManager.getCurrentRegion();
+    TestSupport::require(baseRegion != nullptr, "home base exists before world update portal");
+    movePlayerTo(gs, baseRegion->getTileMap().tileToWorld(20, 9));
+
+    WorldUpdateService::State worldState;
+    for (int i = 0; i < 12; ++i) {
+        WorldUpdateService::update(gs, 0.1f, worldState);
+    }
+
+    TestSupport::require(
+        WorldQuery::isCurrentRegion(gs.regionManager, "popup_arcade"),
+        "world update automatic arcade portal enters popup arcade");
+    TestSupport::require(
+        !gs.regionManager.isTransitioning(),
+        "world update automatic arcade portal transition completes");
+}
+
+void pixelControllerSpotConsumesRelicAndRewardsBaseSupplies() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.regionManager.transitionTo("home_base", glm::ivec2(12, 15), gs.worldId);
+    movePlayerTo(gs, poiWorldPosition(gs.regionManager, "pixel_controller_spot"));
+    gs.inventory.addItem("pixel_controller", 1);
+
+    interact(gs);
+
+    TestSupport::require(gs.inventory.getItemCount("pixel_controller") == 0, "controller spot consumes relic");
+    TestSupport::require(gs.storyProgress.getFlag("pixel_controller_placed"), "controller spot sets placed flag");
+    TestSupport::require(gs.inventory.getItemCount("recovery_candy") == 2, "controller spot grants recovery candy");
+    TestSupport::require(containsText(gs.ui.stage7Notice, "试玩币机关已点亮"), "controller spot shows activation notice");
+
+    interact(gs);
+
+    TestSupport::require(gs.inventory.getItemCount("recovery_candy") == 2, "controller spot reward does not duplicate");
+}
+
+void firstPrincessTalkAfterStarCandyUnlocksFollowingAndCompletesPrologue() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.luaVM.init();
+    gs.dialogueTree.setLuaVM(&gs.luaVM);
+    gs.dialogueTree.loadFromLua("first_meeting");
+    gs.dialogueTree.setOnNodeEnter([&gs](const DialogueNode& node) {
+        gs.dialogueUI.begin(node);
+    });
+    gs.dialogueTree.setOnDialogueEnd([&gs](const DialogueNode&) {
+        gs.dialogueUI.hide();
+    });
+
+    gs.regionManager.transitionTo("real_street_prologue", glm::ivec2(8, 12), gs.worldId);
+    gs.storyProgress.setFlag("star_candy_collected", true);
+    gs.storyProgress.startChapter("prologue_star_candy");
+    movePlayerTo(gs, gs.princess->getPosition());
+
+    interact(gs);
+
+    TestSupport::require(gs.princess->isFollowing(), "first prologue princess talk enables following");
+    TestSupport::require(gs.storyProgress.getFlag("alya_following"), "first prologue princess talk sets Alya following flag");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("prologue_star_candy") == ChapterState::Completed,
+        "first prologue princess talk completes prologue chapter");
+    TestSupport::require(
+        containsText(gs.ui.stage7Notice, "艾莉娅加入") &&
+            containsText(gs.ui.stage7Notice, "秘密基地"),
+        "first prologue princess talk shows the next-step notice");
+}
+
+void startNewGameBeginsInPrologueWithInitialStoryState() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    SaveData defaults;
+    TestSupport::require(defaults.player.regionId == "real_street_prologue", "default save region is prologue");
+
+    gs.luaVM.init();
+    GameSessionService::startNewGame(gs);
+
+    const MapRegion* region = gs.regionManager.getCurrentRegion();
+    TestSupport::require(region != nullptr, "new game region exists");
+    TestSupport::require(region->getId() == "real_street_prologue", "new game starts in prologue");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("prologue_star_candy") == ChapterState::Unlocked,
+        "prologue chapter starts unlocked");
+    TestSupport::require(
+        gs.storyProgress.getChapterState("chapter_1_popup_arcade") == ChapterState::Unlocked,
+        "chapter one starts unlocked");
+}
+
+void startNewGameCanEnterPopupArcadeThroughBasePortal() {
+    Fixture fixture;
+    GameState& gs = fixture.gs;
+
+    gs.luaVM.init();
+    GameSessionService::startNewGame(gs);
+    WorldUpdateService::State worldState;
+    constexpr float dt = 1.0f / 60.0f;
+
+    MapRegion* prologue = gs.regionManager.getCurrentRegion();
+    TestSupport::require(prologue != nullptr, "prologue exists before full arcade route");
+    movePlayerTo(gs, prologue->getTileMap().tileToWorld(18, 26));
+    for (int frame = 0; frame < 120; ++frame) {
+        WorldUpdateService::update(gs, dt, worldState);
+    }
+
+    TestSupport::require(
+        WorldQuery::isCurrentRegion(gs.regionManager, "home_base"),
+        "full route enters home base from prologue crack");
+    TestSupport::require(!gs.regionManager.isTransitioning(),
+                         "full route home base transition completes");
+
+    MapRegion* base = gs.regionManager.getCurrentRegion();
+    TestSupport::require(base != nullptr, "home base exists before full arcade route portal");
+    movePlayerTo(gs, base->getTileMap().tileToWorld(20, 9));
+    for (int frame = 0; frame < 120; ++frame) {
+        WorldUpdateService::update(gs, dt, worldState);
+    }
+
+    TestSupport::require(
+        WorldQuery::isCurrentRegion(gs.regionManager, "popup_arcade"),
+        "full route enters popup arcade from home base portal");
+    TestSupport::require(!gs.regionManager.isTransitioning(),
+                         "full route popup arcade transition completes");
 }
 
 void collectedItemDropUpdatesInventoryAndStoryFlags() {
@@ -471,6 +750,16 @@ int main() {
     popupArcadeSpawnsChapterPickupsWithoutDuplicates();
     progressionFactsDriveChapterQuestReward();
     popupCrownBossDefeatAppliesRewardsOnce();
+    prologueStarCandyInteractionStartsChapterAndAwardsCoin();
+    prologueStarCandyQuestCompletesWithoutDuplicatingCoinReward();
+    tieyiRescueRequiresEliteDefeatAndRewardsBattery();
+    scrapEliteDeathMarksTieyiRescuePrerequisite();
+    arcadeBossDoorRequiresTieyiAndTokensThenStartsBoss();
+    worldUpdateAutomaticArcadePortalEntersPopupArcade();
+    pixelControllerSpotConsumesRelicAndRewardsBaseSupplies();
+    firstPrincessTalkAfterStarCandyUnlocksFollowingAndCompletesPrologue();
+    startNewGameBeginsInPrologueWithInitialStoryState();
+    startNewGameCanEnterPopupArcadeThroughBasePortal();
     collectedItemDropUpdatesInventoryAndStoryFlags();
     applySaveDataRestoresPersistentStateAndClearsTransientState();
     return 0;

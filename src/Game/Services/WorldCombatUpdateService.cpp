@@ -6,6 +6,24 @@
 
 namespace WorldCombatUpdateService {
 
+namespace {
+
+void updateCombatStoryFlags(Context& context) {
+    if (context.storyProgress.getFlag("scrap_elite_defeated")) {
+        return;
+    }
+
+    for (const Enemy& enemy : context.enemyManager.getActive()) {
+        if (enemy.state == Enemy::State::Dead &&
+            enemy.definitionId == "scrap_soldier_elite") {
+            context.storyProgress.setFlag("scrap_elite_defeated", true);
+            return;
+        }
+    }
+}
+
+}  // namespace
+
 Context makeContext(GameState& gs) {
     return {
         gs.projectileManager,
@@ -14,6 +32,7 @@ Context makeContext(GameState& gs) {
         gs.dropManager,
         gs.playerHealth,
         gs.fireballCooldown,
+        gs.storyProgress,
         gs.popupCrownBoss,
         gs.worldId,
         ProjectileTrailService::makeContext(gs),
@@ -37,6 +56,7 @@ void updateAlive(Context& context, float dt, const glm::vec2& playerPos) {
     }
 
     CombatService::handleCollisions(context.collision);
+    updateCombatStoryFlags(context);
 
     context.enemyManager.cleanup();
 

@@ -195,7 +195,7 @@ void initStoryAndPlayerSystems(GameState& gs) {
     gs.homeRadius = 3.0f;
     gs.gameTime = 10.0f;
 
-    gs.princess = std::make_unique<Princess>("小夏");
+    gs.princess = std::make_unique<Princess>("艾莉娅");
     gs.princess->setColor(glm::vec3(0.9f, 0.6f, 0.8f));
     gs.princess->createBody(gs.worldId, glm::vec2(5.0f, 3.0f));
     gs.princess->setDialogueId("first_meeting");

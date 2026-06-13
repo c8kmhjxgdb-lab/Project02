@@ -12,8 +12,11 @@
 
 class BuildingSystem;
 class EmotionSystem;
+class Inventory;
+class PopupCrownBoss;
 class Princess;
 class RegionManager;
+class StoryProgress;
 class TimeSystem;
 class ToySystem;
 class VentAnimation;
@@ -33,6 +36,9 @@ struct Context {
     EmotionSystem& emotionSystem;
     WeatherSystem& weatherSystem;
     VentAnimation& ventAnimation;
+    Inventory& inventory;
+    StoryProgress& storyProgress;
+    PopupCrownBoss& popupCrownBoss;
     std::unique_ptr<Princess>& princess;
     b2BodyId& playerBodyId;
     glm::vec2& homePosition;

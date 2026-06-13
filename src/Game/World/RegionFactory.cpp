@@ -143,6 +143,8 @@ void configureRealStreetPrologue(MapRegion& region) {
     }
     if (map.isInBounds(18, 26)) map.setTile(18, 26, TileType::Portal);
     if (map.isInBounds(18, 25)) map.setTile(18, 25, TileType::Path);
+    if (map.isInBounds(18, 24)) map.setTile(18, 24, TileType::Path);
+    if (map.isInBounds(18, 23)) map.setTile(18, 23, TileType::Path);
 
     addPoi(region, PointOfInterest::Type::Quest,
         "star_candy", "星星糖 / Star Candy", {10, 14});
@@ -152,7 +154,7 @@ void configureRealStreetPrologue(MapRegion& region) {
         "childhood_crack", "童年裂缝 / Childhood Crack", {18, 25});
 
     addConnection(region, MapConnection::Direction::South,
-        "home_base", {18, 26}, {12, 15});
+        "home_base", {18, 26}, {12, 14}); // targetTile 从 {12, 15} 改为 {12, 14}，避开 base_exit
 }
 
 void configureHomeBase(MapRegion& region) {
@@ -191,18 +193,21 @@ void configureHomeBase(MapRegion& region) {
         "arcade_gate", "弹窗游乐厅入口 / Popup Arcade Gate", {19, 9});
 
     addConnection(region, MapConnection::Direction::East,
-        "popup_arcade", {20, 9}, {30, 56});
+        "popup_arcade", {20, 9}, {30, 54}); // targetTile 从 {30, 53} 改为 {30, 54} 远离 base_return_gate {30, 57}
 }
 
 void configurePopupArcade(MapRegion& region) {
     TileMap& map = region.getTileMap();
 
+    // 内部使用 Dirt 作为可行走地板（不创建物理刚体），避免大量 Stone
+    // 瓦片产生数千个 Box2D 静态刚体导致 FPS 骤降。
     for (int y = 1; y < map.height - 1; ++y) {
         for (int x = 1; x < map.width - 1; ++x) {
-            map.setTile(x, y, TileType::Stone);
+            map.setTile(x, y, TileType::Dirt);
         }
     }
 
+    // 先设置主路径区域
     for (int y = 48; y <= 57; ++y) {
         for (int x = 24; x <= 36; ++x) {
             if (map.isInBounds(x, y)) map.setTile(x, y, TileType::Path);
@@ -222,6 +227,29 @@ void configurePopupArcade(MapRegion& region) {
         for (int x = 18; x <= 42; ++x) {
             if (map.isInBounds(x, y)) map.setTile(x, y, TileType::Path);
         }
+    }
+
+    // 在各区域的交界处放置少量 Stone 掩体（在路径区域覆盖之后放置）
+    auto placeStone = [&map](int x, int y) {
+        if (map.isInBounds(x, y) && map.getTile(x, y) != TileType::Wall) {
+            map.setTile(x, y, TileType::Stone);
+        }
+    };
+    for (int y = 4; y <= 18; ++y) {
+        placeStone(18, y);   // 北区左边界石柱
+        placeStone(43, y);   // 北区右边界石柱
+    }
+    for (int y = 20; y <= 34; ++y) {
+        placeStone(39, y);   // 东区左边界石柱
+        placeStone(56, y);   // 东区右边界石柱
+    }
+    for (int y = 26; y <= 47; ++y) {
+        placeStone(21, y);   // 中区左边界石柱
+        placeStone(39, y);   // 中区右边界石柱
+    }
+    for (int y = 48; y <= 57; ++y) {
+        placeStone(23, y);   // 南区左边界石柱
+        placeStone(37, y);   // 南区右边界石柱
     }
 
     if (map.isInBounds(30, 58)) map.setTile(30, 58, TileType::Portal);
@@ -249,7 +277,7 @@ void configurePopupArcade(MapRegion& region) {
         "base_return_gate", "返回秘密基地 / Return to Base", {30, 57});
 
     addConnection(region, MapConnection::Direction::South,
-        "home_base", {30, 58}, {19, 9});
+        "home_base", {30, 58}, {17, 9}); // 避开 arcade_gate {19, 9} 的手动交互范围和自动连接范围
 }
 
 void configureRegionSpecials(MapRegion& region) {

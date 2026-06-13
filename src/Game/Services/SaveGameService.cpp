@@ -60,9 +60,35 @@ SaveMeta getSaveMeta(const std::string& slot) {
         jsonData["player"].contains("progress")) {
         meta.playTime = jsonData["player"]["progress"].value("totalPlayTime", 0.0f);
     }
+    if (jsonData.contains("emotion") && jsonData["emotion"].is_object()) {
+        meta.childlikeHeart = jsonData["emotion"].value("childlikeHeart", 0.0f);
+    }
+    if (jsonData.contains("story") && jsonData["story"].is_object() &&
+        jsonData["story"].contains("unlockedPartners") &&
+        jsonData["story"]["unlockedPartners"].is_array()) {
+        for (const auto& partnerJson : jsonData["story"]["unlockedPartners"]) {
+            if (partnerJson.is_string() && !partnerJson.get<std::string>().empty()) {
+                ++meta.rescuedPartners;
+            }
+        }
+    }
 
-    if (jsonData.contains("regions") && !jsonData["regions"].empty()) {
-        meta.regionName = jsonData["regions"][0].value("name", "");
+    std::string currentRegionId;
+    if (jsonData.contains("player") && jsonData["player"].is_object()) {
+        currentRegionId = jsonData["player"].value("regionId", std::string{});
+    }
+    if (jsonData.contains("regions") && jsonData["regions"].is_array()) {
+        for (const auto& regionJson : jsonData["regions"]) {
+            if (!regionJson.is_object()) continue;
+            if (!currentRegionId.empty() &&
+                regionJson.value("id", std::string{}) == currentRegionId) {
+                meta.regionName = regionJson.value("name", std::string{});
+                break;
+            }
+            if (meta.regionName.empty()) {
+                meta.regionName = regionJson.value("name", std::string{});
+            }
+        }
     }
 
     return meta;

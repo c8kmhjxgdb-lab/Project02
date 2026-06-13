@@ -97,6 +97,7 @@ add_library(StarchildGame STATIC
     src/Game/Presentation/MainMenuView.cpp
     src/Game/Presentation/MiniMapPresenter.cpp
     src/Game/Presentation/ParticleView.cpp
+    src/Game/Presentation/PixelActorView.cpp
     src/Game/Presentation/PresentationModelBuilder.cpp
     src/Game/Presentation/QuestLogView.cpp
     src/Game/Presentation/WindowTitlePresenter.cpp
@@ -273,6 +274,13 @@ if(BUILD_TESTING)
     target_link_libraries(RegionServiceDoorTest PRIVATE StarchildGame)
     add_test(NAME RegionServiceDoorTest COMMAND RegionServiceDoorTest)
 
+    add_executable(ArcadePortalRenderSmokeTest
+        tests/ArcadePortalRenderSmokeTest.cpp
+    )
+    configure_starchild_target(ArcadePortalRenderSmokeTest)
+    target_link_libraries(ArcadePortalRenderSmokeTest PRIVATE StarchildApp)
+    add_test(NAME ArcadePortalRenderSmokeTest COMMAND ArcadePortalRenderSmokeTest)
+
     add_executable(RegionFactoryNostalgiaTest
         tests/RegionFactoryNostalgiaTest.cpp
     )
@@ -349,4 +357,18 @@ if(BUILD_TESTING)
     configure_starchild_target(PopupCrownBossTest)
     target_link_libraries(PopupCrownBossTest PRIVATE StarchildGame)
     add_test(NAME PopupCrownBossTest COMMAND PopupCrownBossTest)
+
+    add_executable(PixelActorViewMappingTest
+        tests/PixelActorViewMappingTest.cpp
+    )
+    configure_starchild_target(PixelActorViewMappingTest)
+    target_link_libraries(PixelActorViewMappingTest PRIVATE StarchildGame)
+    add_test(NAME PixelActorViewMappingTest COMMAND PixelActorViewMappingTest)
+
+    add_executable(MainMenuMetadataTest
+        tests/MainMenuMetadataTest.cpp
+    )
+    configure_starchild_target(MainMenuMetadataTest)
+    target_link_libraries(MainMenuMetadataTest PRIVATE StarchildGame)
+    add_test(NAME MainMenuMetadataTest COMMAND MainMenuMetadataTest)
 endif()

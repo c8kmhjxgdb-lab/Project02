@@ -32,8 +32,8 @@ struct SaveData {
 
     // 玩家数据
     struct PlayerData {
-        std::string regionId = "starter_village";
-        glm::vec2 position = glm::vec2(7.0f, 8.0f);
+        std::string regionId = "real_street_prologue";
+        glm::vec2 position = glm::vec2(8.0f, 12.0f);
         float health = 100.0f;
         float maxHealth = 100.0f;
         float mana = 100.0f;

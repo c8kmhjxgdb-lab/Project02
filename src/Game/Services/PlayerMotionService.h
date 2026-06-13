@@ -48,6 +48,7 @@ struct Context {
     float& armAngle;
     int screenWidth;
     int screenHeight;
+    bool movementInputEnabled = true;
 };
 
 struct Result {
