@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"E:/DouBao2/Project/KatCode/Project02\\\" && git push && git worktree remove \\\".worktrees/nostalgia-rework-vertical-slice\\\"\",\"description\":\"Push main and remove the worktree\"}",
+  "error": "Exit code 128\nremote: This repository moved. Please use the new location:        \nremote:   https://github.com/c8kmhjxgdb-lab/Child-of-Starwish.git        \nTo https://github.com/c8kmhjxgdb-lab/Project02.git\n   5db5c36..7d6b57d  main -> main\nfatal: '.worktrees/nostalgia-rework-vertical-slice' contains modified or untracked files, use --force to delete it",
+  "timestamp": "2026-06-13T21:20:05.805Z",
+  "retry_count": 1
+}
