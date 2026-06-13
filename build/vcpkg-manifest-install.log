@@ -1,4 +1,5 @@
 Detecting compiler hash for triplet x64-windows...
+-- Automatically setting %HTTP(S)_PROXY% environment variables to "127.0.0.1:7890".
 Compiler found: E:/Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe
 The following packages are already installed:
     box2d:x64-windows@3.1.1
@@ -81,4 +82,4 @@ sol2 provides pkg-config modules:
   # C++ <-> Lua Wrapper Library
   sol2
 
-All requested installations completed successfully in: 741 us
+All requested installations completed successfully in: 1.05 ms

@@ -174,9 +174,17 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\ArcadePortalRenderSmokeTest.vcxproj">
+      <Project>{9D5B15F5-6606-380D-A9D9-8867C1011A46}</Project>
+      <Name>ArcadePortalRenderSmokeTest</Name>
+    </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\AudioManifestTest.vcxproj">
       <Project>{F168D7F8-266F-38A4-A9F7-39B27212C143}</Project>
       <Name>AudioManifestTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\ChildlikeSkillProfileTest.vcxproj">
+      <Project>{01185BDF-8DF4-3403-AAFC-A2EDBCAF163A}</Project>
+      <Name>ChildlikeSkillProfileTest</Name>
     </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\CombatCastServiceTest.vcxproj">
       <Project>{76488E4C-2F7F-31D7-98EB-DB7D15A80CF9}</Project>
@@ -190,13 +198,45 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{2A4C7B50-E9D1-371C-AABD-7AD1BF1BA44D}</Project>
       <Name>DialogueServiceRewardTest</Name>
     </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\EmotionTierTest.vcxproj">
+      <Project>{7B192DAB-5F24-3067-8971-A95F64C9107A}</Project>
+      <Name>EmotionTierTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\EnemyDefinitionTest.vcxproj">
+      <Project>{F6AB0696-CAC4-345D-A1A3-E2AB4CA08353}</Project>
+      <Name>EnemyDefinitionTest</Name>
+    </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\InputControllerBoundaryTest.vcxproj">
       <Project>{D0D2017F-56D4-35DC-924C-541FF303F165}</Project>
       <Name>InputControllerBoundaryTest</Name>
     </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\InventoryItemTest.vcxproj">
+      <Project>{8704981F-68B7-312A-8393-40C145BC3298}</Project>
+      <Name>InventoryItemTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\MainMenuMetadataTest.vcxproj">
+      <Project>{F5707587-AF5E-3068-A2A6-DA089489ECC8}</Project>
+      <Name>MainMenuMetadataTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\PixelActorViewMappingTest.vcxproj">
+      <Project>{FCC0D36A-B66D-3C08-8465-55D5C8FE52FC}</Project>
+      <Name>PixelActorViewMappingTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\PopupCrownBossTest.vcxproj">
+      <Project>{F73B84A6-23AD-30DE-9E44-657D8EAD2733}</Project>
+      <Name>PopupCrownBossTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\QuestObjectiveFlowTest.vcxproj">
+      <Project>{8B9ABC64-6BA3-32EA-B434-5679948F3BF3}</Project>
+      <Name>QuestObjectiveFlowTest</Name>
+    </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\QuestSystemFlowTest.vcxproj">
       <Project>{D56968AE-2FE5-3391-9B47-89C3F302555C}</Project>
       <Name>QuestSystemFlowTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\RegionFactoryNostalgiaTest.vcxproj">
+      <Project>{FF03CEF2-4CC9-3D93-91C5-400ACE9E9350}</Project>
+      <Name>RegionFactoryNostalgiaTest</Name>
     </ProjectReference>
     <ProjectReference Include="E:\DouBao2\Project\KatCode\Project02\build\RegionServiceDoorTest.vcxproj">
       <Project>{F128B4F0-92CD-3430-88F2-FC8ECACEF7C7}</Project>
