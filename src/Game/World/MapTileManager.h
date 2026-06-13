@@ -40,6 +40,10 @@ public:
     // 查询：获取某位置的 Box2D 刚体
     b2BodyId getBodyAt(int x, int y) const;
 
+    // 查询：当前管理的物理刚体总数（用于回归测试，验证 dungeon 类
+    // 大地图不会一次性塞入数千个 Box2D 静态刚体导致 buildPhysics 卡顿）
+    size_t getBodyCount() const { return tileBodies.size(); }
+
     // 清理：释放所有物理资源
     void shutdown();
 
