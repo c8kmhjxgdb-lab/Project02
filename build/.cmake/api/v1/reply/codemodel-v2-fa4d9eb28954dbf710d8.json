@@ -1,0 +1,1272 @@
+{
+	"configurations" : 
+	[
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::GLEW::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__GLEW-Debug-346a2c71865590e902f3.json",
+					"name" : "GLEW::GLEW",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::glew::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__glew-Debug-d46c4abd684baf7531e8.json",
+					"name" : "GLEW::glew",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2-Debug-56f6c3ddfb65308c8800.json",
+					"name" : "SDL2::SDL2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2main::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2main-Debug-ecb63ce14e138415deb7.json",
+					"name" : "SDL2::SDL2main",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "box2d::box2d::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-box2d__box2d-Debug-0b5deda1b05e07b4d809.json",
+					"name" : "box2d::box2d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-Debug-3dcdbca6e2a252ea6dad.json",
+					"name" : "glm::glm",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-header-only-Debug-6b2d5bd7fee106332446.json",
+					"name" : "glm::glm-header-only",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json-Debug-fe365060d0c0a4ce6ced.json",
+					"name" : "nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json__nlohmann_json-Debug-445f8e69f4490f228659.json",
+					"name" : "nlohmann_json::nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sol2::sol2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sol2__sol2-Debug-d5a45b70cc84a873fc08.json",
+					"name" : "sol2::sol2",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f040eec181a89de70dbe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Starchild2D",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-Debug-045cd888f9ba83e55083.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "AudioManifestTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AudioManifestTest-Debug-8000e5547718e58f1bd3.json",
+					"name" : "AudioManifestTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCastServiceTest-Debug-bb2dc819b13321cd1fa9.json",
+					"name" : "CombatCastServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCollisionServiceTest-Debug-bb15ec3575a2e1e187cd.json",
+					"name" : "CombatCollisionServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Continuous::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Continuous-Debug-31ce02b6402796e571f7.json",
+					"name" : "Continuous",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DialogueServiceRewardTest-Debug-763ac33298262fe0ef12.json",
+					"name" : "DialogueServiceRewardTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Experimental::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Experimental-Debug-0ae95a0a9696e443a968.json",
+					"name" : "Experimental",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-InputControllerBoundaryTest-Debug-8e3284a3b6d523aee760.json",
+					"name" : "InputControllerBoundaryTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Nightly::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Nightly-Debug-da8bbb5792c56b7a6d29.json",
+					"name" : "Nightly",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NightlyMemoryCheck::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NightlyMemoryCheck-Debug-7b1a1bf792b5afe3b5b1.json",
+					"name" : "NightlyMemoryCheck",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-QuestSystemFlowTest-Debug-14e7cfbf9fe56e315dcc.json",
+					"name" : "QuestSystemFlowTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RegionServiceDoorTest-Debug-6319374d68af904f67af.json",
+					"name" : "RegionServiceDoorTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveApplierIntegrationTest-Debug-6f27ed88d23506e1171a.json",
+					"name" : "SaveApplierIntegrationTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveDataRoundTripTest-Debug-1640fe7a9db1d18fdd66.json",
+					"name" : "SaveDataRoundTripTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Starchild2D::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Starchild2D-Debug-9af5002f35cb070db51e.json",
+					"name" : "Starchild2D",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildApp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildApp-Debug-3cd5cdcdbb2be89ef105.json",
+					"name" : "StarchildApp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildEngine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildEngine-Debug-b9e8a250258321656a0e.json",
+					"name" : "StarchildEngine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildGame::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildGame-Debug-30832725aad11c8e4f65.json",
+					"name" : "StarchildGame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StoryProgressTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StoryProgressTest-Debug-d16ac39ca08011d605ac.json",
+					"name" : "StoryProgressTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-Debug-b6811b5db9f81ad1b113.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		},
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::GLEW::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__GLEW-Release-7af82f43e5711f2a570e.json",
+					"name" : "GLEW::GLEW",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::glew::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__glew-Release-9d7f20d49fd6155f289f.json",
+					"name" : "GLEW::glew",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2-Release-e8ee120b9ab378de4a30.json",
+					"name" : "SDL2::SDL2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2main::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2main-Release-7030cedfcec7fa7b22d9.json",
+					"name" : "SDL2::SDL2main",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "box2d::box2d::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-box2d__box2d-Release-3d4f853d8a29a50f85e5.json",
+					"name" : "box2d::box2d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-Release-6e1914891d656a047030.json",
+					"name" : "glm::glm",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-header-only-Release-6b2d5bd7fee106332446.json",
+					"name" : "glm::glm-header-only",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json-Release-fe365060d0c0a4ce6ced.json",
+					"name" : "nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json__nlohmann_json-Release-445f8e69f4490f228659.json",
+					"name" : "nlohmann_json::nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sol2::sol2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sol2__sol2-Release-d5a45b70cc84a873fc08.json",
+					"name" : "sol2::sol2",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f040eec181a89de70dbe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Starchild2D",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-Release-045cd888f9ba83e55083.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "AudioManifestTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AudioManifestTest-Release-58e4b0da0d47cc2425e2.json",
+					"name" : "AudioManifestTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCastServiceTest-Release-66b0c2a597b317093dc3.json",
+					"name" : "CombatCastServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCollisionServiceTest-Release-fb28a30914cd6d87d647.json",
+					"name" : "CombatCollisionServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Continuous::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Continuous-Release-31ce02b6402796e571f7.json",
+					"name" : "Continuous",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DialogueServiceRewardTest-Release-cbe69a89ed165fe70b3e.json",
+					"name" : "DialogueServiceRewardTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Experimental::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Experimental-Release-0ae95a0a9696e443a968.json",
+					"name" : "Experimental",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-InputControllerBoundaryTest-Release-a34e6bcc455903824324.json",
+					"name" : "InputControllerBoundaryTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Nightly::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Nightly-Release-da8bbb5792c56b7a6d29.json",
+					"name" : "Nightly",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NightlyMemoryCheck::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NightlyMemoryCheck-Release-7b1a1bf792b5afe3b5b1.json",
+					"name" : "NightlyMemoryCheck",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-QuestSystemFlowTest-Release-344a98022480d7ff17e2.json",
+					"name" : "QuestSystemFlowTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RegionServiceDoorTest-Release-4ad27ff00ca0165f3505.json",
+					"name" : "RegionServiceDoorTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveApplierIntegrationTest-Release-74de186731b5272f88a0.json",
+					"name" : "SaveApplierIntegrationTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveDataRoundTripTest-Release-dea23670e316378dc4a0.json",
+					"name" : "SaveDataRoundTripTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Starchild2D::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Starchild2D-Release-23f12431e3975dccbdd4.json",
+					"name" : "Starchild2D",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildApp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildApp-Release-ef35fb0067363f442048.json",
+					"name" : "StarchildApp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildEngine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildEngine-Release-e1f19043cae47991858a.json",
+					"name" : "StarchildEngine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildGame::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildGame-Release-9d727a43386defdcf040.json",
+					"name" : "StarchildGame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StoryProgressTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StoryProgressTest-Release-d3d9ef62e75028c213bd.json",
+					"name" : "StoryProgressTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-Release-b6811b5db9f81ad1b113.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		},
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::GLEW::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__GLEW-MinSizeRel-7af82f43e5711f2a570e.json",
+					"name" : "GLEW::GLEW",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::glew::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__glew-MinSizeRel-9d7f20d49fd6155f289f.json",
+					"name" : "GLEW::glew",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2-MinSizeRel-e8ee120b9ab378de4a30.json",
+					"name" : "SDL2::SDL2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2main::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2main-MinSizeRel-7030cedfcec7fa7b22d9.json",
+					"name" : "SDL2::SDL2main",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "box2d::box2d::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-box2d__box2d-MinSizeRel-3d4f853d8a29a50f85e5.json",
+					"name" : "box2d::box2d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-MinSizeRel-6e1914891d656a047030.json",
+					"name" : "glm::glm",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-header-only-MinSizeRel-6b2d5bd7fee106332446.json",
+					"name" : "glm::glm-header-only",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json-MinSizeRel-fe365060d0c0a4ce6ced.json",
+					"name" : "nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json__nlohmann_json-MinSizeRel-445f8e69f4490f228659.json",
+					"name" : "nlohmann_json::nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sol2::sol2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sol2__sol2-MinSizeRel-d5a45b70cc84a873fc08.json",
+					"name" : "sol2::sol2",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-MinSizeRel-f040eec181a89de70dbe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"name" : "MinSizeRel",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Starchild2D",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-MinSizeRel-045cd888f9ba83e55083.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "AudioManifestTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AudioManifestTest-MinSizeRel-9d845eacc4892e4dd9d1.json",
+					"name" : "AudioManifestTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCastServiceTest-MinSizeRel-f0240160cd8782a57354.json",
+					"name" : "CombatCastServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCollisionServiceTest-MinSizeRel-161fa1f274759c3a7cdd.json",
+					"name" : "CombatCollisionServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Continuous::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Continuous-MinSizeRel-31ce02b6402796e571f7.json",
+					"name" : "Continuous",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DialogueServiceRewardTest-MinSizeRel-759651d475d111269aad.json",
+					"name" : "DialogueServiceRewardTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Experimental::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Experimental-MinSizeRel-0ae95a0a9696e443a968.json",
+					"name" : "Experimental",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-InputControllerBoundaryTest-MinSizeRel-4675db11445203ebf13b.json",
+					"name" : "InputControllerBoundaryTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Nightly::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Nightly-MinSizeRel-da8bbb5792c56b7a6d29.json",
+					"name" : "Nightly",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NightlyMemoryCheck::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NightlyMemoryCheck-MinSizeRel-7b1a1bf792b5afe3b5b1.json",
+					"name" : "NightlyMemoryCheck",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-QuestSystemFlowTest-MinSizeRel-de867d758894ba6a49ee.json",
+					"name" : "QuestSystemFlowTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RegionServiceDoorTest-MinSizeRel-39a1ca0415bf3d6f2017.json",
+					"name" : "RegionServiceDoorTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveApplierIntegrationTest-MinSizeRel-6a448a72e7ce2bd41314.json",
+					"name" : "SaveApplierIntegrationTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveDataRoundTripTest-MinSizeRel-9738ac23b8a64149024c.json",
+					"name" : "SaveDataRoundTripTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Starchild2D::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Starchild2D-MinSizeRel-0ae3ee97b30d68b6bb45.json",
+					"name" : "Starchild2D",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildApp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildApp-MinSizeRel-17972dfb32e25b3fabcf.json",
+					"name" : "StarchildApp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildEngine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildEngine-MinSizeRel-75c11225d77f6fe4c5fb.json",
+					"name" : "StarchildEngine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildGame::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildGame-MinSizeRel-b583d01e6e951568d693.json",
+					"name" : "StarchildGame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StoryProgressTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StoryProgressTest-MinSizeRel-ae19dec17228f2b2bb4b.json",
+					"name" : "StoryProgressTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-MinSizeRel-b6811b5db9f81ad1b113.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		},
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::GLEW::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__GLEW-RelWithDebInfo-7af82f43e5711f2a570e.json",
+					"name" : "GLEW::GLEW",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GLEW::glew::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLEW__glew-RelWithDebInfo-9d7f20d49fd6155f289f.json",
+					"name" : "GLEW::glew",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2-RelWithDebInfo-e8ee120b9ab378de4a30.json",
+					"name" : "SDL2::SDL2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SDL2::SDL2main::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SDL2__SDL2main-RelWithDebInfo-7030cedfcec7fa7b22d9.json",
+					"name" : "SDL2::SDL2main",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "box2d::box2d::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-box2d__box2d-RelWithDebInfo-3d4f853d8a29a50f85e5.json",
+					"name" : "box2d::box2d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-RelWithDebInfo-6e1914891d656a047030.json",
+					"name" : "glm::glm",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm__glm-header-only-RelWithDebInfo-6b2d5bd7fee106332446.json",
+					"name" : "glm::glm-header-only",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json-RelWithDebInfo-fe365060d0c0a4ce6ced.json",
+					"name" : "nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nlohmann_json::nlohmann_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nlohmann_json__nlohmann_json-RelWithDebInfo-445f8e69f4490f228659.json",
+					"name" : "nlohmann_json::nlohmann_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sol2::sol2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sol2__sol2-RelWithDebInfo-d5a45b70cc84a873fc08.json",
+					"name" : "sol2::sol2",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-RelWithDebInfo-f040eec181a89de70dbe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"name" : "RelWithDebInfo",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Starchild2D",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-045cd888f9ba83e55083.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "AudioManifestTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AudioManifestTest-RelWithDebInfo-aa039dd3315c49366f59.json",
+					"name" : "AudioManifestTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCastServiceTest-RelWithDebInfo-4bd186bb9c95a4fc23dd.json",
+					"name" : "CombatCastServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CombatCollisionServiceTest-RelWithDebInfo-89b594cf8a89235c3128.json",
+					"name" : "CombatCollisionServiceTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Continuous::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Continuous-RelWithDebInfo-31ce02b6402796e571f7.json",
+					"name" : "Continuous",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DialogueServiceRewardTest-RelWithDebInfo-16088f82020910d77031.json",
+					"name" : "DialogueServiceRewardTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Experimental::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Experimental-RelWithDebInfo-0ae95a0a9696e443a968.json",
+					"name" : "Experimental",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-InputControllerBoundaryTest-RelWithDebInfo-ef4ea0bd1a1253580085.json",
+					"name" : "InputControllerBoundaryTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Nightly::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Nightly-RelWithDebInfo-da8bbb5792c56b7a6d29.json",
+					"name" : "Nightly",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NightlyMemoryCheck::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NightlyMemoryCheck-RelWithDebInfo-7b1a1bf792b5afe3b5b1.json",
+					"name" : "NightlyMemoryCheck",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-QuestSystemFlowTest-RelWithDebInfo-1ee435e315bb93424541.json",
+					"name" : "QuestSystemFlowTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RegionServiceDoorTest-RelWithDebInfo-3f2642893b09928f2cbf.json",
+					"name" : "RegionServiceDoorTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveApplierIntegrationTest-RelWithDebInfo-789e683c509cd8c3ad9e.json",
+					"name" : "SaveApplierIntegrationTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SaveDataRoundTripTest-RelWithDebInfo-6fd86259faa9d9b94ceb.json",
+					"name" : "SaveDataRoundTripTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Starchild2D::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Starchild2D-RelWithDebInfo-3100bdaa29e2e6245f12.json",
+					"name" : "Starchild2D",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildApp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildApp-RelWithDebInfo-7c9cb9a19e8761061fb2.json",
+					"name" : "StarchildApp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildEngine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildEngine-RelWithDebInfo-62151bef9774a473c4a5.json",
+					"name" : "StarchildEngine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StarchildGame::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StarchildGame-RelWithDebInfo-7aadbb21606638fd894d.json",
+					"name" : "StarchildGame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "StoryProgressTest::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-StoryProgressTest-RelWithDebInfo-4053353a93fe4f5d61bf.json",
+					"name" : "StoryProgressTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-RelWithDebInfo-b6811b5db9f81ad1b113.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/DouBao2/Project/KatCode/Project02/build",
+		"source" : "E:/DouBao2/Project/KatCode/Project02"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	}
+}

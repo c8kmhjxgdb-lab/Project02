@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/sol2-x64-windows-3.5.0#1-06a0c6e4-66ef-4b1c-9057-5bfec184a45b",
-  "name": "sol2:x64-windows@3.5.0#1 4b07919f20ce559a2d2527361355f8d85701b67d917539636c3f20372068d469",
+  "documentNamespace": "https://spdx.org/spdxdocs/sol2-x64-windows-3.5.0#1-fd29f80d-95a3-4913-9029-e7b32386d968",
+  "name": "sol2:x64-windows@3.5.0#1 b1c8d57ced4fde3864d55ca11a7b0c9439c762bb7950cb0d328bd89cefeefc93",
   "creationInfo": {
     "creators": [
       "Tool: vcpkg-2026-05-27-d5b6777d666efc1a7f491babfcdab37794c1ae3e"
     ],
-    "created": "2026-06-03T13:18:55Z"
+    "created": "2026-06-10T07:52:02Z"
   },
   "relationships": [
     {
@@ -679,7 +679,7 @@
     {
       "name": "sol2:x64-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "4b07919f20ce559a2d2527361355f8d85701b67d917539636c3f20372068d469",
+      "versionInfo": "b1c8d57ced4fde3864d55ca11a7b0c9439c762bb7950cb0d328bd89cefeefc93",
       "downloadLocation": "NONE",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",

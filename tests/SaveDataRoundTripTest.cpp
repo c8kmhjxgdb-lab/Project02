@@ -49,6 +49,7 @@ void saveDataRoundTripsNewFields() {
         "chapter state round trips");
     TestSupport::require(restored.storyProgress.unlockedPartners.size() == 1,
         "partner progress round trips");
+<<<<<<< HEAD
     TestSupport::require(restored.storyProgress.unlockedPartners[0] == "tieyi",
         "partner id round trips");
     TestSupport::require(restored.storyProgress.flags.size() == 1, "story flag round trips");
@@ -154,5 +155,8 @@ int main() {
     invalidNewFieldsAreIgnored();
     invalidNewFieldContainersAreIgnored();
     serializerSkipsInvalidNewFieldsOnWrite();
+=======
+    TestSupport::require(restored.storyProgress.flags.size() == 1, "story flag round trips");
+>>>>>>> origin/main
     return 0;
 }

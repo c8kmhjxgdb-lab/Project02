@@ -1,10 +1,10 @@
-SaveDataRoundTripTest 21 0.0123605
-CombatCastServiceTest 13 0.0138721
-QuestSystemFlowTest 12 0.0114301
-RegionServiceDoorTest 11 0.0184831
-DialogueServiceRewardTest 9 0.02978
-AudioManifestTest 9 0.0190419
-SaveApplierIntegrationTest 5 0.0496553
-CombatCollisionServiceTest 4 0.0362
-InputControllerBoundaryTest 3 0.0501641
+SaveDataRoundTripTest 22 0.00622829
+CombatCastServiceTest 14 0.0136872
+QuestSystemFlowTest 13 0.00704004
+RegionServiceDoorTest 12 0.0114897
+DialogueServiceRewardTest 10 0.0190548
+AudioManifestTest 10 0.0260739
+SaveApplierIntegrationTest 6 0.0375867
+CombatCollisionServiceTest 5 0.0159433
+InputControllerBoundaryTest 4 0.0223299
 ---

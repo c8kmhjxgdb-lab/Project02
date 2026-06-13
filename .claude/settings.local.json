@@ -14,7 +14,11 @@
       "Bash(mmx music *)",
       "Bash(mmx --version)",
       "Bash(mmx video *)",
-      "Bash(mmx quota *)"
+      "Bash(mmx quota *)",
+      "Bash(cd \"/e/DouBao2/Project/KatCode/Project02/.worktrees/nostalgia-rework-vertical-slice\" && find src -name \"GameBootstrap*\" -o -name \"main.cpp\")",
+      "Read(//e/e/DouBao2/Project/KatCode/Project02/.worktrees/nostalgia-rework-vertical-slice/**)",
+      "Bash(xxd)",
+      "Bash(timeout 60 ./build/Release/ArcadePortalRenderSmokeTest.exe)"
     ]
   }
 }

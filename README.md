@@ -1,170 +1,248 @@
-# 星愿之子 (Starchild2D)
+# 星愿之子 / Starchild2D
 
-> 一个 C++17 写的 2D 俯视角动作 RPG。
-> 表面上是少年、魔法、公主和 BOSS；实际上是把“作业写完没”“只要 6 元立刻变强”“等你长大就懂了”拖进战斗系统里公开处刑。
+> 我会长大，但不交出童心。
+> I will grow up, but I will not hand over my colors.
 
-如果你曾经：
+**《星愿之子》** 是一款 C++17 开发的 2D 俯视角动作 RPG。它把六一傍晚的小卖部、旧游戏币、弹窗小游戏、黑屏电视、课间十分钟和那些没讲完的故事，做成一个可以探索、战斗、存档、失败后再站起来的怀旧童心宇宙。
 
-- 放学第一件事不是写作业，而是打开 4399；
-- 对 Flash Player 停止工作有一种说不清的 PTSD；
-- 在暑假最后一天晚上相信自己能创造奇迹；
-- 听见“下一话见”以后真的等了很多年；
-- 长大后还想理直气壮地过六一；
+**Starchild2D** is a C++17 top-down action RPG about a glowing star candy, a secret layer of childhood beneath reality, and the brave decision to grow up without becoming gray inside.
 
-那你可能不是目标玩家，你就是受害者本人。欢迎回到童心广场。
+它有魔法、Boss、秘密基地和会嘴硬的公主；也有工程结构、存档边界、任务流、背包系统和一条清楚的垂直切片计划。浪漫归浪漫，构建失败的时候 CMake 可不会因为你童心值高就心软。
 
-## 这是什么？
+It is warm, playful, and a little ridiculous in the right places. It is also built like an actual game project, because nostalgia still needs deterministic save data.
 
-《星愿之子》是一款 **2D 俯视角动作 RPG**。主角星愿在 2026 年六一捡到一颗星星糖，随后被卷进“童心王国”和“长大王国”的大战。
+---
 
-童心王国有 9 位公主，分别守护“玩、看、强、信、学、唱、燃、问、听”。长大王国那边也不甘示弱，派出了充值大帝、黑屏大王、补习班校长、拖更大魔王和一句“等你长大就懂了”。
+## 故事 / Story
 
-本项目当前已经具备俯视角移动、战斗、地图、NPC 对话、情绪、天气、昼夜和存档等系统；`doc/` 中的怀旧主题文档则把这些系统重新包装成 **六一儿童节 + 8090/00 后童年怀旧宇宙**。简单说：引擎负责能跑，童年负责破防。
+2026 年 6 月 1 日傍晚，16 岁的高中生 **星愿** 在小卖部门口捡到一颗发光的星星糖。糖在他手心里冷却成一枚淡蓝色旧游戏币，他把它挂在脖子上，然后现实地面裂开，彩色的光把他带进了 **童心层**。
 
-## 核心体验
+那里不是梦，也不是回忆文件夹。那里是现实之下的一层世界，原本保存着孩子们的勇气、好奇、想象力和“再玩五分钟”的坚定信念。现在，**灰钟局** 正在把它折叠进现实层，让所有人走向一条标准、安静、没有颜色的成长路线。
 
-- **童心值 0-1000**：低了世界会灰，像周日晚上听见“明天开学”。归零触发坏结局：你已经不是小朋友了。
-- **9 位公主同行**：公主不是站桩 NPC，而是童心碎片的守护者。好感度拉满后，能放联合技，不是客套，是一起揍补习班校长。
-- **9 大怀旧领域**：4399 游戏大厅、动画放映厅、超级英雄基地、童话森林、校园操场、童谣村庄、漫画城、科学实验室、隐藏音乐厅。
-- **童年阴影 BOSS 化**：6 元首充、电视黑屏、删减版动画、暑假作业、拖更烂尾、跑调噪音和“别人家的孩子”都不再只是回忆，它们会掉血条。
-- **玩具级战斗系统**：火球、冰锥、链式闪电、护盾、抓投、飞行、联合必杀。武器尽量来自童年神物：弹珠、悠悠球、红白机、小卖部三件套。
-- **不逼氪声明**：本游戏拒绝付费抽卡。充值大帝可以当 BOSS，不能当产品经理。
+星愿遇见了忍饥挨饿但绝不承认自己需要帮助的 **艾莉娅**。她是第九位公主，守护的不是某个单独领域，而是童心层本身。两人从互相嘴硬，到一起闯过弹窗游乐厅、雪花放映厅、纸皮英雄基地、铃声操场、问号实验室，最终登上灰钟塔，面对灰钟局长。
 
-## 怀旧宇宙速查
+On June 1st, 2026, sixteen-year-old Xingyuan picks up a glowing star candy outside a corner shop. It cools into a translucent blue game token, opens a crack in reality, and drops him into the **Childlike Layer**.
 
-| 领域 | 公主 | 守护能力 | BOSS | 主要阴影 |
-|------|------|----------|------|----------|
-| 4399 游戏大厅 | 琪琪 | 玩 | 充值大帝 | 6 元首充、弹窗广告、Flash 停服 |
-| 动画放映厅 | 露露 | 看 | 黑屏大王 | 电视雪花、删减版、黑屏 |
-| 超级英雄基地 | 艾琳 | 强 | 烂片魔王 | 5 毛特效、续集疲劳 |
-| 童话森林 | 贝儿 | 信 | 后母皇后 | 童话被改写 |
-| 校园操场 | 小雪 | 学 | 补习班校长 | 作业、考试、家长签字 |
-| 童谣村庄 | 铃铛 | 唱 | 噪音公爵 | 跑调、忘词、早睡怪 |
-| 漫画城 | 美琪 | 燃 | 拖更大魔王 | 烂尾、周更、下一话见 |
-| 科学实验室 | 诺诺 | 问 | 实验失败魔王 | 试管炸了但嘴硬 |
-| 音乐厅（隐藏） | 乐乐 | 听 | 失谐魔王 | 音准离家出走 |
-| 长大魔王的城堡 | — | — | 无聊之王 / 长大魔王 | “小孩子懂什么” |
+This hidden world is being compressed by the **Gray Bell Bureau**, an institution obsessed with one tidy version of growing up. Xingyuan meets **Alya**, a stubborn princess who insists she does not need help, especially while visibly starving. Together they rescue guardians, restore color to nostalgic domains, and challenge the idea that maturity must be gray.
 
-> 终章台词预警：长大魔王说“等你长大就懂了”。主角回答：“我会长大的。但在那之前，我还想再玩一会儿。”
+The heart of the story is simple:
 
-## 快速开始
+> 长大不是把童年锁起来。长大是带着它继续走。
+> Growing up does not mean locking childhood away. It means carrying it forward.
+
+---
+
+## 核心体验 / Core Experience
+
+| 中文 | English |
+|---|---|
+| **秘密基地 Hub**：休息、保存、整理背包、查看任务、和艾莉娅斗嘴。 | **Secret Base Hub**: rest, save, sort inventory, track quests, and trade stubborn comments with Alya. |
+| **章节领域副本**：每章一个童年主题场景，一个独特机制，一个守护伙伴，一个 Boss。 | **Chapter Domains**: each chapter has a nostalgic theme, a signature mechanic, a rescued guardian, and a boss. |
+| **童心值动态技能**：童心越亮，技能名字、粒子、伤害、画面饱和度和隐藏物可见性都会变化。 | **Childlike Heart Skill Tiers**: your skills, particles, damage, world color, and hidden discoveries react to your heart level. |
+| **怀旧不是复刻**：主线角色和 Boss 原创化，致敬元素放在道具描述、闲聊、贴纸、海报和彩蛋房里。 | **Homage, Not Cloning**: main characters and bosses are original; references live in item text, banter, stickers, posters, and secrets. |
+| **反派像压力，不像坏人甲**：灰钟局的敌人常常是规则、格式、弹窗、排名、标准答案。 | **Villains Feel Like Pressure**: rules, formats, popups, rankings, and “standard answers” are just as dangerous as monsters. |
+
+---
+
+## 当前制作目标 / Current Production Target
+
+完整剧情覆盖序章、八个主章节、隐藏章和终章；当前第一轮实现聚焦一个可玩的正式垂直切片：
+
+1. 主菜单。
+2. 序章：星星糖穿越，遇见艾莉娅。
+3. 秘密基地 Hub：地图桌、存档床、任务、属性、背包、系统菜单。
+4. 第一章：弹窗游乐厅。
+5. 救出伙伴 **铁翼**。
+6. 击败 Boss **六元冠冕**。
+7. 带 **像素手柄** 回基地，解锁基地变化。
+8. 覆盖上述进度的存档与读档。
+
+The full narrative includes a prologue, eight main domains, an optional hidden chapter, and a finale. The current production milestone is the first playable vertical slice: prologue, secret base, in-game menu, inventory, quest log, childlike-heart skill tiers, Popup Arcade, Tieyi rescue, Six-Yuan Crown boss, and save/load continuity.
+
+这份 README 描述的是新的叙事方向和第一轮生产目标，不代表所有章节都已经实装。换句话说：灰钟塔已经在设计里等你，但它还没有完全搬进可执行文件。
+
+This README describes the new narrative direction and first production target. Not every chapter is playable yet. The Gray Bell Tower is waiting in the design, not fully in the executable.
+
+---
+
+## 章节路线 / Chapter Roadmap
+
+| 顺序 | 中文章节 | English Chapter | 核心机制 |
+|---:|---|---|---|
+| 0 | 序章：星星糖穿越 | Prologue: Star Candy Crossing | 移动、互动、童心值教学 |
+| Hub | 秘密基地 | Secret Base | 任务、背包、存档、恢复、基地展示物 |
+| 1 | 弹窗游乐厅 | Popup Arcade | 弹窗遮挡、诱导按钮、试玩币机关 |
+| 2 | 雪花放映厅 | Snow-Screen Theater | 色彩通道、黑屏记忆、光束显形 |
+| 3 | 纸皮英雄基地 | Cardboard Hero Base | 真假危险、救援、勇气槽 |
+| 4 | 反面童话森林 | Rewritten Fairy-Tale Forest | 故事页、规则改写、命运书签 |
+| 5 | 铃声操场 | Bell-Ring Playground | 上课 / 课间切换、试卷墙、冲刺 |
+| 6 | 跑调童谣镇 | Off-Key Nursery Town | 节拍道路、三轨舞台、噪音扰乱 |
+| 7 | 断格漫画城 | Broken-Panel Comic City | 分镜格、进度回滚、未完待续屏障 |
+| 8 | 问号实验室 | Question-Mark Laboratory | 火冰电风实验、创造性错误、标准答案屏障 |
+| ? | 回声音乐厅 | Echo Music Hall | 十二乐器复调、隐藏结局条件 |
+| End | 灰钟塔 | Gray Bell Tower | 前章机制回归、标准化封印、最终选择 |
+
+---
+
+## 主要角色 / Cast
+
+| 角色 | Role | 说明 |
+|---|---|---|
+| 星愿 / Xingyuan | 主角 / Protagonist | 16 岁高中生，星星糖选中的人。外冷内热，关键时刻会帅一下，之后可能装作没有发生。 |
+| 艾莉娅 / Alya | 第九公主 / Ninth Princess | 守护童心层本身。嘴硬、温柔、饿了也要先讲道理。 |
+| 铁翼 / Tieyi | 第一章伙伴 / Chapter 1 Guardian | 红蓝机器人少年，火箭核心恢复后提供破盾支援。 |
+| 灰钟局长 / Director of the Gray Bell Bureau | 终章反派 / Final Antagonist | 不是单纯作恶，而是试图用“标准成长”保护所有人，结果差点把颜色保护没了。 |
+| 六元冠冕 / Six-Yuan Crown | 第一章 Boss / Chapter 1 Boss | 漂浮广告皇冠。它的职业理想是让你点击“立即变强”，你的职业理想是让它闭嘴。 |
+
+更多伙伴会在后续章节中加入：星牌师洛宸、纸甲工程师阿洛、键盘战士赤弦、星拳守护者承野、蓝袋工匠多洛、铃羊发明家乐铃、云棍少年悟星，以及隐藏章的回音。
+
+More guardians join later chapters, including star-card tacticians, cardboard engineers, rhythm helpers, inventors, and one very serious argument against the phrase “there is only one correct answer.”
+
+---
+
+## 系统亮点 / Systems
+
+- **童心值 / Childlike Heart**: 0-1000 的长期资源，影响后处理、移动、对话、技能表现、隐藏物和结局判断。
+- **委屈值 / Grievance**: 失败和压力的积累，不是为了惩罚玩家，而是让基地恢复和情绪回报有意义。
+- **任务日志 / Quest Log**: 支持主线、领域支线和基地任务，目标可以是对话、收集、击败、互动、进入区域和通关 Boss。
+- **通用背包 / Inventory**: 消耗品、材料、剧情物、玩具 / 家具、领域信物、隐藏收集物。
+- **章节进度 / Story Progress**: 记录章节状态、伙伴解锁、Boss 奖励、隐藏章 flag 和多结局条件。
+- **Boss 机制 / Boss Design**: 每个 Boss 至少有一个本章机制、一个压力诱导点、一个清晰反制点和一个高童心奖励条件。
+- **程序化发光像素表现 / Procedural Glow-Pixel Look**: 第一轮先用稳定尺寸的程序化像素角色和特效，后续可替换正式 sprite 素材管线。
+
+---
+
+## 技术栈 / Tech Stack
+
+| 领域 | Stack |
+|---|---|
+| 语言 / Language | C++17 |
+| 构建 / Build | CMake + vcpkg |
+| 图形 / Graphics | OpenGL 3.3 Core |
+| 物理 / Physics | Box2D v3, top-down zero-gravity setup |
+| 脚本 / Scripting | Lua + sol2 |
+| 存档 / Save Data | Structured game snapshot and migration path |
+| 内容方向 / Content Direction | Secret Base Hub + Chapter Domains |
+
+---
+
+## 快速开始 / Quick Start
+
+前提：安装 vcpkg，并设置 `VCPKG_ROOT`。
+
+Prerequisite: install vcpkg and set `VCPKG_ROOT`.
 
 ```bash
-# 前提：安装 vcpkg，并设置 VCPKG_ROOT
-
 cmake -B build
 cmake --build build --config Release
-
-# 运行时请从 build/ 目录启动，否则 assets 会像暑假作业一样找不到
-cd build && ./Release/Starchild2D.exe
 ```
 
-Debug 构建：
+从 `build/` 目录运行游戏，否则相对资源路径会找不到 `assets/`。这是电脑在提醒你：小卖部可以乱逛，工作目录不能乱跑。
+
+Run from `build/` so relative asset paths resolve correctly.
+
+```bash
+cd build
+./Release/Starchild2D.exe
+```
+
+Debug 构建 / Debug build:
 
 ```bash
 cmake --build build --config Debug
 ```
 
-Visual Studio 工程：
+Visual Studio 工程 / Visual Studio solution:
 
 ```bash
 cmake -B build -G "Visual Studio 17 2022" -A x64
 ```
 
-## 操作方式
+---
 
-| 键位 | 功能 | 段子版说明 |
-|------|------|------------|
-| WASD | 移动 | 不会自动寻路，童年也没人替你写作业 |
-| J | 火球术 | 小学生法师的朴素梦想 |
-| L | 冰锥术 | 给敌人降温，也给补习班降温 |
-| Q | 链式闪电 | 自动索敌，专治“我没惹你啊” |
-| F | 护盾 | 反弹敌人，暂不反弹家长会 |
-| G | 必杀技 | 与公主羁绊合击，童心版大招 |
-| 空格 | 飞行 | 像超人一样自由自在到处飞，这确实是每个人的童年梦想 |
-| K | 抓取 / 投掷 | 怪力不是暴力，是童年幻想合理化 |
-| E | 互动 | 对话、发泄、听 NPC 讲冷笑话 |
-| F5 | 快速存档 | 防止“妈拔电源”级事故 |
-| F9 | 快速读档 | 给童年一次重来的机会 |
-| 鼠标滚轮 | 缩放视角 | 近看是冒险，远看是作业没写 |
+## 操作 / Controls
 
-## 技术栈
+| 输入 | 功能 | Notes |
+|---|---|---|
+| `WASD` | 移动 / Move | 童年没有自动寻路，秘密基地也没有。 |
+| `J` | 火系投射 / Fire skill | 从打火机到星愿焰火，取决于童心值。 |
+| `L` | 冰系投射 / Ice skill | 降温可以给敌人，也可以给补课总监的 KPI。 |
+| `Q` | 连锁闪电 / Chain lightning | 适合处理“我就站这儿碍你事了吗”的敌群。 |
+| `F` | 防御 / Shield | 暂不保证能挡住家长会。 |
+| `Space` | 位移 / Flight or dash | 童心够高时，世界会同意你飞一会儿。 |
+| `K` | 抓取 / 投掷 / Grab or throw | 怪力是童年幻想的一种合理表达。 |
+| `E` | 互动 / Interact | 对话、调查、触发机关。 |
+| `Tab` / `Esc` | 游戏内菜单 / In-game menu | 任务、属性、背包、伙伴、系统。 |
+| `F5` | 快速存档 / Quick save | 防止“刚才那段能不能重来”的经典时刻。 |
+| `F9` | 快速读档 / Quick load | 给童心一次从检查点站起来的机会。 |
+| 鼠标滚轮 / Mouse wheel | 缩放视角 / Zoom | 近看是冒险，远看是地图编辑器的尊严。 |
 
-| 领域 | 技术 |
-|------|------|
-| 语言 | C++17 |
-| 图形 | OpenGL 3.3 Core + SDF 渲染 |
-| 物理 | Box2D v3（俯视角零重力） |
-| 脚本 | Lua + sol2（对话树、技能配置） |
-| 构建 | CMake + vcpkg |
+---
 
-## 项目结构
+## 项目结构 / Project Structure
 
 ```text
 src/
-├── Engine/        # 引擎层：渲染、物理、摄像机、LuaVM
-├── Game/          # 游戏层：地图、AI、战斗、对话、情绪、存档
-└── Utils/         # 工具：数学库、着色器加载
+├── main.cpp          # Application setup and game loop
+├── Engine/           # Renderer, physics, camera, scripting
+├── Game/             # World, abilities, AI, quests, inventory, saves, UI
+└── Utils/            # Shared helpers
 
 assets/
-├── shaders/       # GLSL 着色器
-└── scripts/       # Lua 脚本：对话树、技能配置
+├── shaders/          # GLSL shaders
+└── scripts/          # Lua gameplay and dialogue scripts
 
 doc/
-├── 怀旧主题-*.md  # 六一怀旧再创作方案
-├── plan*.md       # 阶段计划
-└── 技术栈.md      # 技术路线
+└── 怀旧主题-*.md      # Narrative, cast, maps, bosses, music, promo ideas
+
+docs/superpowers/
+├── specs/            # Design specs
+└── plans/            # Implementation plans
 ```
 
-`assets/` 会由 CMake 复制到 `build/assets/`。运行游戏时请从 `build/` 启动，不然资源路径会当场表演“我明明放这儿了”。
+`build/` 是生成目录，请把它当作自动售货机吐出来的小票：有用，但不手改。
 
-## 架构亮点
+`build/` is generated output. Useful, but not hand-authored.
 
-- **组件化对象池**：弹幕、敌人、粒子预分配，减少运行时内存抖动。
-- **类型安全实体 ID**：`ProjectileId`、`EnemyId` 不是裸整数，编译期先帮你拦一刀。
-- **回调驱动解耦**：受伤、死亡、对话、情绪变化通过事件串联，系统之间少一点“你管我我管你”。
-- **Y 排序渲染**：树、角色、装饰物能正确遮挡，俯视角也要有空间感。
-- **Lua 内容配置**：对话和部分玩法内容可脚本化调整，方便把“补习班校长”从普通坏人升级成精神伤害。
+---
 
-## 开发阶段
+## 设计文档 / Design References
 
-| 阶段 | 状态 | 内容 |
-|------|------|------|
-| 1-2 | 已完成 | 窗口、渲染、物理、基础地图 |
-| 3-4 | 已完成 | 战斗系统、Lua 脚本、情绪系统 |
-| 5 | 已完成 | 通行判定、噪声地形、装饰物、小地图 |
-| 6 | 已完成 | 多区域、A* 寻路、存档 / 读档、昼夜循环、天气系统 |
-| 7-8 | 规划中 | 室内细节、建造模式、家具、音频、主线剧情、怀旧主题落地 |
+- [`doc/怀旧主题-完整剧情.md`](doc/怀旧主题-完整剧情.md) — 新主线剧情、章节、结局和叙事语气。
+- [`docs/superpowers/specs/2026-06-10-starchild-nostalgia-rework-design.md`](docs/superpowers/specs/2026-06-10-starchild-nostalgia-rework-design.md) — 怀旧主题重构设计。
+- [`docs/superpowers/plans/2026-06-10-starchild-nostalgia-rework.md`](docs/superpowers/plans/2026-06-10-starchild-nostalgia-rework.md) — 第一轮垂直切片实施计划。
+- [`doc/技术栈.md`](doc/技术栈.md) — 技术路线与阶段规划。
 
-## 怀旧主题文档
+---
 
-| 文档 | 用途 |
-|------|------|
-| [`doc/怀旧主题-README.md`](doc/怀旧主题-README.md) | 怀旧主题总览和工作流 |
-| [`doc/怀旧主题-梗与元素索引.md`](doc/怀旧主题-梗与元素索引.md) | 4399、动画、童年阴影、儿童节梗库 |
-| [`doc/怀旧主题-世界观与剧情.md`](doc/怀旧主题-世界观与剧情.md) | 童心王国、长大王国、九章剧情 |
-| [`doc/怀旧主题-地图与场景.md`](doc/怀旧主题-地图与场景.md) | 10 张主地图、15 个副本、隐藏房间 |
-| [`doc/怀旧主题-主角与九公主.md`](doc/怀旧主题-主角与九公主.md) | 星愿与 9 位公主设定 |
-| [`doc/怀旧主题-NPC设计.md`](doc/怀旧主题-NPC设计.md) | 主城、领域和彩蛋 NPC |
-| [`doc/怀旧主题-怪物与BOSS.md`](doc/怀旧主题-怪物与BOSS.md) | 童年阴影怪物与 BOSS 机制 |
-| [`doc/怀旧主题-技能与战斗.md`](doc/怀旧主题-技能与战斗.md) | 主角技能、联合技、BOSS 招式、引擎映射 |
-| [`doc/怀旧主题-音乐与音效.md`](doc/怀旧主题-音乐与音效.md) | 地图 BGM、BOSS 战音乐、技能音效 |
-| [`doc/怀旧主题-宣传动画.md`](doc/怀旧主题-宣传动画.md) | 90 秒宣传片和短视频脚本 |
+## 开发原则 / Development Principles
 
-更多工程文档：
+- 基于现有架构扩展，不推倒重来。
+- 先证明“序章 + 秘密基地 + 第一章”完整循环，再扩展后续章节。
+- 玩法相关地图改动通过 `MapTileManager` 同步物理和持久化。
+- 新增 `.cpp` 文件需要显式加入 `CMakeLists.txt`。
+- 运行时从 `build/` 启动，确认 CMake 已复制 `assets/`。
+- 渲染、UI、剧情和战斗可以很有童心；存档、任务和进度状态必须像班主任点名一样可靠。
 
-- [`doc/技术栈.md`](doc/技术栈.md) — 技术路线与阶段规划
-- [`doc/plan5.md`](doc/plan5.md) — 第 5 阶段实现细节
-- [`doc/plan6.md`](doc/plan6.md) — 第 6 阶段计划
-- [`doc/plan7.md`](doc/plan7.md) — 第 7 阶段计划
-- [`CLAUDE.md`](CLAUDE.md) — AI 协作者指南
+- Extend the existing architecture instead of replacing it.
+- Prove the prologue, secret base, and first chapter loop before scaling the rest.
+- Use `MapTileManager` for gameplay-relevant tile edits so physics and persistence stay synchronized.
+- Add new `.cpp` files explicitly to `CMakeLists.txt`.
+- Run from `build/` and confirm assets are copied.
+- Keep the story playful; keep save data boring in the best possible way.
 
-## 幼稚力宣言
+---
 
-我们不做“长大以后才配玩”的游戏。
+## 童心声明 / Childlike-Heart Statement
 
-我们要做的是：按下 `J` 能发火球，按下 `G` 能和公主合击，遇到充值弹窗可以直接开打，看到补习班校长的血条会觉得人生终于公平了一点。
+我们不是要做一款拒绝长大的游戏。
 
-童心不是拒绝长大，是长大以后还记得：小卖部的辣条、课间十分钟、电视雪花屏、Flash 小游戏、没写完的暑假作业，以及那个拿树枝当魔法杖的下午。
+我们想做的是一款承认“长大很难”的游戏：你会遇到标准答案、黑屏、排名、弹窗、断更和很多听起来很有道理的灰色规则。但你也会遇到艾莉娅、秘密基地、像素手柄、恢复糖、会发光的旧游戏币，以及那些愿意陪你把颜色找回来的人。
 
-> 六一快乐。今天我们都是小学生。
+所以，六一快乐。不管今天是不是 6 月 1 日。
+
+This is not a game about refusing to grow up.
+
+It is a game about growing up with witnesses: a stubborn princess, a secret base, a pixel controller, a glowing token, and enough recovered color to keep walking.
+
+Happy Children’s Day, even when the calendar disagrees.
