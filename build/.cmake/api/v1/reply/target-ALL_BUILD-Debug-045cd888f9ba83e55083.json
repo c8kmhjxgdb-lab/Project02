@@ -31,40 +31,40 @@
 			"id" : "StarchildApp::@6890427a1f51a3e7e1df"
 		},
 		{
+			"id" : "Starchild2D::@6890427a1f51a3e7e1df"
+		},
+		{
 			"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "Starchild2D::@6890427a1f51a3e7e1df"
-		},
-		{
 			"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df"
+			"id" : "StoryProgressTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "AudioManifestTest::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df"
-		},
-		{
 			"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "StoryProgressTest::@6890427a1f51a3e7e1df"
+			"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
-		},
-		{
-			"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
@@ -82,37 +82,37 @@
 			"id" : "StarchildApp::@6890427a1f51a3e7e1df"
 		},
 		{
+			"id" : "Starchild2D::@6890427a1f51a3e7e1df"
+		},
+		{
 			"id" : "QuestSystemFlowTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "RegionServiceDoorTest::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "Starchild2D::@6890427a1f51a3e7e1df"
-		},
-		{
 			"id" : "DialogueServiceRewardTest::@6890427a1f51a3e7e1df"
-		},
-		{
-			"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df"
-		},
-		{
-			"id" : "AudioManifestTest::@6890427a1f51a3e7e1df"
-		},
-		{
-			"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df"
-		},
-		{
-			"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "StoryProgressTest::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df"
+			"id" : "AudioManifestTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveApplierIntegrationTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "CombatCastServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "SaveDataRoundTripTest::@6890427a1f51a3e7e1df"
 		},
 		{
 			"id" : "CombatCollisionServiceTest::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "InputControllerBoundaryTest::@6890427a1f51a3e7e1df"
 		}
 	],
 	"paths" : 

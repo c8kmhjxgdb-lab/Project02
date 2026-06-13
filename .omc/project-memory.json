@@ -1,0 +1,241 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1781329834707,
+  "projectRoot": "e:\\DouBao2\\Project\\KatCode\\Project02",
+  "techStack": {
+    "languages": [
+      {
+        "name": "C/C++",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "CMakeLists.txt"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "assets",
+      "docs",
+      "src",
+      "tests"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "assets": {
+      "path": "assets",
+      "purpose": "Static assets",
+      "fileCount": 0,
+      "lastAccessed": 1781329834621,
+      "keyFiles": []
+    },
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 48,
+      "lastAccessed": 1781329834623,
+      "keyFiles": [
+        "ALL_BUILD.vcxproj",
+        "ALL_BUILD.vcxproj.filters",
+        "AudioManifestTest.vcxproj",
+        "AudioManifestTest.vcxproj.filters",
+        "CMakeCache.txt"
+      ]
+    },
+    "doc": {
+      "path": "doc",
+      "purpose": null,
+      "fileCount": 25,
+      "lastAccessed": 1781329834624,
+      "keyFiles": [
+        "map-spec.md",
+        "plan.md",
+        "plan2.md",
+        "plan3.md",
+        "plan4.md"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1781329834626,
+      "keyFiles": []
+    },
+    "image": {
+      "path": "image",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1781329834627,
+      "keyFiles": []
+    },
+    "MP4": {
+      "path": "MP4",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1781329834627,
+      "keyFiles": []
+    },
+    "music": {
+      "path": "music",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1781329834628,
+      "keyFiles": []
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 1,
+      "lastAccessed": 1781329834629,
+      "keyFiles": [
+        "main.cpp"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 11,
+      "lastAccessed": 1781329834630,
+      "keyFiles": [
+        "AudioManifestTest.cpp",
+        "CombatCastServiceTest.cpp",
+        "CombatCollisionServiceTest.cpp",
+        "DialogueServiceRewardTest.cpp",
+        "InputControllerBoundaryTest.cpp"
+      ]
+    },
+    "assets\\scripts": {
+      "path": "assets\\scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 9,
+      "lastAccessed": 1781329834632,
+      "keyFiles": [
+        "abilities.lua",
+        "childhood_config.lua",
+        "emotion_config.lua"
+      ]
+    },
+    "build\\assets": {
+      "path": "build\\assets",
+      "purpose": "Static assets",
+      "fileCount": 0,
+      "lastAccessed": 1781329834634,
+      "keyFiles": []
+    },
+    "src\\App": {
+      "path": "src\\App",
+      "purpose": "Application code",
+      "fileCount": 8,
+      "lastAccessed": 1781329834637,
+      "keyFiles": [
+        "Application.cpp",
+        "Application.h",
+        "GameBootstrap.cpp"
+      ]
+    },
+    "src\\Utils": {
+      "path": "src\\Utils",
+      "purpose": "Utility functions",
+      "fileCount": 2,
+      "lastAccessed": 1781329834638,
+      "keyFiles": [
+        "Math.h",
+        "ShaderUtils.h"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\tests\\ArcadePortalRenderSmokeTest.cpp",
+      "accessCount": 6,
+      "lastAccessed": 1781359735331,
+      "type": "file"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\World\\RegionFactory.cpp",
+      "accessCount": 5,
+      "lastAccessed": 1781361568740,
+      "type": "file"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\Presentation\\WorldRenderer.cpp",
+      "accessCount": 3,
+      "lastAccessed": 1781360979198,
+      "type": "directory"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\World\\MapTileManager.h",
+      "accessCount": 2,
+      "lastAccessed": 1781359660592,
+      "type": "directory"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\Services\\RegionService.cpp",
+      "accessCount": 2,
+      "lastAccessed": 1781361580250,
+      "type": "file"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\Presentation",
+      "accessCount": 1,
+      "lastAccessed": 1781360934209,
+      "type": "directory"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src",
+      "accessCount": 1,
+      "lastAccessed": 1781360949895,
+      "type": "directory"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Engine\\Renderer\\DecorRenderer.cpp",
+      "accessCount": 1,
+      "lastAccessed": 1781360954863,
+      "type": "file"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\World\\DecorationGen.cpp",
+      "accessCount": 1,
+      "lastAccessed": 1781360962332,
+      "type": "file"
+    },
+    {
+      "path": ".worktrees\\nostalgia-rework-vertical-slice\\src\\Game\\Presentation\\GameRenderer.cpp",
+      "accessCount": 1,
+      "lastAccessed": 1781360968500,
+      "type": "directory"
+    },
+    {
+      "path": "C:\\Users\\LIAOMI~1\\AppData\\Local\\Temp\\claude\\e--DouBao2-Project-KatCode-Project02\\d81cade5-51be-4a39-aa60-9cee9aa6cdac\\tasks\\bvlhuv07p.output",
+      "accessCount": 1,
+      "lastAccessed": 1781382135742,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
